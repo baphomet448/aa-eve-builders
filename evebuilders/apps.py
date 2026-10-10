@@ -3,13 +3,13 @@
 # Django
 from django.apps import AppConfig
 
-# AA Example App
-from example import __version__
+# AA EVE Builders
+from evebuilders import __version__
 
 
-class ExampleConfig(AppConfig):
+class EveBuildersConfig(AppConfig):
     """App Config"""
 
-    name = "example"
-    label = "example"
-    verbose_name = f"Example App v{__version__}"
+    name = "evebuilders"
+    label = "evebuilders"
+    verbose_name = f"EVE Builders v{__version__}"

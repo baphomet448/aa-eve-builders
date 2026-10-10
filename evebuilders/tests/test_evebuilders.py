@@ -6,9 +6,9 @@ Example Test
 from django.test import TestCase
 
 
-class TestExample(TestCase):
+class TestEveBuilders(TestCase):
     """
-    TestExample
+    TestEveBuilders
     """
 
     @classmethod

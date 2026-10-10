@@ -1,5 +1,5 @@
-appname = example
-package = example
+appname = evebuilders
+package = evebuilders
 
 # Default goal
 .DEFAULT_GOAL := help

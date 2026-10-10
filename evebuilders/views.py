@@ -8,7 +8,7 @@ from django.shortcuts import render
 
 
 @login_required
-@permission_required("example.basic_access")
+@permission_required("evebuilders.basic_access")
 def index(request: WSGIRequest) -> HttpResponse:
     """
     Index view
@@ -18,4 +18,4 @@ def index(request: WSGIRequest) -> HttpResponse:
 
     context = {"text": "Hello, World!"}
 
-    return render(request, "example/index.html", context)
+    return render(request, "evebuilders/index.html", context)

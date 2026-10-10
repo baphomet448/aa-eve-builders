@@ -5,16 +5,16 @@ requires = [
 ]
 
 [project]
-name = "aa-example-plugin"
-description = "Example Plugin for Alliance Auth (GitHub Version)"
+name = "aa-eve-builders"
+description = "EVE Builders plugin for Alliance Auth: corporate and private build orders"
 readme = "README.md"
 keywords = [
     "allianceauth",
-    "example",
+    "evebuilders",
 ]
 license = { file = "LICENSE" }
 authors = [
-    { name = "Peter Pfeufer", email = "develop@ppfeufer.de" },
+    { name = "baphomet448", email = "baphomet448@gmail.com" },
 ]
 requires-python = ">=3.10,<3.15"
 classifiers = [
@@ -40,11 +40,11 @@ dynamic = [
 dependencies = [
     "allianceauth>=5",
 ]
-urls.Changelog = "https://github.com/ppfeufer/aa-example-plugin/blob/master/CHANGELOG.md"
-urls.Tracker = "https://github.com/ppfeufer/aa-example-plugin/issues"
+urls.Changelog = "https://github.com/baphomet448/aa-eve-builders/blob/main/CHANGELOG.md"
+urls.Tracker = "https://github.com/baphomet448/aa-eve-builders/issues"
 
 [tool.hatch]
-version.path = "example/__init__.py"
+version.path = "evebuilders/__init__.py"
 build.include = [
-    "/example",
+    "/evebuilders",
 ]
