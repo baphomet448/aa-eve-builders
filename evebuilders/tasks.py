@@ -4,16 +4,8 @@
 import logging
 
 # Third Party
-from celery import shared_task
+from celery import shared_task  # noqa: F401
 
 logger = logging.getLogger(__name__)
 
-# Create your tasks here
-
-
-# Example Task
-@shared_task
-def example_task():
-    """Example Task"""
-
-    pass
+# Tasks are added here as the plugin grows

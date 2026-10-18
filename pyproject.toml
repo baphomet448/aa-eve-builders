@@ -39,6 +39,7 @@ dynamic = [
 ]
 dependencies = [
     "allianceauth>=5",
+    "django-eveuniverse>=2.2",
 ]
 urls.Changelog = "https://github.com/baphomet448/aa-eve-builders/blob/main/CHANGELOG.md"
 urls.Tracker = "https://github.com/baphomet448/aa-eve-builders/issues"
