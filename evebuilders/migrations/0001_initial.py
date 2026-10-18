@@ -11,8 +11,8 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('esi', '0013_squashed_0012_fix_token_type_choices'),
-        ('eveuniverse', '0012_alter_evebloodline_eve_ship_type'),
+        ('esi', '__first__'),
+        ('eveuniverse', '__first__'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
