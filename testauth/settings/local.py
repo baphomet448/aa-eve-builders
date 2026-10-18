@@ -10,7 +10,7 @@ Test settings
 
 from .base import *
 
-PACKAGE = "example"
+PACKAGE = "evebuilders"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -62,6 +62,7 @@ NOTIFICATIONS_MAX_PER_USER = 50
 
 # Add any additional apps to this list.
 INSTALLED_APPS += [
+    "eveuniverse",
     PACKAGE,
 ]
 
