@@ -9,6 +9,7 @@ from allianceauth.services.hooks import MenuItemHook, UrlHook
 
 # AA EVE Builders
 from evebuilders import urls
+from evebuilders.permissions import has_any_access
 
 
 class EveBuildersMenuItem(MenuItemHook):
@@ -27,7 +28,7 @@ class EveBuildersMenuItem(MenuItemHook):
     def render(self, request):
         """Render the menu item"""
 
-        if request.user.has_perm("evebuilders.basic_access"):
+        if has_any_access(request.user):
             return MenuItemHook.render(self, request)
 
         return ""
