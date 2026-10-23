@@ -362,3 +362,44 @@ class BuilderProfile(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user_id}: {self.get_level_display()}"
+
+class CatalogSync(models.Model):
+    """
+    State of the item catalog sync (single row).
+
+    The end of a sync cannot be observed (eveuniverse fans the work out into
+    many small tasks), so only the start is recorded.
+    """
+
+    started_at = models.DateTimeField(null=True, blank=True)
+    started_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+    category_ids = models.CharField(max_length=255, blank=True, default="")
+    group_ids = models.CharField(max_length=255, blank=True, default="")
+    last_error = models.TextField(blank=True, default="")
+
+    class Meta:
+        """Meta definitions"""
+
+        default_permissions = ()
+
+    def save(self, *args, **kwargs):
+        """Keep this table to a single row"""
+
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get_solo(cls):
+        """Return the single row, creating it if needed"""
+
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+
+    def __str__(self) -> str:
+        return f"Catalog sync (started {self.started_at})"

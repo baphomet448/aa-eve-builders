@@ -15,8 +15,10 @@ from django.test import TestCase
 from eveuniverse.models import EveCategory, EveGroup, EveType
 
 # AA EVE Builders
+from evebuilders import app_settings
 from evebuilders.models import (
     BuilderProfile,
+    CatalogSync,
     ContractRecord,
     ContractSource,
     Order,
@@ -173,3 +175,26 @@ class TestPermissions(TestCase):
 
     def test_manage_access(self):
         self.assertTrue(has_any_access(self._user_with("manage_access")))
+
+class TestCatalogSync(TestCase):
+    """Catalog sync state keeps a single row"""
+
+    def test_get_solo_creates_single_row(self):
+        first = CatalogSync.get_solo()
+        second = CatalogSync.get_solo()
+
+        self.assertEqual(first.pk, second.pk)
+        self.assertEqual(CatalogSync.objects.count(), 1)
+        self.assertIsNone(first.started_at)
+
+
+class TestAppSettings(TestCase):
+    """Catalog settings have the agreed defaults"""
+
+    def test_defaults(self):
+        self.assertEqual(
+            app_settings.EVEBUILDERS_CATALOG_CATEGORY_IDS,
+            [4, 6, 7, 8, 18, 22, 32, 65, 66, 87],
+        )
+        self.assertEqual(app_settings.EVEBUILDERS_CATALOG_GROUP_IDS, [])
+        self.assertEqual(app_settings.EVEBUILDERS_CATALOG_MIN_INTERVAL_MINUTES, 15)

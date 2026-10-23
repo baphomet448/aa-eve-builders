@@ -6,6 +6,7 @@ from django.contrib import admin
 # AA EVE Builders
 from evebuilders.models import (
     BuilderProfile,
+    CatalogSync,
     ContractRecord,
     ContractSource,
     Order,
@@ -121,3 +122,21 @@ class OrderSequenceAdmin(admin.ModelAdmin):
     """Per-day order counters"""
 
     list_display = ("date", "last_number")
+
+@admin.register(CatalogSync)
+class CatalogSyncAdmin(admin.ModelAdmin):
+    """Item catalog sync state (single row)"""
+
+    list_display = (
+        "started_at",
+        "started_by",
+        "category_ids",
+        "group_ids",
+        "last_error",
+    )
+    raw_id_fields = ("started_by",)
+
+    def has_add_permission(self, request):
+        """Only one row is allowed"""
+
+        return not CatalogSync.objects.exists()
