@@ -61,7 +61,7 @@ def find_order_numbers(title: str) -> set[str]:
     return set(ORDER_NUMBER_RE.findall(title or ""))
 
 
-def _issuer_user(character_id):
+def user_of_character(character_id):
     """The Auth user who owns the character, if there is one"""
 
     ownership = (
@@ -147,7 +147,7 @@ def classify_contract(
             price=existing.price,
         )
 
-    issuer = _issuer_user(contract.get("issuer_id"))
+    issuer = user_of_character(contract.get("issuer_id"))
     numbers = find_order_numbers(contract.get("title") or "")
 
     if not numbers:
