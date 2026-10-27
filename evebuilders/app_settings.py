@@ -26,3 +26,9 @@ EVEBUILDERS_CATALOG_GROUP_IDS = list(
 EVEBUILDERS_CATALOG_MIN_INTERVAL_MINUTES = int(
     getattr(settings, "EVEBUILDERS_CATALOG_MIN_INTERVAL_MINUTES", 15)
 )
+
+# Minimum number of seconds between two contract syncs (the button and the
+# schedule alike). ESI keeps its answers for a few minutes anyway.
+EVEBUILDERS_SYNC_MIN_INTERVAL_SECONDS = int(
+    getattr(settings, "EVEBUILDERS_SYNC_MIN_INTERVAL_SECONDS", 60)
+)

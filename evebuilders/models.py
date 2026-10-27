@@ -318,6 +318,7 @@ class ContractSource(models.Model):
     connected_at = models.DateTimeField(null=True, blank=True)
     last_sync_at = models.DateTimeField(null=True, blank=True)
     last_success_at = models.DateTimeField(null=True, blank=True)
+    esi_expires_at = models.DateTimeField(null=True, blank=True)
     last_error = models.TextField(blank=True, default="")
     token_ok = models.BooleanField(default=True)
 

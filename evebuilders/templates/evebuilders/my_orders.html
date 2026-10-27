@@ -10,25 +10,45 @@
         </div>
 
         <div class="card-body">
-            <p class="text-muted small">
-                {% if source and source.last_success_at %}
-                    {% blocktranslate trimmed with when=source.last_success_at|naturaltime %}
-                        Contracts were last checked {{ when }}. ESI keeps its answers for a
-                        few minutes, so a new contract can take a little while to show up.
-                    {% endblocktranslate %}
-                {% elif source and source.last_error %}
-                    {% translate "The last contract check failed:" %} {{ source.last_error }}
-                {% else %}
-                    {% translate "Contracts are not read automatically yet." %}
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+                <p class="text-muted small mb-0">
+                    {% if source and source.last_success_at %}
+                        {% blocktranslate trimmed with when=source.last_success_at|naturaltime %}
+                            Contracts were last checked {{ when }}.
+                        {% endblocktranslate %}
+                        {% if source.esi_expires_at %}
+                            {% blocktranslate trimmed with until=source.esi_expires_at|date:"H:i" %}
+                                ESI keeps its current answer until {{ until }} (server time): a contract
+                                that you create, or that is accepted in the game, after ESI made it
+                                shows up only then.
+                            {% endblocktranslate %}
+                        {% endif %}
+                    {% elif source and source.last_error %}
+                        {% translate "The last contract check failed:" %} {{ source.last_error }}
+                    {% elif source %}
+                        {% translate "The contracts have not been checked yet." %}
+                    {% else %}
+                        {% translate "ESI is not connected yet. A manager can connect it in the settings." %}
+                    {% endif %}
+                </p>
+
+                {% if source %}
+                    <form method="post" action="{% url 'evebuilders:sync_contracts' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            {% translate "Sync contracts" %}
+                        </button>
+                    </form>
                 {% endif %}
-            </p>
+            </div>
 
             {% if rows %}
                 <p>
                     {% blocktranslate trimmed %}
                         When your items are ready, create an item exchange contract to the
                         corporation. Put the order number into the contract title and set the
-                        price to the price per unit multiplied by the quantity.
+                        price to the price per unit multiplied by the quantity. Then press
+                        "Sync contracts".
                     {% endblocktranslate %}
                 </p>
 

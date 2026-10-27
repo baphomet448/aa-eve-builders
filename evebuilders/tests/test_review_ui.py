@@ -144,7 +144,7 @@ class TestPages(ReviewTestCase):
         )
         with_source = self.client.get(reverse("evebuilders:my_orders"))
 
-        self.assertContains(without_source, "not read automatically")
+        self.assertContains(without_source, "ESI is not connected yet")
         self.assertContains(with_source, "Contracts were last checked")
 
     def test_the_order_list_has_the_on_review_column(self):

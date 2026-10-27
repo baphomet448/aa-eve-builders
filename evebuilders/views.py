@@ -2,6 +2,7 @@
 
 # Standard Library
 from datetime import timedelta
+from datetime import timezone as dt_timezone
 
 # Django
 from django.contrib import messages
@@ -41,6 +42,7 @@ from evebuilders.orders import (
     visible_orders,
 )
 from evebuilders.permissions import MANAGE_ACCESS, has_any_access
+from evebuilders.sync import sync_now
 
 # The due date offered on a new order form
 DEFAULT_DUE_DAYS = 7
@@ -314,3 +316,87 @@ def connect_esi(request: WSGIRequest, token) -> HttpResponse:
         )
 
     return redirect("evebuilders:settings")
+
+def _report_messages(request: WSGIRequest, report) -> None:
+    """Tell the user what a contract sync did and what the state is now"""
+
+    changes = []
+    level = messages.INFO
+
+    if report.credited:
+        changes.append(
+            _("%(count)s contract(s) credited (%(items)s items).")
+            % {"count": report.credited, "items": report.credited_items}
+        )
+        level = messages.SUCCESS
+    if report.pending:
+        changes.append(
+            _("%(count)s new contract(s) wait for acceptance.")
+            % {"count": report.pending}
+        )
+    if report.closed:
+        changes.append(
+            _("%(count)s contract(s) ended without being accepted.")
+            % {"count": report.closed}
+        )
+    if report.invalid:
+        changes.append(
+            _("%(count)s contract(s) cannot be counted, see the list below.")
+            % {"count": report.invalid}
+        )
+        if level == messages.INFO:
+            level = messages.WARNING
+    if not changes:
+        changes.append(_("Nothing changed since the last check."))
+
+    messages.add_message(request, level, " ".join(changes))
+
+    if report.expires is None:
+        until = _("a few minutes")
+    else:
+        until = report.expires.astimezone(dt_timezone.utc).strftime("%H:%M UTC")
+
+    messages.info(
+        request,
+        _(
+            "Right now %(waiting)s contract(s) wait for acceptance (%(items)s items) "
+            "and %(problems)s cannot be counted. ESI keeps this answer until "
+            "%(until)s; whatever changed in the game after it was made shows up later."
+        )
+        % {
+            "waiting": report.waiting_contracts,
+            "items": report.waiting_items,
+            "problems": report.problem_contracts,
+            "until": until,
+        },
+    )
+
+
+@login_required
+@user_passes_test(has_any_access)
+@require_POST
+def sync_contracts_view(request: WSGIRequest) -> HttpResponse:
+    """
+    Read the corporation contracts now (the "Sync contracts" button)
+    :param request:
+    :return:
+    """
+
+    attempt = sync_now()
+
+    if attempt.too_soon:
+        messages.warning(
+            request,
+            _("The contracts were checked a moment ago. Please wait %(seconds)s seconds.")
+            % {"seconds": attempt.wait_seconds},
+        )
+    elif attempt.report.error:
+        messages.error(
+            request,
+            _("The contracts could not be read: %(error)s")
+            % {"error": attempt.report.error},
+        )
+    else:
+        _report_messages(request, attempt.report)
+
+    return redirect("evebuilders:my_orders")

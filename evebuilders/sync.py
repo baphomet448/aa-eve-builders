@@ -5,6 +5,7 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
+from math import ceil
 
 # Django
 from django.db import transaction
@@ -18,6 +19,7 @@ from django.utils.translation import gettext as _
 from allianceauth.eveonline.models import EveCharacter
 
 # AA EVE Builders
+from evebuilders import app_settings
 from evebuilders.contracts import (
     EsiError,
     EsiTokenError,
@@ -393,7 +395,11 @@ def sync_contracts(source: ContractSource | None = None) -> SyncReport:
     _fill_current_state(report)
     now = timezone.now()
     ContractSource.objects.filter(pk=source.pk).update(
-        last_sync_at=now, last_success_at=now, last_error="", token_ok=True
+        last_sync_at=now,
+        last_success_at=now,
+        last_error="",
+        token_ok=True,
+        esi_expires_at=fetched.expires,
     )
 
     return report
@@ -410,3 +416,45 @@ def _fill_current_state(report: SyncReport) -> None:
     report.problem_contracts = ContractRecord.objects.filter(
         state=ContractRecord.State.INVALID
     ).count()
+
+@dataclass
+class SyncAttempt:
+    """The outcome of asking for a sync: either too soon, or a report"""
+
+    too_soon: bool = False
+    wait_seconds: int = 0
+    report: SyncReport | None = None
+
+
+def sync_now(min_interval: int | None = None) -> SyncAttempt:
+    """
+    Run a contract sync unless one was started very recently.
+
+    The slot is claimed under a row lock, so the button and the schedule
+    cannot both start a sync at the same moment.
+
+    :param min_interval: Seconds that must have passed since the last sync
+        started, the setting EVEBUILDERS_SYNC_MIN_INTERVAL_SECONDS by default
+    :return: Either "too soon" with the seconds to wait, or the report
+    """
+
+    if min_interval is None:
+        min_interval = app_settings.EVEBUILDERS_SYNC_MIN_INTERVAL_SECONDS
+
+    source = ContractSource.get_solo()
+    if source is None:
+        return SyncAttempt(report=SyncReport(error=_("No ESI source is connected.")))
+
+    now = timezone.now()
+    with transaction.atomic():
+        locked = ContractSource.objects.select_for_update().get(pk=source.pk)
+
+        if locked.last_sync_at is not None:
+            elapsed = (now - locked.last_sync_at).total_seconds()
+            if elapsed < min_interval:
+                return SyncAttempt(too_soon=True, wait_seconds=ceil(min_interval - elapsed))
+
+        locked.last_sync_at = now
+        locked.save(update_fields=["last_sync_at"])
+
+    return SyncAttempt(report=sync_contracts(source))
