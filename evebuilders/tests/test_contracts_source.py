@@ -4,6 +4,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 # Alliance Auth (External Libs)
 from esi.models import Token
@@ -48,8 +49,9 @@ class TestConnectSource(TestCase):
         self.assertTrue(source.token_ok)
         self.assertEqual(ContractSource.objects.count(), 1)
 
-    def test_a_character_of_somebody_else_is_refused(self):
-        token = make_token(self.manager, 123456789, name="Stranger")
+    def test_a_token_of_somebody_elses_character_is_refused(self):
+        other = make_user("other", "manage_access")
+        token = make_token(other, other.profile.main_character.character_id)
 
         with self.assertRaises(ValidationError):
             connect_source(user=self.manager, token=token)
@@ -98,8 +100,12 @@ class TestEsiConnectionBlock(TestCase):
         self.assertContains(response, reverse("evebuilders:connect_esi"))
 
     def test_connected(self):
-        token = make_token(self.manager, self.manager.profile.main_character.character_id)
-        connect_source(user=self.manager, token=token)
+        ContractSource.objects.create(
+            corporation_id=98000001,
+            corporation_name="Test Corp",
+            connected_by=self.manager,
+            connected_at=timezone.now(),
+        )
         self.client.force_login(self.manager)
 
         response = self.client.get(reverse("evebuilders:settings"))
