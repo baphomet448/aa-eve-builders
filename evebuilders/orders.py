@@ -20,10 +20,11 @@ from evebuilders.models import (
     BuilderProfile,
     ContractSource,
     Order,
+    OrderAssignment,
     OrderEvent,
     OrderSequence,
 )
-from evebuilders.permissions import MANAGE_ACCESS
+from evebuilders.permissions import MANAGE_ACCESS, has_any_access
 
 # Orders a builder can still see: not finished and not cancelled
 OPEN_STATUSES = (
@@ -174,3 +175,91 @@ def visible_orders(user):
         .annotate(free=F("quantity") - F("taken"))
         .order_by("due_date", "-created_at")
     )
+
+def recalculate_status(order: Order) -> None:
+    """
+    Set the order status from its shares.
+
+    Nothing taken is NEW, part taken is IN_PROGRESS, everything taken is
+    DISTRIBUTED and everything credited is COMPLETED. A cancelled order stays
+    cancelled.
+    """
+
+    if order.status == Order.Status.CANCELLED:
+        return
+
+    totals = order.assignments.aggregate(
+        taken=Coalesce(Sum("taken"), 0), credited=Coalesce(Sum("credited"), 0)
+    )
+
+    if totals["credited"] >= order.quantity:
+        status = Order.Status.COMPLETED
+    elif totals["taken"] >= order.quantity:
+        status = Order.Status.DISTRIBUTED
+    elif totals["taken"] > 0:
+        status = Order.Status.IN_PROGRESS
+    else:
+        status = Order.Status.NEW
+
+    if status != order.status:
+        order.status = status
+        order.save(update_fields=["status", "updated_at"])
+
+
+def take_order(*, user, order_id: int, quantity: int) -> OrderAssignment:
+    """
+    A builder takes a part of an order.
+
+    The order row is locked while this runs, so two builders taking at the
+    same moment can never take more than is free. Taking again raises the
+    builder's single share of the order; it never touches contracts.
+
+    :param user: The builder (or manager) who takes the part
+    :param order_id: The order
+    :param quantity: How many items to take
+    :raises django.core.exceptions.ValidationError: When the order cannot be
+        taken like this. Nothing is changed in that case.
+    :return: The builder's share of the order
+    """
+
+    if not has_any_access(user):
+        raise ValidationError(_("You are not allowed to take orders."))
+
+    with transaction.atomic():
+        order = Order.objects.select_for_update().get(
+            pk=order_id, kind=Order.Kind.CORPORATE
+        )
+
+        # Orders the user may not see do not exist for him
+        if not visible_orders(user).filter(pk=order.pk).exists():
+            raise ValidationError(_("This order is not available to you."))
+
+        if order.status not in OPEN_STATUSES:
+            raise ValidationError(_("This order is closed."))
+
+        taken = order.assignments.aggregate(total=Coalesce(Sum("taken"), 0))["total"]
+        free = order.quantity - taken
+
+        if quantity < 1:
+            raise ValidationError(_("The quantity must be at least 1."))
+        if quantity > free:
+            raise ValidationError(
+                _("Only %(free)s items are free in this order.") % {"free": free}
+            )
+
+        share, _created = OrderAssignment.objects.select_for_update().get_or_create(
+            order=order, builder=user
+        )
+        share.taken += quantity
+        share.save(update_fields=["taken", "updated_at"])
+
+        OrderEvent.objects.create(
+            order=order,
+            assignment=share,
+            kind=OrderEvent.Kind.TAKEN,
+            actor=user,
+            description=f"Took {quantity} (now {share.taken} in total)",
+        )
+        recalculate_status(order)
+
+    return share
