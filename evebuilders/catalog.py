@@ -167,12 +167,9 @@ def search_items(query: str, limit: int = ITEM_SEARCH_LIMIT) -> list[dict]:
     if len(query) < ITEM_SEARCH_MIN_LENGTH:
         return []
 
-    in_catalog = Q(
-        eve_group__eve_category_id__in=app_settings.EVEBUILDERS_CATALOG_CATEGORY_IDS
-    ) | Q(eve_group_id__in=app_settings.EVEBUILDERS_CATALOG_GROUP_IDS)
-
     eve_types = (
-        EveType.objects.filter(in_catalog, published=True, name__icontains=query)
+        catalog_types()
+        .filter(name__icontains=query)
         .select_related("eve_group__eve_category")
         .annotate(
             rank=Case(
@@ -193,3 +190,17 @@ def search_items(query: str, limit: int = ITEM_SEARCH_LIMIT) -> list[dict]:
         }
         for eve_type in eve_types
     ]
+
+def catalog_types():
+    """
+    The types that can be ordered: published types from the configured
+    categories and groups.
+
+    :return: A queryset of EveType
+    """
+
+    in_catalog = Q(
+        eve_group__eve_category_id__in=app_settings.EVEBUILDERS_CATALOG_CATEGORY_IDS
+    ) | Q(eve_group_id__in=app_settings.EVEBUILDERS_CATALOG_GROUP_IDS)
+
+    return EveType.objects.filter(in_catalog, published=True)

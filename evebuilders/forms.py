@@ -1,0 +1,86 @@
+"""Forms"""
+
+# Django
+from django import forms
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+
+# AA EVE Builders
+from evebuilders.catalog import catalog_types
+from evebuilders.models import Order
+
+
+class OrderForm(forms.Form):
+    """Create a corporate order"""
+
+    # Shown to the manager; the order form's JS fills it from the search results
+    item_text = forms.CharField(
+        label=_("Item"),
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "autocomplete": "off",
+                "placeholder": _("Start typing the item name"),
+            }
+        ),
+    )
+    # What is actually saved: the id of the picked item
+    eve_type_id = forms.IntegerField(
+        widget=forms.HiddenInput,
+        error_messages={"required": _("Please pick an item from the list.")},
+    )
+    quantity = forms.IntegerField(label=_("Quantity"), min_value=1)
+    unit_price = forms.DecimalField(
+        label=_("Price per unit (ISK)"), min_value=0, max_digits=20, decimal_places=2
+    )
+    priority = forms.ChoiceField(
+        label=_("Priority"),
+        choices=Order.Priority.choices,
+        initial=Order.Priority.MEDIUM,
+    )
+    due_date = forms.DateField(
+        label=_("Due date"),
+        widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
+    )
+    access_level = forms.TypedChoiceField(
+        label=_("Access level"),
+        choices=Order.AccessLevel.choices,
+        coerce=int,
+        initial=Order.AccessLevel.BASE,
+        help_text=_("Builders below this level will not see the order."),
+    )
+    destination = forms.CharField(label=_("Destination"), max_length=255, required=False)
+    note = forms.CharField(
+        label=_("Note"), required=False, widget=forms.Textarea(attrs={"rows": 3})
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            if isinstance(field.widget, forms.HiddenInput):
+                continue
+            css_class = (
+                "form-select" if isinstance(field.widget, forms.Select) else "form-control"
+            )
+            field.widget.attrs["class"] = css_class
+
+    def clean_due_date(self):
+        due_date = self.cleaned_data["due_date"]
+        if due_date < timezone.localdate():
+            raise forms.ValidationError(_("The due date cannot be in the past."))
+
+        return due_date
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        type_id = cleaned_data.get("eve_type_id")
+        if type_id is not None:
+            eve_type = catalog_types().filter(id=type_id).first()
+            if eve_type is None:
+                self.add_error("eve_type_id", _("This item is not in the catalog."))
+            else:
+                cleaned_data["eve_type"] = eve_type
+
+        return cleaned_data
