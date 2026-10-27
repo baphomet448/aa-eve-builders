@@ -18,6 +18,9 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_POST
 
+# Alliance Auth (External Libs)
+from esi.decorators import token_required
+
 # AA EVE Builders
 from evebuilders import app_settings
 from evebuilders.catalog import (
@@ -26,8 +29,9 @@ from evebuilders.catalog import (
     search_items,
     start_catalog_sync,
 )
+from evebuilders.contracts import CONTRACTS_SCOPE, connect_source
 from evebuilders.forms import OrderForm
-from evebuilders.models import CatalogSync, Order
+from evebuilders.models import CatalogSync, ContractSource, Order
 from evebuilders.orders import (
     create_order,
     discard_share,
@@ -126,6 +130,7 @@ def settings_view(request: WSGIRequest) -> HttpResponse:
 
     context = {
         "sync": CatalogSync.get_solo(),
+        "source": ContractSource.get_solo(),
         "rows": catalog_overview(),
         "min_interval": app_settings.EVEBUILDERS_CATALOG_MIN_INTERVAL_MINUTES,
     }
@@ -273,3 +278,34 @@ def my_orders(request: WSGIRequest) -> HttpResponse:
     return render(
         request, "evebuilders/my_orders.html", {"rows": my_shares(request.user)}
     )
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+@token_required(scopes=CONTRACTS_SCOPE, new=True)
+def connect_esi(request: WSGIRequest, token) -> HttpResponse:
+    """
+    Connect the token that is used to read the corporation contracts.
+
+    django-esi sends the manager through the EVE login first and then calls
+    this view with the new token.
+    :param request:
+    :param token: The new django-esi token
+    :return:
+    """
+
+    try:
+        source = connect_source(user=request.user, token=token)
+    except ValidationError as ex:
+        for message in ex.messages:
+            messages.error(request, message)
+    else:
+        messages.success(
+            request,
+            _(
+                "The corporation contracts are now read with the token of "
+                "%(name)s (%(corporation)s)."
+            )
+            % {"name": token.character_name, "corporation": source.corporation_name},
+        )
+
+    return redirect("evebuilders:settings")

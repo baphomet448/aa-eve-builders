@@ -6,6 +6,51 @@
 {% block details %}
     <div class="card card-primary mb-3">
         <div class="card-header">
+            <div class="card-title">{% translate "ESI connection" %}</div>
+        </div>
+
+        <div class="card-body">
+            <p>
+                {% blocktranslate trimmed %}
+                    The contracts of the corporation are read with the token of one
+                    corporation member (no in-game role is needed). This is how the plugin
+                    finds the contracts of the builders and credits them.
+                {% endblocktranslate %}
+            </p>
+
+            {% if source %}
+                <dl class="row">
+                    <dt class="col-sm-3">{% translate "Corporation" %}</dt>
+                    <dd class="col-sm-9">{{ source.corporation_name }}</dd>
+
+                    <dt class="col-sm-3">{% translate "Connected by" %}</dt>
+                    <dd class="col-sm-9">
+                        {{ source.connected_by }}{% if source.token %} ({{ source.token.character_name }}){% endif %},
+                        {{ source.connected_at|date:"Y-m-d H:i" }}
+                    </dd>
+
+                    <dt class="col-sm-3">{% translate "Token" %}</dt>
+                    <dd class="col-sm-9">
+                        {% if source.token_ok %}
+                            <span class="badge bg-success">{% translate "OK" %}</span>
+                        {% else %}
+                            <span class="badge bg-danger">{% translate "Problem" %}</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+            {% else %}
+                <p class="text-warning">
+                    {% translate "Not connected yet: the contracts cannot be read, so nothing is credited automatically." %}
+                </p>
+            {% endif %}
+
+            <a href="{% url 'evebuilders:connect_esi' %}" class="btn btn-primary">
+                {% if source %}{% translate "Reconnect" %}{% else %}{% translate "Connect" %}{% endif %}
+            </a>
+        </div>
+    </div>
+    <div class="card card-primary mb-3">
+        <div class="card-header">
             <div class="card-title">{% translate "Item catalog" %}</div>
         </div>
 

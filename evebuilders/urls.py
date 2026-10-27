@@ -16,6 +16,7 @@ urlpatterns = [
     path("orders/<int:order_id>/discard/", views.discard_view, name="discard"),
     path("my-orders/", views.my_orders, name="my_orders"),
     path("settings/", views.settings_view, name="settings"),
+    path("settings/esi/connect/", views.connect_esi, name="connect_esi"),
     path("settings/sync-catalog/", views.start_sync, name="sync_catalog"),
     path("items/search/", views.item_search, name="item_search"),
 ]
