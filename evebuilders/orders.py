@@ -18,6 +18,7 @@ from eveuniverse.models import EveType
 # AA EVE Builders
 from evebuilders.models import (
     BuilderProfile,
+    ContractRecord,
     ContractSource,
     Order,
     OrderAssignment,
@@ -263,3 +264,99 @@ def take_order(*, user, order_id: int, quantity: int) -> OrderAssignment:
         recalculate_status(order)
 
     return share
+
+
+
+def pending_quantity(share: OrderAssignment) -> int:
+    """P: items of the share that sit in contracts waiting for acceptance."""
+
+    return share.contracts.filter(state=ContractRecord.State.OUTSTANDING).aggregate(
+        total=Coalesce(Sum("quantity"), 0)
+    )["total"]
+
+
+def releasable_quantity(share: OrderAssignment) -> int:
+    """What the builder may still give back: taken - credited - pending (T - R - P)."""
+
+    return max(share.taken - share.credited - pending_quantity(share), 0)
+
+
+def discard_deadline(order: Order) -> date:
+    """
+    The last day a builder may give the order back: the middle of the time
+    between the creation of the order and its due date.
+    """
+
+    created = timezone.localtime(order.created_at).date()
+
+    return created + (order.due_date - created) / 2
+
+
+def discard_share(*, user, order_id: int, quantity: int | None = None) -> int:
+    """
+    A builder gives back (part of) his share of an order.
+
+    Only what is neither credited nor in a contract waiting for acceptance can
+    be given back, and only until half of the time to the due date has passed.
+    The order row is locked while this runs.
+
+    :param user: The builder
+    :param order_id: The order
+    :param quantity: How many items to give back, everything possible by default
+    :raises django.core.exceptions.ValidationError: When it cannot be done.
+        Nothing is changed in that case.
+    :return: How many items were given back
+    """
+
+    with transaction.atomic():
+        order = Order.objects.select_for_update().get(
+            pk=order_id, kind=Order.Kind.CORPORATE
+        )
+        share = OrderAssignment.objects.select_for_update().filter(
+            order=order, builder=user
+        ).first()
+
+        if share is None:
+            raise ValidationError(_("You have not taken this order."))
+
+        if order.status not in OPEN_STATUSES:
+            raise ValidationError(_("This order is closed."))
+
+        if timezone.localdate() > discard_deadline(order):
+            raise ValidationError(
+                _(
+                    "It is too late to give this order back: more than half of "
+                    "the time until the due date has passed. Please ask a manager."
+                )
+            )
+
+        available = releasable_quantity(share)
+        if available < 1:
+            raise ValidationError(
+                _(
+                    "There is nothing to give back: everything is delivered or "
+                    "waits for a contract to be accepted."
+                )
+            )
+
+        if quantity is None:
+            quantity = available
+        if quantity < 1 or quantity > available:
+            raise ValidationError(
+                _("You can give back between 1 and %(available)s items.")
+                % {"available": available}
+            )
+
+        share.taken -= quantity
+        share.save(update_fields=["taken", "updated_at"])
+
+        OrderEvent.objects.create(
+            order=order,
+            assignment=share,
+            kind=OrderEvent.Kind.DISCARDED,
+            actor=user,
+            description=f"Gave back {quantity} (now {share.taken} in total)",
+        )
+        recalculate_status(order)
+
+    return quantity
