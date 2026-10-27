@@ -7,10 +7,13 @@ from decimal import Decimal
 # Django
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import F, Sum
+from django.db.models import F, IntegerField, OuterRef, Subquery, Sum, Value
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.translation import gettext as _
+
+# Alliance Auth
+from allianceauth.authentication.models import CharacterOwnership
 
 # EVE Universe
 from eveuniverse.models import EveType
@@ -173,7 +176,12 @@ def visible_orders(user):
             taken=Coalesce(Sum("assignments__taken"), 0),
             credited=Coalesce(Sum("assignments__credited"), 0),
         )
-        .annotate(free=F("quantity") - F("taken"))
+        .annotate(
+            free=F("quantity") - F("taken"),
+            pending=Coalesce(
+                Subquery(_waiting_quantity(), output_field=IntegerField()), Value(0)
+            ),
+        )
         .order_by("due_date", "-created_at")
     )
 
@@ -388,6 +396,7 @@ def my_shares(user) -> list[dict]:
                 "share": share,
                 "order": share.order,
                 "pending": pending_quantity(share),
+                "status": share_status(share),
                 "releasable": releasable,
                 "discard_deadline": deadline,
                 "can_discard": (
@@ -399,3 +408,58 @@ def my_shares(user) -> list[dict]:
         )
 
     return rows
+
+
+
+def _waiting_quantity():
+    """
+    Subquery for visible_orders: the items of an order that sit in contracts
+    waiting for acceptance. A subquery, so it cannot multiply the sums of the
+    shares.
+    """
+
+    return (
+        ContractRecord.objects.filter(
+            order=OuterRef("pk"), state=ContractRecord.State.OUTSTANDING
+        )
+        .order_by()
+        .values("order")
+        .annotate(total=Sum("quantity"))
+        .values("total")
+    )
+
+
+def share_status(share: OrderAssignment) -> str:
+    """
+    How a builder's share is doing, for the "My orders" page.
+
+    UNDER_REVIEW while a contract waits for acceptance, DONE when everything
+    taken is credited, otherwise IN_PROGRESS.
+    """
+
+    if pending_quantity(share) > 0:
+        return "UNDER_REVIEW"
+
+    if share.taken > 0 and share.credited >= share.taken:
+        return "DONE"
+
+    return "IN_PROGRESS"
+
+
+def problem_contracts(user):
+    """
+    The contracts of the user's characters that were found but cannot be
+    counted. A contract that is deleted later drops out of this list.
+    """
+
+    character_ids = CharacterOwnership.objects.filter(user=user).values_list(
+        "character__character_id", flat=True
+    )
+
+    return (
+        ContractRecord.objects.filter(
+            state=ContractRecord.State.INVALID, issuer_character_id__in=character_ids
+        )
+        .select_related("order__eve_type")
+        .order_by("-issued_at", "-created_at")
+    )

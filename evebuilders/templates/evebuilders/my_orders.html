@@ -4,12 +4,25 @@
 {% load humanize %}
 
 {% block details %}
-    <div class="card card-primary">
+    <div class="card card-primary mb-3">
         <div class="card-header">
             <div class="card-title">{% translate "My orders" %}</div>
         </div>
 
         <div class="card-body">
+            <p class="text-muted small">
+                {% if source and source.last_success_at %}
+                    {% blocktranslate trimmed with when=source.last_success_at|naturaltime %}
+                        Contracts were last checked {{ when }}. ESI keeps its answers for a
+                        few minutes, so a new contract can take a little while to show up.
+                    {% endblocktranslate %}
+                {% elif source and source.last_error %}
+                    {% translate "The last contract check failed:" %} {{ source.last_error }}
+                {% else %}
+                    {% translate "Contracts are not read automatically yet." %}
+                {% endif %}
+            </p>
+
             {% if rows %}
                 <p>
                     {% blocktranslate trimmed %}
@@ -24,6 +37,7 @@
                         <thead>
                             <tr>
                                 <th>{% translate "Order" %}</th>
+                                <th>{% translate "Status" %}</th>
                                 <th>{% translate "Item" %}</th>
                                 <th class="text-end">{% translate "Taken" %}</th>
                                 <th class="text-end">{% translate "Ready" %}</th>
@@ -38,6 +52,15 @@
                             {% for row in rows %}
                                 <tr>
                                     <td class="text-nowrap">{{ row.order.number }}</td>
+                                    <td>
+                                        {% if row.status == 'UNDER_REVIEW' %}
+                                            <span class="badge bg-warning">{% translate "Under review" %}</span>
+                                        {% elif row.status == 'DONE' %}
+                                            <span class="badge bg-success">{% translate "Done" %}</span>
+                                        {% else %}
+                                            <span class="badge bg-info">{% translate "In progress" %}</span>
+                                        {% endif %}
+                                    </td>
                                     <td>{{ row.order.eve_type.name }}</td>
                                     <td class="text-end">{{ row.share.taken|intcomma }}</td>
                                     <td class="text-end">{{ row.share.credited|intcomma }}</td>
@@ -67,4 +90,50 @@
             {% endif %}
         </div>
     </div>
+
+    {% if problems %}
+        <div class="card card-primary">
+            <div class="card-header">
+                <div class="card-title">{% translate "Contracts that could not be counted" %}</div>
+            </div>
+
+            <div class="card-body">
+                <p>
+                    {% blocktranslate trimmed %}
+                        These contracts were found, but they cannot be credited. The title of a
+                        contract cannot be changed, so create a new one with the order number in
+                        the title and the right price. A contract that is deleted disappears from
+                        this list.
+                    {% endblocktranslate %}
+                </p>
+
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>{% translate "Issued" %}</th>
+                                <th>{% translate "Title" %}</th>
+                                <th>{% translate "Order" %}</th>
+                                <th class="text-end">{% translate "Quantity" %}</th>
+                                <th class="text-end">{% translate "Price" %}</th>
+                                <th>{% translate "Problem" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contract in problems %}
+                                <tr>
+                                    <td class="text-nowrap">{{ contract.issued_at|date:"Y-m-d H:i" }}</td>
+                                    <td>{{ contract.title|default:"-" }}</td>
+                                    <td class="text-nowrap">{{ contract.order.number|default:"-" }}</td>
+                                    <td class="text-end">{{ contract.quantity|intcomma }}</td>
+                                    <td class="text-end">{{ contract.price|intcomma }}</td>
+                                    <td class="text-danger">{{ contract.reason }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

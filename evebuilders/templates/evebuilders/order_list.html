@@ -27,6 +27,7 @@
                                 <th class="text-end">{% translate "Taken" %}</th>
                                 <th class="text-end">{% translate "Free" %}</th>
                                 <th class="text-end">{% translate "Ready" %}</th>
+                                <th class="text-end">{% translate "On review" %}</th>
                                 <th class="text-end">{% translate "Price per unit" %}</th>
                                 <th>{% translate "Priority" %}</th>
                                 <th>{% translate "Due date" %}</th>
@@ -56,6 +57,7 @@
                                     <td class="text-end">{{ order.taken|intcomma }}</td>
                                     <td class="text-end">{{ order.free|intcomma }}</td>
                                     <td class="text-end">{{ order.credited|intcomma }}</td>
+                                    <td class="text-end">{{ order.pending|intcomma }}</td>
                                     <td class="text-end">{{ order.unit_price|intcomma }}</td>
                                     <td>
                                         <span class="badge

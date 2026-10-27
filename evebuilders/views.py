@@ -36,6 +36,7 @@ from evebuilders.orders import (
     create_order,
     discard_share,
     my_shares,
+    problem_contracts,
     take_order,
     visible_orders,
 )
@@ -275,9 +276,13 @@ def my_orders(request: WSGIRequest) -> HttpResponse:
     :return:
     """
 
-    return render(
-        request, "evebuilders/my_orders.html", {"rows": my_shares(request.user)}
-    )
+    context = {
+        "rows": my_shares(request.user),
+        "problems": problem_contracts(request.user),
+        "source": ContractSource.get_solo(),
+    }
+
+    return render(request, "evebuilders/my_orders.html", context)
 
 @login_required
 @permission_required(MANAGE_ACCESS)
