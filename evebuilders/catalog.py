@@ -7,7 +7,7 @@ from enum import Enum
 
 # Django
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Case, Count, IntegerField, Q, When
 from django.utils import timezone
 
 # EVE Universe
@@ -146,3 +146,50 @@ def catalog_overview() -> list[dict]:
     ]
 
     return rows
+
+ITEM_SEARCH_MIN_LENGTH = 2
+ITEM_SEARCH_LIMIT = 20
+
+
+def search_items(query: str, limit: int = ITEM_SEARCH_LIMIT) -> list[dict]:
+    """
+    Search the item catalog by name, for the order form.
+
+    Only published types from the configured categories and groups are found.
+    Names that start with the query come first, then names that contain it.
+
+    :param query: Part of the item name (at least ITEM_SEARCH_MIN_LENGTH characters)
+    :param limit: Maximum number of results
+    :return: Dicts with id, name, group and category
+    """
+
+    query = query.strip()
+    if len(query) < ITEM_SEARCH_MIN_LENGTH:
+        return []
+
+    in_catalog = Q(
+        eve_group__eve_category_id__in=app_settings.EVEBUILDERS_CATALOG_CATEGORY_IDS
+    ) | Q(eve_group_id__in=app_settings.EVEBUILDERS_CATALOG_GROUP_IDS)
+
+    eve_types = (
+        EveType.objects.filter(in_catalog, published=True, name__icontains=query)
+        .select_related("eve_group__eve_category")
+        .annotate(
+            rank=Case(
+                When(name__istartswith=query, then=0),
+                default=1,
+                output_field=IntegerField(),
+            )
+        )
+        .order_by("rank", "name")[:limit]
+    )
+
+    return [
+        {
+            "id": eve_type.id,
+            "name": eve_type.name,
+            "group": eve_type.eve_group.name,
+            "category": eve_type.eve_group.eve_category.name,
+        }
+        for eve_type in eve_types
+    ]

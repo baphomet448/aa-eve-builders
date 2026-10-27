@@ -12,4 +12,5 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("settings/", views.settings_view, name="settings"),
     path("settings/sync-catalog/", views.start_sync, name="sync_catalog"),
+    path("items/search/", views.item_search, name="item_search"),
 ]

@@ -8,14 +8,19 @@ from django.contrib.auth.decorators import (
     user_passes_test,
 )
 from django.core.handlers.wsgi import WSGIRequest
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 # AA EVE Builders
 from evebuilders import app_settings
-from evebuilders.catalog import SyncResult, catalog_overview, start_catalog_sync
+from evebuilders.catalog import (
+    SyncResult,
+    catalog_overview,
+    search_items,
+    start_catalog_sync,
+)
 from evebuilders.models import CatalogSync
 from evebuilders.permissions import MANAGE_ACCESS, has_any_access
 
@@ -92,3 +97,15 @@ def start_sync(request: WSGIRequest) -> HttpResponse:
         )
 
     return redirect("evebuilders:settings")
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+@require_GET
+def item_search(request: WSGIRequest) -> JsonResponse:
+    """
+    Search the item catalog by name (managers only), for the order form
+    :param request: GET parameter ``q`` holds part of the item name
+    :return: JSON: {"results": [{"id", "name", "group", "category"}, ...]}
+    """
+
+    return JsonResponse({"results": search_items(request.GET.get("q", ""))})
