@@ -357,6 +357,34 @@ class TestSyncContracts(SyncTestCase):
 
         self.assertTrue(report.error)
 
+    def _sync(self, contracts):
+        fetched = FetchResult(contracts=contracts, expires=None)
+
+        with patch(f"{SYNC}.fetch_corporation_contracts", return_value=fetched):
+            with patch(f"{SYNC}.fetch_contract_items", return_value=self._items()):
+                return sync_contracts()
+
+    def test_the_report_shows_what_waits_even_when_nothing_changed(self):
+        first = self._sync([self._contract()])
+        second = self._sync([self._contract()])
+
+        self.assertEqual(first.pending, 1)
+        self.assertTrue(first.changed)
+        self.assertEqual(second.pending, 0)
+        self.assertFalse(second.changed)
+        # Nothing changed, but the state is still reported
+        self.assertEqual(second.waiting_contracts, 1)
+        self.assertEqual(second.waiting_items, 5)
+
+    def test_problem_contracts_are_counted_in_every_report(self):
+        first = self._sync([self._contract(price=499.0)])
+        second = self._sync([self._contract(price=499.0)])
+
+        self.assertEqual(first.invalid, 1)
+        self.assertEqual(second.invalid, 0)
+        self.assertEqual(second.problem_contracts, 1)
+        self.assertEqual(second.waiting_contracts, 0)
+
 
 class TestSyncContractsCommand(TestCase):
     """evebuilders_sync_contracts"""
@@ -377,3 +405,31 @@ class TestSyncContractsCommand(TestCase):
         ):
             with self.assertRaises(CommandError):
                 call_command("evebuilders_sync_contracts", stdout=StringIO())
+
+    def test_reports_the_current_state_and_the_cache_note(self):
+        out = StringIO()
+        report = SyncReport(
+            seen=19,
+            waiting_contracts=1,
+            waiting_items=1,
+            problem_contracts=1,
+            expires=datetime(2026, 10, 27, 17, 55, 55, tzinfo=timezone.utc),
+        )
+
+        with patch(f"{COMMAND}.sync_contracts", return_value=report):
+            call_command("evebuilders_sync_contracts", stdout=out)
+
+        text = out.getvalue()
+        self.assertIn("Nothing changed", text)
+        self.assertIn("1 contract(s) waiting for acceptance (1 items)", text)
+        self.assertIn("1 problem contract(s)", text)
+        self.assertIn("17:55:55 UTC", text)
+
+    def test_no_nothing_changed_note_after_changes(self):
+        out = StringIO()
+        report = SyncReport(seen=1, credited=1, credited_items=1)
+
+        with patch(f"{COMMAND}.sync_contracts", return_value=report):
+            call_command("evebuilders_sync_contracts", stdout=out)
+
+        self.assertNotIn("Nothing changed", out.getvalue())

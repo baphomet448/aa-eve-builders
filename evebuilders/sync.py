@@ -8,7 +8,7 @@ from decimal import Decimal
 
 # Django
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Count, Sum
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -55,6 +55,17 @@ class SyncReport:
     skipped: int = 0  # contracts that could not be checked (try again later)
     error: str = ""  # why the whole sync failed, empty if it did not
     expires: datetime | None = None  # until when ESI keeps this answer
+
+    # The state right now, not what changed in this run
+    waiting_contracts: int = 0  # contracts that wait for acceptance
+    waiting_items: int = 0  # the items in those contracts
+    problem_contracts: int = 0  # contracts that cannot be counted
+
+    @property
+    def changed(self) -> bool:
+        """Whether this run changed anything"""
+
+        return bool(self.pending or self.credited or self.closed or self.invalid)
 
 
 def _money(value: Decimal) -> Decimal:
@@ -379,9 +390,23 @@ def sync_contracts(source: ContractSource | None = None) -> SyncReport:
         return SyncReport(error=str(ex))
 
     report.expires = fetched.expires
+    _fill_current_state(report)
     now = timezone.now()
     ContractSource.objects.filter(pk=source.pk).update(
         last_sync_at=now, last_success_at=now, last_error="", token_ok=True
     )
 
     return report
+
+def _fill_current_state(report: SyncReport) -> None:
+    """Put the current numbers of waiting and problem contracts into the report"""
+
+    waiting = ContractRecord.objects.filter(
+        state=ContractRecord.State.OUTSTANDING
+    ).aggregate(contracts=Count("pk"), items=Coalesce(Sum("quantity"), 0))
+
+    report.waiting_contracts = waiting["contracts"]
+    report.waiting_items = waiting["items"]
+    report.problem_contracts = ContractRecord.objects.filter(
+        state=ContractRecord.State.INVALID
+    ).count()
