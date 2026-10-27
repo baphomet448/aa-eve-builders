@@ -1,5 +1,8 @@
 """App Views"""
 
+# Standard Library
+from datetime import timedelta
+
 # Django
 from django.contrib import messages
 from django.contrib.auth.decorators import (
@@ -7,9 +10,11 @@ from django.contrib.auth.decorators import (
     permission_required,
     user_passes_test,
 )
+from django.core.exceptions import ValidationError
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_POST
 
@@ -21,8 +26,13 @@ from evebuilders.catalog import (
     search_items,
     start_catalog_sync,
 )
+from evebuilders.forms import OrderForm
 from evebuilders.models import CatalogSync
+from evebuilders.orders import create_order
 from evebuilders.permissions import MANAGE_ACCESS, has_any_access
+
+# The due date offered on a new order form
+DEFAULT_DUE_DAYS = 7
 
 
 @login_required
@@ -37,6 +47,52 @@ def index(request: WSGIRequest) -> HttpResponse:
     context = {"text": "Hello, World!"}
 
     return render(request, "evebuilders/index.html", context)
+
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+def new_order(request: WSGIRequest) -> HttpResponse:
+    """
+    Create a corporate order (managers only)
+    :param request:
+    :return:
+    """
+
+    if request.method == "POST":
+        form = OrderForm(request.POST)
+
+        if form.is_valid():
+            data = form.cleaned_data
+
+            try:
+                order = create_order(
+                    user=request.user,
+                    eve_type=data["eve_type"],
+                    quantity=data["quantity"],
+                    unit_price=data["unit_price"],
+                    due_date=data["due_date"],
+                    priority=data["priority"],
+                    access_level=data["access_level"],
+                    destination=data["destination"],
+                    note=data["note"],
+                )
+            except ValidationError as ex:
+                for message in ex.messages:
+                    form.add_error(None, message)
+            else:
+                messages.success(
+                    request, _("Order %(number)s created.") % {"number": order.number}
+                )
+
+                return redirect("evebuilders:index")
+    else:
+        form = OrderForm(
+            initial={
+                "due_date": timezone.localdate() + timedelta(days=DEFAULT_DUE_DAYS)
+            }
+        )
+
+    return render(request, "evebuilders/order_form.html", {"form": form})
 
 
 @login_required
@@ -97,6 +153,7 @@ def start_sync(request: WSGIRequest) -> HttpResponse:
         )
 
     return redirect("evebuilders:settings")
+
 
 @login_required
 @permission_required(MANAGE_ACCESS)

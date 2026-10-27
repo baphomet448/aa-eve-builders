@@ -1,0 +1,126 @@
+{% extends 'evebuilders/base.html' %}
+
+{% load i18n %}
+
+{% block details %}
+    <div class="card card-primary">
+        <div class="card-header">
+            <div class="card-title">{% translate "New corporate order" %}</div>
+        </div>
+
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {# Item: a search box; the picked item's id goes into the hidden field #}
+                <div class="mb-3 position-relative">
+                    <label for="{{ form.item_text.id_for_label }}" class="form-label">
+                        {{ form.item_text.label }}
+                    </label>
+                    {{ form.item_text }}
+                    {{ form.eve_type_id }}
+                    <div id="evebuilders-item-results"
+                         class="list-group position-absolute w-100 shadow"
+                         style="z-index: 1000;"></div>
+                    {% for error in form.eve_type_id.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                {% for field in form.visible_fields %}
+                    {% if field.name != "item_text" %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">
+                                {{ field.label }}
+                            </label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary">
+                    {% translate "Create order" %}
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_javascript %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchUrl = "{% url 'evebuilders:item_search' %}";
+            const input = document.getElementById("id_item_text");
+            const hidden = document.getElementById("id_eve_type_id");
+            const results = document.getElementById("evebuilders-item-results");
+            let timer = null;
+
+            function clearResults() {
+                results.innerHTML = "";
+            }
+
+            function showResults(items) {
+                clearResults();
+                items.forEach(function (item) {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "list-group-item list-group-item-action";
+                    button.textContent = item.name;
+
+                    const small = document.createElement("small");
+                    small.className = "text-muted ms-2";
+                    small.textContent = item.category + " / " + item.group;
+                    button.appendChild(small);
+
+                    button.addEventListener("click", function () {
+                        input.value = item.name;
+                        hidden.value = item.id;
+                        clearResults();
+                    });
+                    results.appendChild(button);
+                });
+            }
+
+            input.addEventListener("input", function () {
+                // Typing again drops the previous pick: the item must be chosen from the list
+                hidden.value = "";
+                clearTimeout(timer);
+
+                const query = input.value.trim();
+                if (query.length < 2) {
+                    clearResults();
+                    return;
+                }
+
+                timer = setTimeout(function () {
+                    fetch(searchUrl + "?q=" + encodeURIComponent(query), {
+                        headers: {"Accept": "application/json"}
+                    })
+                        .then(function (response) { return response.json(); })
+                        .then(function (data) { showResults(data.results); })
+                        .catch(clearResults);
+                }, 250);
+            });
+
+            document.addEventListener("click", function (event) {
+                if (!results.contains(event.target) && event.target !== input) {
+                    clearResults();
+                }
+            });
+        });
+    </script>
+{% endblock %}
