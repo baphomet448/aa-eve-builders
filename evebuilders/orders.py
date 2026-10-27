@@ -7,6 +7,8 @@ from decimal import Decimal
 # Django
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import F, Sum
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -14,7 +16,21 @@ from django.utils.translation import gettext as _
 from eveuniverse.models import EveType
 
 # AA EVE Builders
-from evebuilders.models import ContractSource, Order, OrderEvent, OrderSequence
+from evebuilders.models import (
+    BuilderProfile,
+    ContractSource,
+    Order,
+    OrderEvent,
+    OrderSequence,
+)
+from evebuilders.permissions import MANAGE_ACCESS
+
+# Orders a builder can still see: not finished and not cancelled
+OPEN_STATUSES = (
+    Order.Status.NEW,
+    Order.Status.IN_PROGRESS,
+    Order.Status.DISTRIBUTED,
+)
 
 
 def next_order_number(day: date | None = None) -> str:
@@ -121,3 +137,40 @@ def create_order(
         )
 
     return order
+
+
+def builder_level(user) -> int:
+    """The access level of a builder. Without a profile that is BASE."""
+
+    profile = BuilderProfile.objects.filter(user=user).first()
+
+    return profile.level if profile else Order.AccessLevel.BASE
+
+
+def visible_orders(user):
+    """
+    The corporate orders the user may see, with the numbers for the list.
+
+    Managers see every order. Builders see only open orders whose access level
+    is not higher than their own; everything else is hidden from them entirely.
+
+    Each order gets ``taken`` (sum of the builders' shares), ``credited``
+    (what is already counted as done) and ``free`` (quantity minus taken).
+    """
+
+    orders = Order.objects.filter(kind=Order.Kind.CORPORATE)
+
+    if not user.has_perm(MANAGE_ACCESS):
+        orders = orders.filter(
+            status__in=OPEN_STATUSES, access_level__lte=builder_level(user)
+        )
+
+    return (
+        orders.select_related("eve_type")
+        .annotate(
+            taken=Coalesce(Sum("assignments__taken"), 0),
+            credited=Coalesce(Sum("assignments__credited"), 0),
+        )
+        .annotate(free=F("quantity") - F("taken"))
+        .order_by("due_date", "-created_at")
+    )

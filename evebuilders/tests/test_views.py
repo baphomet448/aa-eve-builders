@@ -97,9 +97,9 @@ class TestSettingsPage(TestCase):
         settings_url = reverse("evebuilders:settings")
 
         self.client.force_login(self.manager)
-        manager_page = self.client.get(reverse("evebuilders:index"))
+        manager_page = self.client.get(reverse("evebuilders:orders"))
         self.client.force_login(self.builder)
-        builder_page = self.client.get(reverse("evebuilders:index"))
+        builder_page = self.client.get(reverse("evebuilders:orders"))
 
         self.assertContains(manager_page, settings_url)
         self.assertNotContains(builder_page, settings_url)

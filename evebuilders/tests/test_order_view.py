@@ -74,7 +74,7 @@ class TestNewOrderView(TestCase):
         response = self.client.post(reverse("evebuilders:new_order"), self._post_data())
 
         self.assertRedirects(
-            response, reverse("evebuilders:index"), fetch_redirect_response=False
+            response, reverse("evebuilders:orders"), fetch_redirect_response=False
         )
         order = Order.objects.get()
         self.assertTrue(order.number.startswith("N"))
@@ -113,9 +113,9 @@ class TestNewOrderView(TestCase):
         url = reverse("evebuilders:new_order")
 
         self.client.force_login(self.manager)
-        manager_page = self.client.get(reverse("evebuilders:index"))
+        manager_page = self.client.get(reverse("evebuilders:orders"))
         self.client.force_login(self.builder)
-        builder_page = self.client.get(reverse("evebuilders:index"))
+        builder_page = self.client.get(reverse("evebuilders:orders"))
 
         self.assertContains(manager_page, url)
         self.assertNotContains(builder_page, url)

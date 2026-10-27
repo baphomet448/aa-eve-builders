@@ -11,20 +11,19 @@
 {% endblock header_nav_brand %}
 
 {% block header_nav_collapse_left %}
-    {# Tabs are only shown to managers. Builder tabs come with the order pages. #}
+    {% if perms.evebuilders.builder_access or perms.evebuilders.manage_access %}
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'orders' or request.resolver_match.url_name == 'new_order' %}active{% endif %}"
+               href="{% url 'evebuilders:orders' %}">
+                {% translate "Corporate orders" %}
+            </a>
+        </li>
+    {% endif %}
+{% endblock header_nav_collapse_left %}
+
+{% block header_nav_collapse_right %}
+    {{ block.super }}
     {% if perms.evebuilders.manage_access %}
-        <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}"
-               href="{% url 'evebuilders:index' %}">
-                {% translate "Overview" %}
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'new_order' %}active{% endif %}"
-               href="{% url 'evebuilders:new_order' %}">
-                {% translate "New order" %}
-            </a>
-        </li>
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}"
                href="{% url 'evebuilders:settings' %}">
@@ -32,7 +31,7 @@
             </a>
         </li>
     {% endif %}
-{% endblock header_nav_collapse_left %}
+{% endblock header_nav_collapse_right %}
 
 {% block content %}
     <div class="allianceauth-evebuilders-plugin">

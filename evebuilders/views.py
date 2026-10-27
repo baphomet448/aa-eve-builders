@@ -28,7 +28,7 @@ from evebuilders.catalog import (
 )
 from evebuilders.forms import OrderForm
 from evebuilders.models import CatalogSync
-from evebuilders.orders import create_order
+from evebuilders.orders import create_order, visible_orders
 from evebuilders.permissions import MANAGE_ACCESS, has_any_access
 
 # The due date offered on a new order form
@@ -39,14 +39,28 @@ DEFAULT_DUE_DAYS = 7
 @user_passes_test(has_any_access)
 def index(request: WSGIRequest) -> HttpResponse:
     """
-    Index view
+    Entry point of the plugin: the order list
     :param request:
     :return:
     """
 
-    context = {"text": "Hello, World!"}
+    return redirect("evebuilders:orders")
 
-    return render(request, "evebuilders/index.html", context)
+
+@login_required
+@user_passes_test(has_any_access)
+def order_list(request: WSGIRequest) -> HttpResponse:
+    """
+    The corporate orders the user may see (see visible_orders for the rules)
+    :param request:
+    :return:
+    """
+
+    return render(
+        request,
+        "evebuilders/order_list.html",
+        {"orders": visible_orders(request.user)},
+    )
 
 
 @login_required
@@ -84,7 +98,7 @@ def new_order(request: WSGIRequest) -> HttpResponse:
                     request, _("Order %(number)s created.") % {"number": order.number}
                 )
 
-                return redirect("evebuilders:index")
+                return redirect("evebuilders:orders")
     else:
         form = OrderForm(
             initial={

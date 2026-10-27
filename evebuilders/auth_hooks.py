@@ -12,17 +12,16 @@ from evebuilders import urls
 from evebuilders.permissions import has_any_access
 
 
-class EveBuildersMenuItem(MenuItemHook):
-    """This class ensures only authorized users will see the menu entry"""
+class CorporateOrdersMenuItem(MenuItemHook):
+    """Sidebar entry for the corporate orders. Only builders and managers see it."""
 
     def __init__(self):
-        # setup menu entry for sidebar
         MenuItemHook.__init__(
             self,
-            _("EVE Builders"),
-            "fas fa-cube fa-fw",
-            "evebuilders:index",
-            navactive=["evebuilders:"],
+            _("Corporate orders"),
+            "fas fa-clipboard-list fa-fw",
+            "evebuilders:orders",
+            navactive=["evebuilders:orders", "evebuilders:new_order"],
         )
 
     def render(self, request):
@@ -35,10 +34,10 @@ class EveBuildersMenuItem(MenuItemHook):
 
 
 @hooks.register("menu_item_hook")
-def register_menu():
-    """Register the menu item"""
+def register_corporate_orders_menu():
+    """Register the sidebar entry"""
 
-    return EveBuildersMenuItem()
+    return CorporateOrdersMenuItem()
 
 
 @hooks.register("url_hook")
