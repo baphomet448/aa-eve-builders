@@ -7,10 +7,12 @@ from enum import Enum
 
 # Django
 from django.db import transaction
+from django.db.models import Count
 from django.utils import timezone
 
 # EVE Universe
 from eveuniverse.core.esitools import is_esi_online
+from eveuniverse.models import EveCategory, EveGroup, EveType
 from eveuniverse.tasks import load_eve_types
 
 # AA EVE Builders
@@ -93,3 +95,54 @@ def start_catalog_sync(user=None) -> SyncResult:
         "Catalog sync started (categories: %s, groups: %s)", category_ids, group_ids
     )
     return SyncResult.STARTED
+
+def catalog_overview() -> list[dict]:
+    """
+    One row per configured category and group with the number of loaded types.
+
+    Used by the settings page. A row is returned even when nothing is loaded
+    yet (count 0), so the manager can see that a configured entry is empty.
+    """
+
+    category_ids = list(app_settings.EVEBUILDERS_CATALOG_CATEGORY_IDS)
+    group_ids = list(app_settings.EVEBUILDERS_CATALOG_GROUP_IDS)
+
+    category_names = dict(
+        EveCategory.objects.filter(id__in=category_ids).values_list("id", "name")
+    )
+    category_counts = dict(
+        EveType.objects.filter(eve_group__eve_category_id__in=category_ids)
+        .order_by()
+        .values_list("eve_group__eve_category_id")
+        .annotate(total=Count("id"))
+    )
+    group_names = dict(
+        EveGroup.objects.filter(id__in=group_ids).values_list("id", "name")
+    )
+    group_counts = dict(
+        EveType.objects.filter(eve_group_id__in=group_ids)
+        .order_by()
+        .values_list("eve_group_id")
+        .annotate(total=Count("id"))
+    )
+
+    rows = [
+        {
+            "kind": "category",
+            "id": category_id,
+            "name": category_names.get(category_id, ""),
+            "count": category_counts.get(category_id, 0),
+        }
+        for category_id in category_ids
+    ]
+    rows += [
+        {
+            "kind": "group",
+            "id": group_id,
+            "name": group_names.get(group_id, ""),
+            "count": group_counts.get(group_id, 0),
+        }
+        for group_id in group_ids
+    ]
+
+    return rows

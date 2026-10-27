@@ -1,6 +1,5 @@
 """Catalog sync tests"""
 
-# Standard Library
 from datetime import timedelta
 from unittest.mock import patch
 
@@ -9,9 +8,12 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils import timezone
 
+# EVE Universe
+from eveuniverse.models import EveCategory, EveGroup, EveType
+
 # AA EVE Builders
 from evebuilders import app_settings
-from evebuilders.catalog import SyncResult, start_catalog_sync
+from evebuilders.catalog import SyncResult, catalog_overview, start_catalog_sync
 from evebuilders.models import CatalogSync
 
 User = get_user_model()
@@ -98,3 +100,40 @@ class TestStartCatalogSync(TestCase):
 
         self.mock_load.delay.side_effect = None
         self.assertEqual(start_catalog_sync(), SyncResult.STARTED)
+
+class TestCatalogOverview(TestCase):
+    """Rows for the settings page"""
+
+    def test_one_row_per_configured_category_with_counts(self):
+        category = EveCategory.objects.create(id=6, name="Ship", published=True)
+        group = EveGroup.objects.create(
+            id=25, name="Frigate", eve_category=category, published=True
+        )
+        EveType.objects.create(id=597, name="Punisher", eve_group=group, published=True)
+        EveType.objects.create(id=598, name="Breacher", eve_group=group, published=True)
+
+        rows = {
+            row["id"]: row for row in catalog_overview() if row["kind"] == "category"
+        }
+
+        self.assertEqual(sorted(rows), [4, 6, 7, 8, 18, 22, 32, 65, 66, 87])
+        self.assertEqual(rows[6]["name"], "Ship")
+        self.assertEqual(rows[6]["count"], 2)
+        self.assertEqual(rows[4]["name"], "")
+        self.assertEqual(rows[4]["count"], 0)
+
+    def test_configured_groups_are_listed(self):
+        category = EveCategory.objects.create(id=4, name="Material", published=True)
+        group = EveGroup.objects.create(
+            id=1136, name="Fuel Block", eve_category=category, published=True
+        )
+        EveType.objects.create(
+            id=4051, name="Nitrogen Fuel Block", eve_group=group, published=True
+        )
+
+        with patch.object(app_settings, "EVEBUILDERS_CATALOG_GROUP_IDS", [1136]):
+            rows = [row for row in catalog_overview() if row["kind"] == "group"]
+
+        self.assertEqual(
+            rows, [{"kind": "group", "id": 1136, "name": "Fuel Block", "count": 1}]
+        )
