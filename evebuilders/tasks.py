@@ -8,6 +8,8 @@ from celery import shared_task
 
 # AA EVE Builders
 from evebuilders.catalog import start_catalog_sync
+from evebuilders.models import ContractSource
+from evebuilders.sync import sync_now
 
 logger = logging.getLogger(__name__)
 
@@ -25,3 +27,45 @@ def sync_catalog() -> str:
     logger.info("Scheduled catalog sync: %s", result.value)
 
     return result.value
+
+
+@shared_task
+def sync_contracts() -> str:
+    """
+    Scheduled contract sync: read the corporation contracts from ESI and apply
+    them to the orders (waiting, credited, invalid, closed).
+
+    The schedule itself is added by the AA admin in local.py
+    (CELERYBEAT_SCHEDULE), see the README. A run that comes right after another
+    one (for example a press of the Sync button) is skipped.
+
+    :return: no_source, too_soon, error or ok
+    """
+
+    if ContractSource.get_solo() is None:
+        return "no_source"
+
+    attempt = sync_now()
+
+    if attempt.too_soon:
+        return "too_soon"
+
+    report = attempt.report
+    if report.error:
+        logger.warning("Scheduled contract sync failed: %s", report.error)
+
+        return "error"
+
+    logger.info(
+        "Scheduled contract sync: %s contracts seen, %s newly waiting, "
+        "%s credited (%s items), %s closed, %s invalid, %s skipped",
+        report.seen,
+        report.pending,
+        report.credited,
+        report.credited_items,
+        report.closed,
+        report.invalid,
+        report.skipped,
+    )
+
+    return "ok"

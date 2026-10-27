@@ -37,6 +37,37 @@
                             <span class="badge bg-danger">{% translate "Problem" %}</span>
                         {% endif %}
                     </dd>
+                                        <dt class="col-sm-3">{% translate "Last check" %}</dt>
+                    <dd class="col-sm-9">
+                        {% if source.last_sync_at %}
+                            {{ source.last_sync_at|naturaltime }}
+                        {% else %}
+                            {% translate "never" %}
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-3">{% translate "Last successful check" %}</dt>
+                    <dd class="col-sm-9">
+                        {% if source.last_success_at %}
+                            {{ source.last_success_at|naturaltime }}
+                        {% else %}
+                            {% translate "never" %}
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-3">{% translate "ESI answer valid until" %}</dt>
+                    <dd class="col-sm-9">
+                        {% if source.esi_expires_at %}
+                            {{ source.esi_expires_at|date:"Y-m-d H:i" }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </dd>
+
+                    {% if source.last_error %}
+                        <dt class="col-sm-3">{% translate "Last problem" %}</dt>
+                        <dd class="col-sm-9 text-danger">{{ source.last_error }}</dd>
+                    {% endif %}
                 </dl>
             {% else %}
                 <p class="text-warning">
