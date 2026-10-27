@@ -10,4 +10,6 @@ app_name: str = "evebuilders"  # pylint: disable=invalid-name
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("settings/", views.settings_view, name="settings"),
+    path("settings/sync-catalog/", views.start_sync, name="sync_catalog"),
 ]

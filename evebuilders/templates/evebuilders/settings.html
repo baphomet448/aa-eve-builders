@@ -1,0 +1,92 @@
+{% extends 'evebuilders/base.html' %}
+
+{% load i18n %}
+{% load humanize %}
+
+{% block details %}
+    <div class="card card-primary mb-3">
+        <div class="card-header">
+            <div class="card-title">{% translate "Item catalog" %}</div>
+        </div>
+
+        <div class="card-body">
+            <p>
+                {% blocktranslate trimmed %}
+                    The item picker in the order form uses this catalog. It is refreshed
+                    automatically once a day; use the button to refresh it right now.
+                    Loading runs in the background and can take several minutes.
+                {% endblocktranslate %}
+            </p>
+
+            <dl class="row">
+                <dt class="col-sm-3">{% translate "Last started" %}</dt>
+                <dd class="col-sm-9">
+                    {% if sync.started_at %}
+                        {{ sync.started_at|date:"Y-m-d H:i" }} ({{ sync.started_at|naturaltime }})
+                        {% if sync.started_by %}&ndash; {{ sync.started_by }}{% endif %}
+                    {% else %}
+                        {% translate "Never" %}
+                    {% endif %}
+                </dd>
+
+                {% if sync.last_error %}
+                    <dt class="col-sm-3">{% translate "Last problem" %}</dt>
+                    <dd class="col-sm-9 text-danger">{{ sync.last_error }}</dd>
+                {% endif %}
+            </dl>
+
+            <form method="post" action="{% url 'evebuilders:sync_catalog' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">
+                    {% translate "Update catalog" %}
+                </button>
+                <span class="form-text ms-2">
+                    {% blocktranslate trimmed with minutes=min_interval %}
+                        A new update can be started {{ minutes }} minutes after the previous one.
+                    {% endblocktranslate %}
+                </span>
+            </form>
+        </div>
+    </div>
+
+    <div class="card card-primary">
+        <div class="card-header">
+            <div class="card-title">{% translate "Configured categories and groups" %}</div>
+        </div>
+
+        <div class="card-body">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>{% translate "Kind" %}</th>
+                        <th>{% translate "ID" %}</th>
+                        <th>{% translate "Name" %}</th>
+                        <th class="text-end">{% translate "Loaded items" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td>
+                                {% if row.kind == "category" %}
+                                    {% translate "Category" %}
+                                {% else %}
+                                    {% translate "Group" %}
+                                {% endif %}
+                            </td>
+                            <td>{{ row.id }}</td>
+                            <td>
+                                {% if row.name %}
+                                    {{ row.name }}
+                                {% else %}
+                                    <span class="text-muted">{% translate "not loaded yet" %}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">{{ row.count|intcomma }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

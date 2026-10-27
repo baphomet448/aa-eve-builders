@@ -10,6 +10,24 @@
     {% translate "EVE Builders" %}
 {% endblock header_nav_brand %}
 
+{% block header_nav_collapse_left %}
+    {# Tabs are only shown to managers. Builder tabs come with the order pages. #}
+    {% if perms.evebuilders.manage_access %}
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}"
+               href="{% url 'evebuilders:index' %}">
+                {% translate "Overview" %}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}"
+               href="{% url 'evebuilders:settings' %}">
+                {% translate "Settings" %}
+            </a>
+        </li>
+    {% endif %}
+{% endblock header_nav_collapse_left %}
+
 {% block content %}
     <div class="allianceauth-evebuilders-plugin">
         {% block details %}{% endblock %}
