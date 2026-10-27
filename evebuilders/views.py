@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import (
 from django.core.exceptions import ValidationError
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_POST
@@ -27,8 +27,14 @@ from evebuilders.catalog import (
     start_catalog_sync,
 )
 from evebuilders.forms import OrderForm
-from evebuilders.models import CatalogSync
-from evebuilders.orders import create_order, visible_orders
+from evebuilders.models import CatalogSync, Order
+from evebuilders.orders import (
+    create_order,
+    discard_share,
+    my_shares,
+    take_order,
+    visible_orders,
+)
 from evebuilders.permissions import MANAGE_ACCESS, has_any_access
 
 # The due date offered on a new order form
@@ -180,3 +186,90 @@ def item_search(request: WSGIRequest) -> JsonResponse:
     """
 
     return JsonResponse({"results": search_items(request.GET.get("q", ""))})
+
+
+
+@login_required
+@user_passes_test(has_any_access)
+@require_POST
+def take_order_view(request: WSGIRequest, order_id: int) -> HttpResponse:
+    """
+    A builder takes a part of an order
+    :param request: POST parameter ``quantity``
+    :param order_id: The order
+    :return:
+    """
+
+    # Orders the user may not see do not exist for him
+    order = get_object_or_404(visible_orders(request.user), pk=order_id)
+
+    try:
+        quantity = int(request.POST.get("quantity", ""))
+    except ValueError:
+        messages.error(request, _("Please enter how many items you take."))
+
+        return redirect("evebuilders:orders")
+
+    try:
+        take_order(user=request.user, order_id=order.pk, quantity=quantity)
+    except ValidationError as ex:
+        for message in ex.messages:
+            messages.error(request, message)
+    else:
+        messages.success(
+            request,
+            _(
+                "You took %(quantity)s x %(item)s of order %(number)s. When they "
+                "are ready, create an item exchange contract to the corporation "
+                "and put %(number)s into its title."
+            )
+            % {
+                "quantity": quantity,
+                "item": order.eve_type.name,
+                "number": order.number,
+            },
+        )
+
+    return redirect("evebuilders:orders")
+
+
+@login_required
+@user_passes_test(has_any_access)
+@require_POST
+def discard_view(request: WSGIRequest, order_id: int) -> HttpResponse:
+    """
+    A builder gives back what can still be given back of his share
+    :param request:
+    :param order_id: The order
+    :return:
+    """
+
+    order = get_object_or_404(Order, pk=order_id, kind=Order.Kind.CORPORATE)
+
+    try:
+        quantity = discard_share(user=request.user, order_id=order.pk)
+    except ValidationError as ex:
+        for message in ex.messages:
+            messages.error(request, message)
+    else:
+        messages.success(
+            request,
+            _("You gave back %(quantity)s items of order %(number)s.")
+            % {"quantity": quantity, "number": order.number},
+        )
+
+    return redirect("evebuilders:my_orders")
+
+
+@login_required
+@user_passes_test(has_any_access)
+def my_orders(request: WSGIRequest) -> HttpResponse:
+    """
+    The orders the user has taken
+    :param request:
+    :return:
+    """
+
+    return render(
+        request, "evebuilders/my_orders.html", {"rows": my_shares(request.user)}
+    )

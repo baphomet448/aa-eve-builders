@@ -34,6 +34,7 @@
                                     <th>{% translate "Access level" %}</th>
                                 {% endif %}
                                 <th>{% translate "Destination" %}</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -69,6 +70,19 @@
                                         <td>{{ order.get_access_level_display }}</td>
                                     {% endif %}
                                     <td>{{ order.destination }}</td>
+                                    <td class="text-nowrap">
+                                        {% if order.free > 0 and order.status != 'CANCELLED' %}
+                                            <form method="post" action="{% url 'evebuilders:take_order' order.pk %}" class="d-flex gap-1">
+                                                {% csrf_token %}
+                                                <input type="number" name="quantity" min="1" max="{{ order.free }}" required
+                                                       class="form-control form-control-sm" style="width: 6rem;"
+                                                       aria-label="{% translate 'Quantity' %}">
+                                                <button type="submit" class="btn btn-sm btn-primary">
+                                                    {% translate "Take" %}
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>

@@ -1,0 +1,70 @@
+{% extends 'evebuilders/base.html' %}
+
+{% load i18n %}
+{% load humanize %}
+
+{% block details %}
+    <div class="card card-primary">
+        <div class="card-header">
+            <div class="card-title">{% translate "My orders" %}</div>
+        </div>
+
+        <div class="card-body">
+            {% if rows %}
+                <p>
+                    {% blocktranslate trimmed %}
+                        When your items are ready, create an item exchange contract to the
+                        corporation. Put the order number into the contract title and set the
+                        price to the price per unit multiplied by the quantity.
+                    {% endblocktranslate %}
+                </p>
+
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>{% translate "Order" %}</th>
+                                <th>{% translate "Item" %}</th>
+                                <th class="text-end">{% translate "Taken" %}</th>
+                                <th class="text-end">{% translate "Ready" %}</th>
+                                <th class="text-end">{% translate "In contracts" %}</th>
+                                <th class="text-end">{% translate "Can be given back" %}</th>
+                                <th>{% translate "Due date" %}</th>
+                                <th>{% translate "Give back until" %}</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                                <tr>
+                                    <td class="text-nowrap">{{ row.order.number }}</td>
+                                    <td>{{ row.order.eve_type.name }}</td>
+                                    <td class="text-end">{{ row.share.taken|intcomma }}</td>
+                                    <td class="text-end">{{ row.share.credited|intcomma }}</td>
+                                    <td class="text-end">{{ row.pending|intcomma }}</td>
+                                    <td class="text-end">{{ row.releasable|intcomma }}</td>
+                                    <td class="text-nowrap">{{ row.order.due_date|date:"Y-m-d" }}</td>
+                                    <td class="text-nowrap">{{ row.discard_deadline|date:"Y-m-d" }}</td>
+                                    <td class="text-nowrap">
+                                        {% if row.can_discard %}
+                                            {% translate "Give back the items that are not delivered yet?" as confirm_text %}
+                                            <form method="post" action="{% url 'evebuilders:discard' row.order.pk %}"
+                                                  onsubmit="return confirm('{{ confirm_text|escapejs }}');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    {% translate "Discard" %}
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="mb-0">{% translate "You have not taken any orders yet." %}</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

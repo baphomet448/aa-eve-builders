@@ -18,6 +18,12 @@
                 {% translate "Corporate orders" %}
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'my_orders' %}active{% endif %}"
+               href="{% url 'evebuilders:my_orders' %}">
+                {% translate "My orders" %}
+            </a>
+        </li>
     {% endif %}
 {% endblock header_nav_collapse_left %}
 

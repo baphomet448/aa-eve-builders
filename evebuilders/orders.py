@@ -360,3 +360,42 @@ def discard_share(*, user, order_id: int, quantity: int | None = None) -> int:
         recalculate_status(order)
 
     return quantity
+
+def my_shares(user) -> list[dict]:
+    """
+    The user's own shares for the "My orders" page.
+
+    Shares that were given back completely (nothing taken) are not listed.
+
+    :return: One dict per share with the share, its order, the pending (P) and
+        releasable (T - R - P) quantities, the last day for giving it back and
+        whether giving back is possible right now
+    """
+
+    shares = (
+        OrderAssignment.objects.filter(builder=user, taken__gt=0)
+        .select_related("order__eve_type")
+        .order_by("order__due_date", "-created_at")
+    )
+    today = timezone.localdate()
+
+    rows = []
+    for share in shares:
+        releasable = releasable_quantity(share)
+        deadline = discard_deadline(share.order)
+        rows.append(
+            {
+                "share": share,
+                "order": share.order,
+                "pending": pending_quantity(share),
+                "releasable": releasable,
+                "discard_deadline": deadline,
+                "can_discard": (
+                    releasable > 0
+                    and share.order.status in OPEN_STATUSES
+                    and today <= deadline
+                ),
+            }
+        )
+
+    return rows
