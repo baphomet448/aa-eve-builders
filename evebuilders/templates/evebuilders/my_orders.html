@@ -16,11 +16,11 @@
                         {% blocktranslate trimmed with when=source.last_success_at|naturaltime %}
                             Contracts were last checked {{ when }}.
                         {% endblocktranslate %}
-                        {% if source.esi_expires_at %}
-                            {% blocktranslate trimmed with until=source.esi_expires_at|date:"H:i" %}
-                                ESI keeps its current answer until {{ until }} (server time): a contract
-                                that you create, or that is accepted in the game, after ESI made it
-                                shows up only then.
+                        {% if next_check %}
+                            {% blocktranslate trimmed with when=next_check|date:"H:i" %}
+                                The next automatic check is around {{ when }} (server time), right
+                                after ESI refreshes its data. A contract that you create, or that is
+                                accepted in the game, shows up after that.
                             {% endblocktranslate %}
                         {% endif %}
                     {% elif source and source.last_error %}

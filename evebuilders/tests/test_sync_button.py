@@ -223,4 +223,4 @@ class TestMyOrdersSyncButton(TestCase):
 
         response = self.client.get(reverse("evebuilders:my_orders"))
 
-        self.assertContains(response, "ESI keeps its current answer until")
+        self.assertContains(response, "The next automatic check is around")

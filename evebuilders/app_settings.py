@@ -49,3 +49,9 @@ EVEBUILDERS_DISCORD_COMPLETE_WEBHOOK_URL = str(
 EVEBUILDERS_DISCORD_COMPLETE_THREAD_ID = str(
     getattr(settings, "EVEBUILDERS_DISCORD_COMPLETE_THREAD_ID", "")
 ).strip()
+
+# Announce in Discord that a builder took (a part of) an order. The live system
+# does not send this, the officers asked for it.
+EVEBUILDERS_DISCORD_NOTIFY_TAKEN = bool(
+    getattr(settings, "EVEBUILDERS_DISCORD_NOTIFY_TAKEN", True)
+)

@@ -42,7 +42,7 @@ from evebuilders.orders import (
     visible_orders,
 )
 from evebuilders.permissions import MANAGE_ACCESS, has_any_access
-from evebuilders.sync import sync_now
+from evebuilders.sync import next_sync_time, sync_now
 
 # The due date offered on a new order form
 DEFAULT_DUE_DAYS = 7
@@ -278,10 +278,12 @@ def my_orders(request: WSGIRequest) -> HttpResponse:
     :return:
     """
 
+    source = ContractSource.get_solo()
     context = {
         "rows": my_shares(request.user),
         "problems": problem_contracts(request.user),
-        "source": ContractSource.get_solo(),
+        "source": source,
+        "next_check": next_sync_time(source) if source else None,
     }
 
     return render(request, "evebuilders/my_orders.html", context)
@@ -361,7 +363,7 @@ def _report_messages(request: WSGIRequest, report) -> None:
         _(
             "Right now %(waiting)s contract(s) wait for acceptance (%(items)s items) "
             "and %(problems)s cannot be counted. ESI keeps this answer until "
-            "%(until)s; whatever changed in the game after it was made shows up later."
+            "%(until)s. The plugin checks again automatically right after that."
         )
         % {
             "waiting": report.waiting_contracts,

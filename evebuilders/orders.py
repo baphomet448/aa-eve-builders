@@ -28,7 +28,8 @@ from evebuilders.models import (
     OrderEvent,
     OrderSequence,
 )
-from evebuilders.messages import discard_payload, new_order_payload
+from evebuilders import app_settings
+from evebuilders.messages import discard_payload, new_order_payload, taken_payload
 from evebuilders.notifications import CHANNEL_COMPLETE, CHANNEL_NEW_ORDER, notify
 from evebuilders.permissions import MANAGE_ACCESS, has_any_access
 
@@ -273,6 +274,14 @@ def take_order(*, user, order_id: int, quantity: int) -> OrderAssignment:
             description=f"Took {quantity} (now {share.taken} in total)",
         )
         recalculate_status(order)
+
+        if app_settings.EVEBUILDERS_DISCORD_NOTIFY_TAKEN:
+            notify(
+                CHANNEL_COMPLETE,
+                taken_payload(
+                    user=user, order=order, quantity=quantity, free=free - quantity
+                ),
+            )
 
     return share
 

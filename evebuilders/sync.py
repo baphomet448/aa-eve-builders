@@ -3,7 +3,7 @@
 # Standard Library
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 from math import ceil
 
@@ -529,3 +529,31 @@ def _announce_invalid(record: ContractRecord) -> None:
             reason=record.reason,
         ),
     )
+
+
+
+# After ESI's cached answer expires, wait this long (clock differences) before asking
+CACHE_MARGIN = timedelta(seconds=5)
+# After a failed sync, wait this long before the scheduled sync tries again
+RETRY_AFTER_FAILURE = timedelta(minutes=5)
+
+
+def next_sync_time(source: ContractSource) -> datetime:
+    """
+    When the next scheduled sync makes sense.
+
+    Right after ESI's cached answer has expired, because asking earlier only
+    returns the same answer again. After a failed sync a few minutes later, so
+    a broken token or an ESI that is down is not asked every minute.
+    """
+
+    failed = source.last_sync_at is not None and (
+        source.last_success_at is None or source.last_success_at < source.last_sync_at
+    )
+    if failed:
+        return source.last_sync_at + RETRY_AFTER_FAILURE
+
+    if source.esi_expires_at is not None:
+        return source.esi_expires_at + CACHE_MARGIN
+
+    return timezone.now()

@@ -6,11 +6,14 @@ import logging
 # Third Party
 from celery import shared_task
 
+# Django
+from django.utils import timezone
+
 # AA EVE Builders
 from evebuilders.catalog import start_catalog_sync
 from evebuilders.models import ContractSource
 from evebuilders.notifications import DiscordRetry, deliver, retry_delay
-from evebuilders.sync import sync_now
+from evebuilders.sync import next_sync_time, sync_now
 
 logger = logging.getLogger(__name__)
 
@@ -36,15 +39,21 @@ def sync_contracts() -> str:
     Scheduled contract sync: read the corporation contracts from ESI and apply
     them to the orders (waiting, credited, invalid, closed).
 
-    The schedule itself is added by the AA admin in local.py
-    (CELERYBEAT_SCHEDULE), see the README. A run that comes right after another
-    one (for example a press of the Sync button) is skipped.
+    The schedule (every minute) is added by the AA admin in local.py
+    (CELERYBEAT_SCHEDULE), see the README. Most runs do nothing: a sync is
+    done only when ESI has a fresh answer (its cache has expired), or some
+    minutes after a failed sync. A run that comes right after another one (for
+    example a press of the Sync button) is skipped as well.
 
-    :return: no_source, too_soon, error or ok
+    :return: no_source, not_yet, too_soon, error or ok
     """
 
-    if ContractSource.get_solo() is None:
+    source = ContractSource.get_solo()
+    if source is None:
         return "no_source"
+
+    if next_sync_time(source) > timezone.now():
+        return "not_yet"
 
     attempt = sync_now()
 

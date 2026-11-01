@@ -162,3 +162,28 @@ def token_failure_payload(*, corporation: str, error: str) -> dict:
         ],
         [("Корпорация", corporation), ("Причина", error), ("Что делать", what_to_do)],
     )
+
+def taken_payload(*, user, order: Order, quantity: int, free: int) -> dict:
+    """
+    A builder took (a part of) an order.
+
+    :param quantity: How many items were taken now
+    :param free: How many items are still free in the order
+    """
+
+    total = order.unit_price * quantity
+
+    return build_payload(
+        [f"Заказ {order.number} отдан в работу - {display_name(user)}"],
+        [
+            ("Наименование", order.eve_type.name),
+            ("Количество", str(quantity)),
+            ("Остаток свободных позиций в заказе", str(free)),
+            (
+                "Цена за единицу",
+                f"{format_isk(order.unit_price)} {isk_in_words(order.unit_price)}",
+            ),
+            ("Цена за все", f"{format_isk(total)} {isk_in_words(total)}"),
+            ("Срок сдачи до", order.due_date.isoformat()),
+        ],
+    )
