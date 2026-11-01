@@ -21,6 +21,8 @@ from evebuilders.notifications import (
     format_isk,
     isk_in_words,
     notify,
+    positions_for,
+    positions_of,
     retry_delay,
 )
 from evebuilders.tasks import send_discord_notification
@@ -93,36 +95,57 @@ class TestIskInWords(SimpleTestCase):
         )
 
     def test_fractions_use_the_genitive_singular(self):
-        self._check(
-            {
-                "1500000": "1,5 миллиона",
-                "2500000000": "2,5 миллиарда",
-                "1500": "1,5 тысячи",
-            }
-        )
+        self._check({"1500000": "1,5 миллиона", "2500000000": "2,5 миллиарда"})
 
-    def test_billions_and_thousands(self):
+    def test_billions(self):
         self._check(
             {
                 "1000000000": "1 миллиард",
                 "3000000000": "3 миллиарда",
                 "7000000000": "7 миллиардов",
-                "1000": "1 тысяча",
-                "2000": "2 тысячи",
-                "5000": "5 тысяч",
-                "21000": "21 тысяча",
             }
         )
-
-    def test_small_amounts_are_just_numbers(self):
-        self._check({"999": "999", "100": "100", "0": "0", "999.5": "999,5"})
 
     def test_it_cuts_instead_of_rounding(self):
         self._check({"1999999": "1,9 миллиона"})
 
-    def test_nothing_is_zero(self):
-        self.assertEqual(isk_in_words(None), "0")
+    def test_amounts_below_a_million_have_no_words(self):
+        self._check({"999999": "", "5000": "", "1000": "", "100": "", "0": ""})
 
+    def test_nothing_gives_no_words(self):
+        self.assertEqual(isk_in_words(None), "")
+
+class TestPositions(SimpleTestCase):
+    """positions_for and positions_of"""
+
+    def test_after_na(self):
+        cases = {
+            1: "1 позицию",
+            2: "2 позиции",
+            4: "4 позиции",
+            5: "5 позиций",
+            11: "11 позиций",
+            21: "21 позицию",
+            22: "22 позиции",
+            100: "100 позиций",
+            101: "101 позицию",
+        }
+        for count, expected in cases.items():
+            with self.subTest(count=count):
+                self.assertEqual(positions_for(count), expected)
+
+    def test_after_ot(self):
+        cases = {
+            1: "1 позиции",
+            2: "2 позиций",
+            5: "5 позиций",
+            11: "11 позиций",
+            21: "21 позиции",
+            22: "22 позиций",
+        }
+        for count, expected in cases.items():
+            with self.subTest(count=count):
+                self.assertEqual(positions_of(count), expected)
 
 class TestBuildPayload(SimpleTestCase):
     """build_payload"""
@@ -176,6 +199,16 @@ class TestBuildPayload(SimpleTestCase):
         embed = build_payload(fields=fields)["embeds"][0]
 
         self.assertEqual(len(embed["fields"]), 25)
+
+    def test_spaces_at_the_end_are_removed(self):
+        embed = build_payload(
+            ["Контракт 100,00 ISK "], [("Цена", "100,00 ISK "), ("Пусто", "  ")]
+        )["embeds"][0]
+
+        self.assertEqual(embed["description"], "Контракт 100,00 ISK")
+        self.assertEqual(
+            embed["fields"], [{"name": "Цена", "value": "100,00 ISK", "inline": False}]
+        )
 
 
 class TestDeliver(SettingsMixin, SimpleTestCase):

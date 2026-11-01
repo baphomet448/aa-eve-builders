@@ -35,11 +35,9 @@ DISCORD_TIMEOUT = 15  # seconds
 
 _BILLION = Decimal(10**9)
 _MILLION = Decimal(10**6)
-_THOUSAND = Decimal(10**3)
 _SCALES = (
     (_BILLION, ("миллиард", "миллиарда", "миллиардов")),
     (_MILLION, ("миллион", "миллиона", "миллионов")),
-    (_THOUSAND, ("тысяча", "тысячи", "тысяч")),
 )
 
 
@@ -88,10 +86,15 @@ def _plural(amount: Decimal, one: str, few: str, many: str) -> str:
 
 
 def isk_in_words(value) -> str:
-    """An amount in words for reports: 275 миллионов, 1,5 миллиона, 5 тысяч"""
+    """
+    An amount in words for reports: 275 миллионов, 1,5 миллиона.
+
+    Amounts below a million have no words (an empty text): the number is shown
+    next to it anyway, so words would only repeat it.
+    """
 
     if value is None:
-        return "0"
+        return ""
 
     amount = Decimal(str(value))
 
@@ -101,7 +104,7 @@ def isk_in_words(value) -> str:
 
             return f"{_number_text(scaled)} {_plural(scaled, *forms)}"
 
-    return _number_text(amount)
+    return ""
 
 
 def _trim(value: str, limit: int) -> str:
@@ -127,18 +130,18 @@ def build_payload(
 
     embed: dict = {"title": _trim(EMBED_TITLE, TITLE_LIMIT), "color": EMBED_COLOR}
 
-    text = "\n".join(line for line in (description or []) if line)
+    text = "\n".join(line.rstrip() for line in (description or []) if line.strip())
     if text:
         embed["description"] = _trim(text, DESCRIPTION_LIMIT)
 
     shown = [
         {
             "name": _trim(str(name), FIELD_NAME_LIMIT),
-            "value": _trim(str(value), FIELD_VALUE_LIMIT),
+            "value": _trim(str(value).strip(), FIELD_VALUE_LIMIT),
             "inline": False,
         }
         for name, value in (fields or [])
-        if name and value
+        if name and str(value).strip()
     ][:MAX_FIELDS]
     if shown:
         embed["fields"] = shown
@@ -255,3 +258,25 @@ def notify(channel: str, payload: dict) -> None:
         send_discord_notification.delay(channel, payload)
 
     transaction.on_commit(queue)
+
+def _count_form(count: int, one: str, few: str, many: str) -> str:
+    """The Russian word form for a whole number: 1 / 2-4 / 5+ (21 is like 1)"""
+
+    if count % 10 == 1 and count % 100 != 11:
+        return one
+    if 2 <= count % 10 <= 4 and not 12 <= count % 100 <= 14:
+        return few
+
+    return many
+
+
+def positions_for(count: int) -> str:
+    """After the preposition "на": 1 позицию, 2 позиции, 5 позиций"""
+
+    return f"{count} {_count_form(count, 'позицию', 'позиции', 'позиций')}"
+
+
+def positions_of(count: int) -> str:
+    """After the preposition "от": 1 позиции, 2 позиций, 5 позиций"""
+
+    return f"{count} {_count_form(count, 'позиции', 'позиций', 'позиций')}"

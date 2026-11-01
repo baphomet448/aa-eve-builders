@@ -416,6 +416,7 @@ def my_shares(user) -> list[dict]:
                 "order": share.order,
                 "pending": pending_quantity(share),
                 "status": share_status(share),
+                "total": share.order.unit_price * share.taken,
                 "releasable": releasable,
                 "discard_deadline": deadline,
                 "can_discard": (

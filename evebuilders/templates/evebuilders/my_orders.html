@@ -59,6 +59,8 @@
                                 <th>{% translate "Order" %}</th>
                                 <th>{% translate "Status" %}</th>
                                 <th>{% translate "Item" %}</th>
+                                <th class="text-end">{% translate "Price per unit" %}</th>
+                                <th class="text-end">{% translate "Total price" %}</th>
                                 <th class="text-end">{% translate "Taken" %}</th>
                                 <th class="text-end">{% translate "Ready" %}</th>
                                 <th class="text-end">{% translate "In contracts" %}</th>
@@ -82,6 +84,8 @@
                                         {% endif %}
                                     </td>
                                     <td>{{ row.order.eve_type.name }}</td>
+                                    <td class="text-end">{{ row.order.unit_price|intcomma }}</td>
+                                    <td class="text-end">{{ row.total|intcomma }}</td>
                                     <td class="text-end">{{ row.share.taken|intcomma }}</td>
                                     <td class="text-end">{{ row.share.credited|intcomma }}</td>
                                     <td class="text-end">{{ row.pending|intcomma }}</td>

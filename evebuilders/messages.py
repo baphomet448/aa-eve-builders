@@ -6,7 +6,13 @@ from django.urls import reverse
 
 # AA EVE Builders
 from evebuilders.models import Order
-from evebuilders.notifications import build_payload, format_isk, isk_in_words
+from evebuilders.notifications import (
+    build_payload,
+    format_isk,
+    isk_in_words,
+    positions_for,
+    positions_of,
+)
 
 
 def display_name(user) -> str:
@@ -58,7 +64,7 @@ def discard_payload(*, user, order: Order, quantity: int, free: int) -> dict:
     return build_payload(
         [
             f"Отчет от - {display_name(user)}",
-            f"Отказ от {quantity} позиций",
+            f"Отказ от {positions_of(quantity)}",
             f"Сумма {format_isk(total)} {isk_in_words(total)}",
             "ОТМЕНА",
         ],
@@ -86,7 +92,7 @@ def _contract_lines(builder: str, quantity: int, price) -> list[str]:
 
     return [
         f"Отчет от - {builder}",
-        f"Контракт на {quantity} позиций",
+         f"Контракт на {positions_for(quantity)}",
         f"Контракт {format_isk(price)} {isk_in_words(price)}",
     ]
 
@@ -136,7 +142,7 @@ def contract_invalid_payload(
 
     lines = [f"Отчет от - {reporter}", "Контракт не прошёл проверку и не засчитан"]
     if quantity > 0:
-        lines.append(f"Контракт на {quantity} позиций")
+        lines.append(f"Контракт на {positions_for(quantity)}")
         lines.append(f"Контракт {format_isk(price)} {isk_in_words(price)}")
 
     fields = []
