@@ -28,6 +28,8 @@ from evebuilders.models import (
     OrderEvent,
     OrderSequence,
 )
+from evebuilders.messages import discard_payload, new_order_payload
+from evebuilders.notifications import CHANNEL_COMPLETE, CHANNEL_NEW_ORDER, notify
 from evebuilders.permissions import MANAGE_ACCESS, has_any_access
 
 # Orders a builder can still see: not finished and not cancelled
@@ -140,6 +142,7 @@ def create_order(
             actor=user,
             description=f"{quantity} x {eve_type.name}, {unit_price} ISK each",
         )
+        notify(CHANNEL_NEW_ORDER, new_order_payload(order))
 
     return order
 
@@ -366,6 +369,13 @@ def discard_share(*, user, order_id: int, quantity: int | None = None) -> int:
             description=f"Gave back {quantity} (now {share.taken} in total)",
         )
         recalculate_status(order)
+
+        taken = order.assignments.aggregate(total=Coalesce(Sum("taken"), 0))["total"]
+        free = order.quantity - taken
+        notify(
+            CHANNEL_COMPLETE,
+            discard_payload(user=user, order=order, quantity=quantity, free=free),
+        )
 
     return quantity
 
