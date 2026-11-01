@@ -7,7 +7,16 @@ from decimal import Decimal
 # Django
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import F, IntegerField, OuterRef, Subquery, Sum, Value
+from django.db.models import (
+    Case,
+    F,
+    IntegerField,
+    OuterRef,
+    Subquery,
+    Sum,
+    Value,
+    When,
+)
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -186,7 +195,11 @@ def visible_orders(user):
                 Subquery(_waiting_quantity(), output_field=IntegerField()), Value(0)
             ),
         )
-        .order_by("due_date", "-created_at")
+        .annotate(
+            status_rank=_rank("status", STATUS_ORDER),
+            priority_rank=_rank("priority", PRIORITY_ORDER),
+        )
+        .order_by("status_rank", "priority_rank", "-pk")
     )
 
 def recalculate_status(order: Order) -> None:
@@ -482,4 +495,28 @@ def problem_contracts(user):
         )
         .select_related("order__eve_type")
         .order_by("-issued_at", "-created_at")
+    )
+
+# The order of the list: new orders first, finished and cancelled ones last
+STATUS_ORDER = (
+    Order.Status.NEW,
+    Order.Status.IN_PROGRESS,
+    Order.Status.DISTRIBUTED,
+    Order.Status.COMPLETED,
+    Order.Status.CANCELLED,
+)
+# Within a status: urgent orders first
+PRIORITY_ORDER = (Order.Priority.HIGH, Order.Priority.MEDIUM, Order.Priority.LOW)
+
+
+def _rank(field: str, values) -> Case:
+    """The position of a field's value in an ordered list of values, for sorting"""
+
+    return Case(
+        *[
+            When(**{field: value}, then=Value(position))
+            for position, value in enumerate(values)
+        ],
+        default=Value(len(values)),
+        output_field=IntegerField(),
     )

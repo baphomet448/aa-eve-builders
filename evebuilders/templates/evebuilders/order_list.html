@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load humanize %}
+{% load l10n %}
 
 {% block details %}
     <div class="card card-primary">
@@ -17,32 +18,32 @@
         <div class="card-body">
             {% if orders %}
                 <div class="table-responsive">
-                    <table class="table table-sm table-hover align-middle">
+                    <table id="evebuilders-orders" class="table table-sm table-hover align-middle">
                         <thead>
                             <tr>
-                                <th>{% translate "Order" %}</th>
-                                <th>{% translate "Status" %}</th>
-                                <th>{% translate "Item" %}</th>
-                                <th class="text-end">{% translate "Quantity" %}</th>
-                                <th class="text-end">{% translate "Taken" %}</th>
-                                <th class="text-end">{% translate "Free" %}</th>
-                                <th class="text-end">{% translate "Ready" %}</th>
-                                <th class="text-end">{% translate "On review" %}</th>
-                                <th class="text-end">{% translate "Price per unit" %}</th>
-                                <th>{% translate "Priority" %}</th>
-                                <th>{% translate "Due date" %}</th>
+                                <th data-sort="number">{% translate "Order" %}</th>
+                                <th data-sort="number">{% translate "Status" %}</th>
+                                <th data-sort="text">{% translate "Item" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "Quantity" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "Taken" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "Free" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "Ready" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "On review" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "Price per unit" %}</th>
+                                <th data-sort="number">{% translate "Priority" %}</th>
+                                <th data-sort="text">{% translate "Due date" %}</th>
                                 {% if perms.evebuilders.manage_access %}
-                                    <th>{% translate "Access level" %}</th>
+                                    <th data-sort="number">{% translate "Access level" %}</th>
                                 {% endif %}
-                                <th>{% translate "Destination" %}</th>
+                                <th data-sort="text">{% translate "Destination" %}</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for order in orders %}
                                 <tr>
-                                    <td class="text-nowrap">{{ order.number }}</td>
-                                    <td>
+                                    <td class="text-nowrap" data-value="{{ order.pk|unlocalize }}">{{ order.number }}</td>
+                                    <td data-value="{{ order.status_rank|unlocalize }}">
                                         <span class="badge
                                             {% if order.status == 'NEW' %}bg-primary
                                             {% elif order.status == 'IN_PROGRESS' %}bg-info
@@ -53,13 +54,13 @@
                                         </span>
                                     </td>
                                     <td>{{ order.eve_type.name }}</td>
-                                    <td class="text-end">{{ order.quantity|intcomma }}</td>
-                                    <td class="text-end">{{ order.taken|intcomma }}</td>
-                                    <td class="text-end">{{ order.free|intcomma }}</td>
-                                    <td class="text-end">{{ order.credited|intcomma }}</td>
-                                    <td class="text-end">{{ order.pending|intcomma }}</td>
-                                    <td class="text-end">{{ order.unit_price|intcomma }}</td>
-                                    <td>
+                                    <td class="text-end" data-value="{{ order.quantity|unlocalize }}">{{ order.quantity|intcomma }}</td>
+                                    <td class="text-end" data-value="{{ order.taken|unlocalize }}">{{ order.taken|intcomma }}</td>
+                                    <td class="text-end" data-value="{{ order.free|unlocalize }}">{{ order.free|intcomma }}</td>
+                                    <td class="text-end" data-value="{{ order.credited|unlocalize }}">{{ order.credited|intcomma }}</td>
+                                    <td class="text-end" data-value="{{ order.pending|unlocalize }}">{{ order.pending|intcomma }}</td>
+                                    <td class="text-end" data-value="{{ order.unit_price|unlocalize }}">{{ order.unit_price|intcomma }}</td>
+                                    <td data-value="{{ order.priority_rank|unlocalize }}">
                                         <span class="badge
                                             {% if order.priority == 'HIGH' %}bg-danger
                                             {% elif order.priority == 'MEDIUM' %}bg-warning
@@ -69,7 +70,7 @@
                                     </td>
                                     <td class="text-nowrap">{{ order.due_date|date:"Y-m-d" }}</td>
                                     {% if perms.evebuilders.manage_access %}
-                                        <td>{{ order.get_access_level_display }}</td>
+                                        <td data-value="{{ order.access_level|unlocalize }}">{{ order.get_access_level_display }}</td>
                                     {% endif %}
                                     <td>{{ order.destination }}</td>
                                     <td class="text-nowrap">
@@ -95,4 +96,65 @@
             {% endif %}
         </div>
     </div>
+{% endblock %}
+
+{% block extra_javascript %}
+    <style>
+        #evebuilders-orders th[data-sort] { cursor: pointer; user-select: none; }
+        #evebuilders-orders th.sorted-asc::after { content: " \25B2"; }
+        #evebuilders-orders th.sorted-desc::after { content: " \25BC"; }
+    </style>
+    <script>
+        // Click on a column header sorts the table by that column. The first order
+        // of the rows (new orders first, urgent first, newer first) comes from the server.
+        document.addEventListener("DOMContentLoaded", function () {
+            const table = document.getElementById("evebuilders-orders");
+            if (!table) {
+                return;
+            }
+
+            const body = table.tBodies[0];
+            const headers = table.querySelectorAll("thead th[data-sort]");
+
+            function valueOf(row, index, type) {
+                const cell = row.cells[index];
+                const raw = cell.dataset.value !== undefined ? cell.dataset.value : cell.textContent.trim();
+
+                return type === "number" ? parseFloat(raw) : raw.toLowerCase();
+            }
+
+            headers.forEach(function (header) {
+                header.addEventListener("click", function () {
+                    const index = header.cellIndex;
+                    const type = header.dataset.sort;
+                    const direction = header.dataset.direction === "asc" ? "desc" : "asc";
+
+                    headers.forEach(function (other) {
+                        delete other.dataset.direction;
+                        other.classList.remove("sorted-asc", "sorted-desc");
+                    });
+                    header.dataset.direction = direction;
+                    header.classList.add("sorted-" + direction);
+
+                    const rows = Array.from(body.rows);
+                    rows.sort(function (a, b) {
+                        const x = valueOf(a, index, type);
+                        const y = valueOf(b, index, type);
+
+                        if (x < y) {
+                            return direction === "asc" ? -1 : 1;
+                        }
+                        if (x > y) {
+                            return direction === "asc" ? 1 : -1;
+                        }
+
+                        return 0;
+                    });
+                    rows.forEach(function (row) {
+                        body.appendChild(row);
+                    });
+                });
+            });
+        });
+    </script>
 {% endblock %}

@@ -69,6 +69,18 @@
             const results = document.getElementById("evebuilders-item-results");
             let timer = null;
 
+            // Open the calendar as soon as the date field is clicked
+            const dueDate = document.getElementById("id_due_date");
+            if (dueDate && typeof dueDate.showPicker === "function") {
+                dueDate.addEventListener("click", function () {
+                    try {
+                        dueDate.showPicker();
+                    } catch (error) {
+                        // The browser refused: its own calendar button still works
+                    }
+                });
+            }
+
             function clearResults() {
                 results.innerHTML = "";
             }
