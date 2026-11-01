@@ -32,3 +32,20 @@ EVEBUILDERS_CATALOG_MIN_INTERVAL_MINUTES = int(
 EVEBUILDERS_SYNC_MIN_INTERVAL_SECONDS = int(
     getattr(settings, "EVEBUILDERS_SYNC_MIN_INTERVAL_SECONDS", 60)
 )
+
+# Discord webhooks. An empty URL means: no notifications to that channel.
+# "New order" channel: new, changed and removed orders.
+EVEBUILDERS_DISCORD_NEW_ORDER_WEBHOOK_URL = str(
+    getattr(settings, "EVEBUILDERS_DISCORD_NEW_ORDER_WEBHOOK_URL", "")
+).strip()
+EVEBUILDERS_DISCORD_NEW_ORDER_THREAD_ID = str(
+    getattr(settings, "EVEBUILDERS_DISCORD_NEW_ORDER_THREAD_ID", "")
+).strip()
+
+# "Complete" channel: reports about contracts, deliveries, giving back, problems.
+EVEBUILDERS_DISCORD_COMPLETE_WEBHOOK_URL = str(
+    getattr(settings, "EVEBUILDERS_DISCORD_COMPLETE_WEBHOOK_URL", "")
+).strip()
+EVEBUILDERS_DISCORD_COMPLETE_THREAD_ID = str(
+    getattr(settings, "EVEBUILDERS_DISCORD_COMPLETE_THREAD_ID", "")
+).strip()

@@ -9,6 +9,7 @@ from celery import shared_task
 # AA EVE Builders
 from evebuilders.catalog import start_catalog_sync
 from evebuilders.models import ContractSource
+from evebuilders.notifications import DiscordRetry, deliver, retry_delay
 from evebuilders.sync import sync_now
 
 logger = logging.getLogger(__name__)
@@ -69,3 +70,28 @@ def sync_contracts() -> str:
     )
 
     return "ok"
+
+
+@shared_task(bind=True, max_retries=6)
+def send_discord_notification(self, channel: str, payload: dict) -> str:
+    """
+    Post a notification to a Discord webhook, trying again when Discord is
+    busy or not reachable.
+
+    :param channel: evebuilders.notifications.CHANNEL_NEW_ORDER or CHANNEL_COMPLETE
+    :param payload: The webhook body from notifications.build_payload
+    :return: skipped, sent or rejected
+    """
+
+    try:
+        return deliver(channel, payload)
+    except DiscordRetry as ex:
+        logger.warning(
+            "A Discord notification will be tried again (attempt %s): %s",
+            self.request.retries + 1,
+            ex,
+        )
+
+        raise self.retry(
+            exc=ex, countdown=retry_delay(self.request.retries, ex.retry_after)
+        )
