@@ -31,7 +31,7 @@ class TestNewOrderPayload(ViewsTestCase):
         self.assertEqual(fields["Цена за единицу"], "1 000 000,00 ISK")
         self.assertEqual(fields["Приоритет"], "MEDIUM")
         self.assertEqual(
-            fields["Оснастка"], "https://auth.example.com/evebuilders/orders/"
+            fields["Взять заказ:"], "https://auth.example.com/evebuilders/orders/"
         )
         self.assertEqual(fields["Срок сдачи до"], self.order.due_date.isoformat())
         self.assertNotIn("Уровень доступа", fields)
@@ -46,7 +46,7 @@ class TestNewOrderPayload(ViewsTestCase):
     def test_without_a_site_url_there_is_no_link(self):
         fields = fields_of(new_order_payload(self.order))
 
-        self.assertNotIn("Оснастка", fields)
+        self.assertNotIn("Взять заказ:", fields)
 
 
 class TestDiscardPayload(ViewsTestCase):

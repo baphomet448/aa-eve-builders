@@ -39,6 +39,14 @@ from evebuilders.models import (
     OrderAssignment,
     OrderEvent,
 )
+from evebuilders.messages import (
+    contract_credited_payload,
+    contract_invalid_payload,
+    contract_waiting_payload,
+    display_name,
+    token_failure_payload,
+)
+from evebuilders.notifications import CHANNEL_COMPLETE, notify
 from evebuilders.orders import recalculate_status
 
 logger = logging.getLogger(__name__)
@@ -147,6 +155,15 @@ def _apply_pending(contract: dict, verdict: Verdict) -> bool:
                 f"Contract {record.contract_id} with {record.quantity} items "
                 "waits for acceptance",
             )
+            notify(
+                CHANNEL_COMPLETE,
+                contract_waiting_payload(
+                    builder=display_name(record.assignment.builder),
+                    order=record.order,
+                    quantity=record.quantity,
+                    price=record.price,
+                ),
+            )
 
     return changed
 
@@ -187,6 +204,7 @@ def _apply_invalid(contract: dict, verdict: Verdict) -> bool:
                 OrderEvent.Kind.CONTRACT_INVALID,
                 f"Contract {record.contract_id} cannot be counted: {verdict.reason}",
             )
+            _announce_invalid(record)
 
     return changed
 
@@ -262,6 +280,7 @@ def _apply_credit(contract: dict, verdict: Verdict, now) -> int:
                 OrderEvent.Kind.CONTRACT_INVALID,
                 f"Contract {record.contract_id} cannot be counted: {record.reason}",
             )
+            _announce_invalid(record)
 
             return 0
 
@@ -284,6 +303,21 @@ def _apply_credit(contract: dict, verdict: Verdict, now) -> int:
             f"(contract {record.contract_id}), accepted by {accepted_by}",
         )
         recalculate_status(order)
+
+        credited_total = order.assignments.aggregate(
+            total=Coalesce(Sum("credited"), 0)
+        )["total"]
+        notify(
+            CHANNEL_COMPLETE,
+            contract_credited_payload(
+                builder=display_name(share.builder),
+                order=order,
+                quantity=verdict.quantity,
+                price=record.price,
+                acceptor=accepted_by,
+                remaining=order.quantity - credited_total,
+            ),
+        )
 
     return verdict.quantity
 
@@ -348,13 +382,31 @@ def process_contracts(
 
 
 def _record_failure(source: ContractSource, error: str, token_ok: bool | None) -> None:
-    """Remember on the source that a sync failed"""
+    """
+    Remember on the source that a sync failed. When the token stops working
+    (it was fine before), Discord is told once.
+    """
 
     changes = {"last_sync_at": timezone.now(), "last_error": error[:1000]}
     if token_ok is not None:
         changes["token_ok"] = token_ok
 
+    # The first update only matches while the token was fine, so only the run
+    # that notices the failure first announces it
+    announce = False
+    if token_ok is False:
+        announce = (
+            ContractSource.objects.filter(pk=source.pk, token_ok=True).update(**changes)
+            > 0
+        )
+
     ContractSource.objects.filter(pk=source.pk).update(**changes)
+
+    if announce:
+        notify(
+            CHANNEL_COMPLETE,
+            token_failure_payload(corporation=source.corporation_name, error=error),
+        )
 
 
 def sync_contracts(source: ContractSource | None = None) -> SyncReport:
@@ -458,3 +510,22 @@ def sync_now(min_interval: int | None = None) -> SyncAttempt:
         locked.save(update_fields=["last_sync_at"])
 
     return SyncAttempt(report=sync_contracts(source))
+
+def _announce_invalid(record: ContractRecord) -> None:
+    """Tell Discord that a contract cannot be counted"""
+
+    if record.assignment is not None:
+        reporter = display_name(record.assignment.builder)
+    else:
+        reporter = _character_label(record.issuer_character_id)
+
+    notify(
+        CHANNEL_COMPLETE,
+        contract_invalid_payload(
+            reporter=reporter,
+            order=record.order,
+            quantity=record.quantity,
+            price=record.price,
+            reason=record.reason,
+        ),
+    )
