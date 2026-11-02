@@ -1,0 +1,16 @@
+{% load i18n %}
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link {% if active == 'general' %}active{% endif %}"
+           href="{% url 'evebuilders:settings' %}">
+            {% translate "ESI and catalog" %}
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active == 'builders' %}active{% endif %}"
+           href="{% url 'evebuilders:builder_levels' %}">
+            {% translate "Builder levels" %}
+        </a>
+    </li>
+</ul>

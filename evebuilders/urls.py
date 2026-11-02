@@ -17,6 +17,12 @@ urlpatterns = [
     path("my-orders/", views.my_orders, name="my_orders"),
     path("my-orders/sync/", views.sync_contracts_view, name="sync_contracts"),
     path("settings/", views.settings_view, name="settings"),
+    path("settings/builders/", views.builder_levels_view, name="builder_levels"),
+    path(
+        "settings/builders/<int:user_id>/level/",
+        views.set_level_view,
+        name="set_level",
+    ),
     path("settings/esi/connect/", views.connect_esi, name="connect_esi"),
     path("settings/sync-catalog/", views.start_sync, name="sync_catalog"),
     path("items/search/", views.item_search, name="item_search"),

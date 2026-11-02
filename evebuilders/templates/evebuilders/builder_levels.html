@@ -1,0 +1,72 @@
+{% extends 'evebuilders/base.html' %}
+
+{% load i18n %}
+
+{% block details %}
+    {% include 'evebuilders/settings_tabs.html' with active='builders' %}
+
+    <div class="card card-primary">
+        <div class="card-header">
+            <div class="card-title">{% translate "Builder levels" %}</div>
+        </div>
+
+        <div class="card-body">
+            <p>
+                {% blocktranslate trimmed %}
+                    People are listed here when their groups, their state or their own
+                    permissions give them the Builder or Manager access (give the permission in
+                    the Auth group settings). A builder sees and takes the orders up to his
+                    level; without a setting the level is Base.
+                {% endblocktranslate %}
+            </p>
+
+            {% if rows %}
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>{% translate "Name" %}</th>
+                                <th>{% translate "Corporation" %}</th>
+                                <th>{% translate "Access" %}</th>
+                                <th>{% translate "Level" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                                <tr>
+                                    <td>{{ row.name }}</td>
+                                    <td>{{ row.corporation|default:"-" }}</td>
+                                    <td>
+                                        {% if row.is_manager %}
+                                            <span class="badge bg-primary">{% translate "Manager" %}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{% translate "Builder" %}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form method="post" action="{% url 'evebuilders:set_level' row.user.pk %}"
+                                              class="d-flex gap-2">
+                                            {% csrf_token %}
+                                            <select name="level" class="form-select form-select-sm" style="width: auto;">
+                                                {% for value, label in levels %}
+                                                    <option value="{{ value }}" {% if value == row.level %}selected{% endif %}>
+                                                        {{ label }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                {% translate "Save" %}
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="mb-0">{% translate "Nobody has the builder or manager access yet." %}</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

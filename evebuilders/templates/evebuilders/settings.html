@@ -4,6 +4,7 @@
 {% load humanize %}
 
 {% block details %}
+    {% include 'evebuilders/settings_tabs.html' with active='general' %}
     <div class="card card-primary mb-3">
         <div class="card-header">
             <div class="card-title">{% translate "ESI connection" %}</div>

@@ -24,6 +24,7 @@ from esi.decorators import token_required
 
 # AA EVE Builders
 from evebuilders import app_settings
+from evebuilders.messages import display_name
 from evebuilders.catalog import (
     SyncResult,
     catalog_overview,
@@ -32,6 +33,7 @@ from evebuilders.catalog import (
 )
 from evebuilders.contracts import CONTRACTS_SCOPE, connect_source
 from evebuilders.forms import OrderForm
+from evebuilders.levels import builder_users, level_rows, set_builder_level
 from evebuilders.models import CatalogSync, ContractSource, Order
 from evebuilders.orders import (
     create_order,
@@ -402,3 +404,51 @@ def sync_contracts_view(request: WSGIRequest) -> HttpResponse:
         _report_messages(request, attempt.report)
 
     return redirect("evebuilders:my_orders")
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+def builder_levels_view(request: WSGIRequest) -> HttpResponse:
+    """
+    The builders and their access levels (managers only)
+    :param request:
+    :return:
+    """
+
+    context = {"rows": level_rows(), "levels": Order.AccessLevel.choices}
+
+    return render(request, "evebuilders/builder_levels.html", context)
+
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+@require_POST
+def set_level_view(request: WSGIRequest, user_id: int) -> HttpResponse:
+    """
+    Change the access level of a builder (managers only)
+    :param request: POST parameter ``level``
+    :param user_id: The builder
+    :return:
+    """
+
+    user = get_object_or_404(builder_users(), pk=user_id)
+
+    try:
+        level = int(request.POST.get("level", ""))
+        changed = set_builder_level(actor=request.user, user=user, level=level)
+    except ValueError:
+        messages.error(request, _("Please pick a level."))
+    except ValidationError as ex:
+        for message in ex.messages:
+            messages.error(request, message)
+    else:
+        text = {"name": display_name(user), "level": Order.AccessLevel(level).label}
+        if changed:
+            messages.success(
+                request, _("The level of %(name)s is now %(level)s.") % text
+            )
+        else:
+            messages.info(
+                request, _("The level of %(name)s did not change.") % text
+            )
+
+    return redirect("evebuilders:builder_levels")

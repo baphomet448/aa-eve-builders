@@ -31,7 +31,7 @@
     {{ block.super }}
     {% if perms.evebuilders.manage_access %}
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}"
+            <a class="nav-link {% if request.resolver_match.url_name == 'settings' or request.resolver_match.url_name == 'builder_levels' %}active{% endif %}"
                href="{% url 'evebuilders:settings' %}">
                 {% translate "Settings" %}
             </a>
