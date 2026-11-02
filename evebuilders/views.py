@@ -34,6 +34,8 @@ from evebuilders.catalog import (
 from evebuilders.contracts import CONTRACTS_SCOPE, connect_source
 from evebuilders.forms import OrderForm
 from evebuilders.levels import builder_users, level_rows, set_builder_level
+from evebuilders.manager_actions import credit_manually, release_share
+from evebuilders.order_detail import contract_rows, event_rows, share_rows
 from evebuilders.models import CatalogSync, ContractSource, Order
 from evebuilders.orders import (
     create_order,
@@ -452,3 +454,104 @@ def set_level_view(request: WSGIRequest, user_id: int) -> HttpResponse:
             )
 
     return redirect("evebuilders:builder_levels")
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+def order_detail(request: WSGIRequest, order_id: int) -> HttpResponse:
+    """
+    Everything about one order: its builders, contracts and history (managers only)
+    :param request:
+    :param order_id: The order
+    :return:
+    """
+
+    order = get_object_or_404(visible_orders(request.user), pk=order_id)
+
+    context = {
+        "order": order,
+        "shares": share_rows(order),
+        "contracts": contract_rows(order),
+        "events": event_rows(order),
+    }
+
+    return render(request, "evebuilders/order_detail.html", context)
+
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+@require_POST
+def release_view(request: WSGIRequest, order_id: int) -> HttpResponse:
+    """
+    A manager takes items back from a builder
+    :param request: POST parameters ``share`` and, optionally, ``quantity``
+    :param order_id: The order
+    :return:
+    """
+
+    order = get_object_or_404(Order, pk=order_id, kind=Order.Kind.CORPORATE)
+
+    try:
+        assignment_id = int(request.POST.get("share", ""))
+        raw_quantity = request.POST.get("quantity", "").strip()
+        quantity = int(raw_quantity) if raw_quantity else None
+        released = release_share(
+            actor=request.user,
+            order_id=order.pk,
+            assignment_id=assignment_id,
+            quantity=quantity,
+        )
+    except ValueError:
+        messages.error(request, _("Please check the numbers."))
+    except ValidationError as ex:
+        for message in ex.messages:
+            messages.error(request, message)
+    else:
+        messages.success(
+            request,
+            _("%(quantity)s items of order %(number)s are free again.")
+            % {"quantity": released, "number": order.number},
+        )
+
+    return redirect("evebuilders:order_detail", order_id=order.pk)
+
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+@require_POST
+def credit_view(request: WSGIRequest, order_id: int) -> HttpResponse:
+    """
+    A manager credits items to a builder by hand
+    :param request: POST parameters ``share``, ``quantity`` and, optionally,
+        ``contract`` and ``comment``
+    :param order_id: The order
+    :return:
+    """
+
+    order = get_object_or_404(Order, pk=order_id, kind=Order.Kind.CORPORATE)
+
+    try:
+        assignment_id = int(request.POST.get("share", ""))
+        quantity = int(request.POST.get("quantity", ""))
+        raw_contract = request.POST.get("contract", "").strip()
+        contract_id = int(raw_contract) if raw_contract else None
+        credited = credit_manually(
+            actor=request.user,
+            order_id=order.pk,
+            assignment_id=assignment_id,
+            quantity=quantity,
+            comment=request.POST.get("comment", "")[:200],
+            contract_id=contract_id,
+        )
+    except ValueError:
+        messages.error(request, _("Please check the numbers."))
+    except ValidationError as ex:
+        for message in ex.messages:
+            messages.error(request, message)
+    else:
+        messages.success(
+            request,
+            _("%(quantity)s items of order %(number)s were credited.")
+            % {"quantity": credited, "number": order.number},
+        )
+
+    return redirect("evebuilders:order_detail", order_id=order.pk)

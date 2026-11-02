@@ -42,7 +42,13 @@
                         <tbody>
                             {% for order in orders %}
                                 <tr>
-                                    <td class="text-nowrap" data-value="{{ order.pk|unlocalize }}">{{ order.number }}</td>
+                                    <td class="text-nowrap" data-value="{{ order.pk|unlocalize }}">
+                                        {% if perms.evebuilders.manage_access %}
+                                            <a href="{% url 'evebuilders:order_detail' order.pk %}">{{ order.number }}</a>
+                                        {% else %}
+                                            {{ order.number }}
+                                        {% endif %}
+                                    </td>
                                     <td data-value="{{ order.status_rank|unlocalize }}">
                                         <span class="badge
                                             {% if order.status == 'NEW' %}bg-primary

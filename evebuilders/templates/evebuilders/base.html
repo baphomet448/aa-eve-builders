@@ -13,7 +13,7 @@
 {% block header_nav_collapse_left %}
     {% if perms.evebuilders.builder_access or perms.evebuilders.manage_access %}
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'orders' or request.resolver_match.url_name == 'new_order' %}active{% endif %}"
+            <a class="nav-link {% if request.resolver_match.url_name == 'orders' or request.resolver_match.url_name == 'new_order' or request.resolver_match.url_name == 'order_detail' %}active{% endif %}"
                href="{% url 'evebuilders:orders' %}">
                 {% translate "Corporate orders" %}
             </a>
