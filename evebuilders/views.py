@@ -35,6 +35,7 @@ from evebuilders.contracts import CONTRACTS_SCOPE, connect_source
 from evebuilders.forms import OrderEditForm, OrderForm
 from evebuilders.levels import builder_users, level_rows, set_builder_level
 from evebuilders.manager_actions import (
+    cancel_order,
     credit_manually,
     item_is_locked,
     release_share,
@@ -630,3 +631,34 @@ def edit_order(request: WSGIRequest, order_id: int) -> HttpResponse:
     context = {"form": form, "order": order, "editing": True, "item_locked": locked}
 
     return render(request, "evebuilders/order_form.html", context)
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+@require_POST
+def delete_order(request: WSGIRequest, order_id: int) -> HttpResponse:
+    """
+    Delete (cancel) an order (managers only)
+    :param request: POST parameter ``reason``, optional
+    :param order_id: The order
+    :return:
+    """
+
+    order = get_object_or_404(Order, pk=order_id, kind=Order.Kind.CORPORATE)
+
+    try:
+        cancel_order(
+            actor=request.user,
+            order_id=order.pk,
+            reason=request.POST.get("reason", "")[:200],
+        )
+    except ValidationError as ex:
+        for message in ex.messages:
+            messages.error(request, message)
+
+        return redirect("evebuilders:order_detail", order_id=order.pk)
+
+    messages.success(
+        request, _("Order %(number)s was deleted.") % {"number": order.number}
+    )
+
+    return redirect("evebuilders:orders")

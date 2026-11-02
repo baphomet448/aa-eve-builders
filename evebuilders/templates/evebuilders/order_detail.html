@@ -103,6 +103,8 @@
                                             <span class="badge bg-warning">{% translate "Under review" %}</span>
                                         {% elif row.status == 'DONE' %}
                                             <span class="badge bg-success">{% translate "Done" %}</span>
+                                        {% elif row.status == 'CANCELLED' %}
+                                            <span class="badge bg-secondary">{% translate "Cancelled" %}</span>
                                         {% else %}
                                             <span class="badge bg-info">{% translate "In progress" %}</span>
                                         {% endif %}
@@ -244,4 +246,33 @@
             {% endif %}
         </div>
     </div>
+    
+    {% if order.status != 'CANCELLED' %}
+        <div class="card border-danger mt-3">
+            <div class="card-header">
+                <div class="card-title">{% translate "Delete order" %}</div>
+            </div>
+            <div class="card-body">
+                <p>
+                    {% blocktranslate trimmed %}
+                        The order is cancelled: builders can no longer take it, contracts for it
+                        are not credited automatically (you can credit them by hand), and
+                        everyone is told in Discord. It stays in the list and in the history.
+                    {% endblocktranslate %}
+                </p>
+                {% translate "Delete this order? Builders will not be able to take it any more." as confirm_text %}
+                <form method="post" action="{% url 'evebuilders:delete_order' order.pk %}"
+                      class="d-flex flex-wrap gap-2"
+                      onsubmit="return confirm('{{ confirm_text|escapejs }}');">
+                    {% csrf_token %}
+                    <input type="text" name="reason" maxlength="200"
+                           placeholder="{% translate 'reason (optional)' %}"
+                           class="form-control form-control-sm" style="width: 20rem;">
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        {% translate "Delete order" %}
+                    </button>
+                </form>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

@@ -1,12 +1,14 @@
 """What a manager can do with the shares and contracts of an order"""
 
 # Standard Library
+from datetime import timedelta
 from typing import Any, NamedTuple
 # Django
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce
+from django.utils import timezone
 from django.utils.translation import gettext as _
 
 # AA EVE Builders
@@ -14,6 +16,7 @@ from evebuilders.messages import (
     FIELD_LABELS,
     display_name,
     manual_credit_payload,
+    order_cancelled_payload,
     order_changed_payload,
     released_payload,
     show_value,
@@ -347,3 +350,79 @@ def update_order(*, actor, order_id: int, values: dict) -> list[Change]:
         )
 
     return changes
+
+# How long the creator of an order who is not a manager may still delete it
+DELETE_WINDOW = timedelta(hours=1)
+
+
+def can_delete_order(user, order: Order) -> bool:
+    """
+    Whether the user may delete (cancel) the order.
+
+    A manager may delete any order at any time, whatever its status. Someone
+    who is not a manager may delete an order he created himself, but only
+    within an hour and only while nobody has taken it.
+    """
+
+    if order.status == Order.Status.CANCELLED:
+        return False
+
+    if user.has_perm(MANAGE_ACCESS):
+        return True
+
+    return (
+        order.created_by_id == user.pk
+        and order.status == Order.Status.NEW
+        and timezone.now() - order.created_at <= DELETE_WINDOW
+        and not item_is_locked(order)
+    )
+
+
+def cancel_order(*, actor, order_id: int, reason: str = "") -> Order:
+    """
+    Delete an order. It is not erased but cancelled: builders can no longer
+    take it, contracts for it are not credited automatically any more, and it
+    stays in the history. Discord is told.
+
+    :param reason: Why, if the manager says (shown in the history and in Discord)
+    :raises django.core.exceptions.ValidationError: When the user may not delete
+        this order or it is cancelled already. Nothing is changed in that case.
+    :return: The cancelled order
+    """
+
+    reason = (reason or "").strip()
+
+    with transaction.atomic():
+        order = (
+            Order.objects.select_for_update()
+            .select_related("eve_type")
+            .get(pk=order_id, kind=Order.Kind.CORPORATE)
+        )
+
+        if order.status == Order.Status.CANCELLED:
+            raise ValidationError(_("This order is already cancelled."))
+        if not can_delete_order(actor, order):
+            raise ValidationError(_("You cannot delete this order."))
+
+        order.status = Order.Status.CANCELLED
+        order.updated_by = actor
+        order.save(update_fields=["status", "updated_by", "updated_at"])
+
+        taken = _sum(order.assignments, "taken")
+        text = "Order cancelled"
+        if reason:
+            text += f": {reason}"
+        OrderEvent.objects.create(
+            order=order,
+            kind=OrderEvent.Kind.CANCELLED,
+            actor=actor,
+            description=text,
+        )
+        notify(
+            CHANNEL_NEW_ORDER,
+            order_cancelled_payload(
+                manager=actor, order=order, taken=taken, reason=reason
+            ),
+        )
+
+    return order

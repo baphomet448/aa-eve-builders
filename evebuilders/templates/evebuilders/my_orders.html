@@ -79,6 +79,8 @@
                                             <span class="badge bg-warning">{% translate "Under review" %}</span>
                                         {% elif row.status == 'DONE' %}
                                             <span class="badge bg-success">{% translate "Done" %}</span>
+                                        {% elif row.status == 'CANCELLED' %}
+                                            <span class="badge bg-secondary">{% translate "Cancelled" %}</span>
                                         {% else %}
                                             <span class="badge bg-info">{% translate "In progress" %}</span>
                                         {% endif %}

@@ -302,3 +302,25 @@ def order_changed_payload(*, manager, order: Order, changes) -> dict:
             for change in changes
         ],
     )
+
+def order_cancelled_payload(
+    *, manager, order: Order, taken: int, reason: str = ""
+) -> dict:
+    """An order was deleted (cancelled)
+
+    :param taken: How many items builders had taken
+    :param reason: Why, if the manager said
+    """
+
+    fields = [
+        ("Наименование", order.eve_type.name),
+        ("Количество", str(order.quantity)),
+    ]
+    if taken:
+        fields.append(("Было взято в работу", f"{taken} шт"))
+    if reason:
+        fields.append(("Причина", reason))
+
+    return build_payload(
+        [f"Заказ {order.number} был удален {display_name(manager)}"], fields
+    )

@@ -470,6 +470,9 @@ def share_status(share: OrderAssignment) -> str:
     taken is credited, otherwise IN_PROGRESS.
     """
 
+    if share.order.status == Order.Status.CANCELLED:
+        return "CANCELLED"
+
     if pending_quantity(share) > 0:
         return "UNDER_REVIEW"
 

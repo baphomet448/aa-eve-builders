@@ -192,7 +192,15 @@ def classify_contract(
             reason=_("The builder has not taken this order."),
             order=order,
         )
-
+    
+    if order.status == Order.Status.CANCELLED:
+        return Verdict(
+            Outcome.INVALID,
+            reason=_("The order was cancelled."),
+            order=order,
+            share=share,
+        )
+    
     items = items_loader(contract_id)
     quantity = sum(
         item.get("quantity", 0)
