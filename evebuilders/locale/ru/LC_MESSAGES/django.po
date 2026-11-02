@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aa-eve-builders 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 17:41+0000\n"
+"POT-Creation-Date: 2026-11-02 22:58+0000\n"
 "PO-Revision-Date: 2026-11-02 18:00+0000\n"
 "Last-Translator: baphomet448\n"
 "Language-Team: Russian\n"
@@ -10,751 +10,1176 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
+#: auth_hooks.py templates/evebuilders/base.html
+#: templates/evebuilders/order_detail.html
+#: templates/evebuilders/order_list.html
 msgid "Corporate orders"
 msgstr "Корпоративные заказы"
 
+#: auth_hooks.py templates/evebuilders/base.html
+#: templates/evebuilders/my_orders.html
 msgid "My orders"
 msgstr "Мои заказы"
 
-msgid "The character %(name)s is not on your Auth account. Add it there first and connect again."
-msgstr "Персонаж %(name)s не привязан к вашему аккаунту Auth. Сначала добавьте его там и подключитесь снова."
+#: contracts.py
+#, python-format
+msgid ""
+"The character %(name)s is not on your Auth account. Add it there first and "
+"connect again."
+msgstr ""
+"Персонаж %(name)s не привязан к вашему аккаунту Auth. Сначала добавьте его "
+"там и подключитесь снова."
 
+#: forms.py templates/evebuilders/management.html
+#: templates/evebuilders/my_orders.html templates/evebuilders/order_detail.html
+#: templates/evebuilders/order_list.html
 msgid "Item"
 msgstr "Предмет"
 
+#: forms.py
 msgid "Start typing the item name"
 msgstr "Начните вводить название предмета"
 
+#: forms.py
 msgid "Please pick an item from the list."
 msgstr "Выберите предмет из списка."
 
+#: forms.py templates/evebuilders/management.html
+#: templates/evebuilders/my_orders.html templates/evebuilders/order_detail.html
+#: templates/evebuilders/order_list.html
 msgid "Quantity"
 msgstr "Количество"
 
+#: forms.py
 msgid "Price per unit (ISK)"
 msgstr "Цена за единицу (ISK)"
 
+#: forms.py templates/evebuilders/my_orders.html
+#: templates/evebuilders/order_detail.html
+#: templates/evebuilders/order_list.html
 msgid "Priority"
 msgstr "Приоритет"
 
+#: forms.py templates/evebuilders/my_orders.html
+#: templates/evebuilders/order_detail.html
+#: templates/evebuilders/order_list.html
 msgid "Due date"
 msgstr "Срок сдачи"
 
+#: forms.py templates/evebuilders/order_detail.html
+#: templates/evebuilders/order_list.html
 msgid "Access level"
 msgstr "Уровень доступа"
 
+#: forms.py
 msgid "Builders below this level will not see the order."
 msgstr "Строители ниже этого уровня не увидят заказ."
 
+#: forms.py templates/evebuilders/order_detail.html
+#: templates/evebuilders/order_list.html
 msgid "Destination"
 msgstr "Доставка"
 
+#: forms.py templates/evebuilders/order_detail.html
 msgid "Note"
 msgstr "Примечание"
 
+#: forms.py orders.py
 msgid "The due date cannot be in the past."
 msgstr "Срок сдачи не может быть в прошлом."
 
+#: forms.py
 msgid "This item is not in the catalog."
 msgstr "Этого предмета нет в каталоге."
 
+#: levels.py
 msgid "Unknown access level."
 msgstr "Неизвестный уровень доступа."
 
+#: manager_actions.py places.py
 msgid "Only managers can do this."
 msgstr "Это могут делать только менеджеры."
 
+#: manager_actions.py
 msgid "This share does not belong to the order."
 msgstr "Эта часть не относится к этому заказу."
 
-msgid "There is nothing to release: everything is delivered or waits for a contract to be accepted."
+#: manager_actions.py
+msgid ""
+"There is nothing to release: everything is delivered or waits for a contract "
+"to be accepted."
 msgstr "Нечего освобождать: всё сдано или ожидает принятия контракта."
 
+#: manager_actions.py
+#, python-format
 msgid "You can release between 1 and %(available)s items."
 msgstr "Можно освободить от 1 до %(available)s шт."
 
+#: manager_actions.py
+#, python-format
 msgid "The contract %(id)s is not known to the plugin."
 msgstr "Контракт %(id)s плагину неизвестен."
 
+#: manager_actions.py
 msgid "This contract is already credited."
 msgstr "Этот контракт уже зачтён."
 
-msgid "There is nothing left to credit: everything is already credited or waits in other contracts."
+#: manager_actions.py
+msgid ""
+"There is nothing left to credit: everything is already credited or waits in "
+"other contracts."
 msgstr "Зачитывать нечего: всё уже зачтено или находится в других контрактах."
 
+#: manager_actions.py
+#, python-format
 msgid "You can credit between 1 and %(available)s items."
 msgstr "Можно зачесть от 1 до %(available)s шт."
 
+#: manager_actions.py
 msgid "A finished or cancelled order cannot be changed."
 msgstr "Завершённый или отменённый заказ изменить нельзя."
 
-msgid "The item cannot be changed: builders already took or delivered this order."
+#: manager_actions.py
+msgid ""
+"The item cannot be changed: builders already took or delivered this order."
 msgstr "Предмет изменить нельзя: строители уже взяли или сдали этот заказ."
 
-msgid "The quantity cannot be lower than the %(taken)s items that are already taken."
+#: manager_actions.py
+#, python-format
+msgid ""
+"The quantity cannot be lower than the %(taken)s items that are already taken."
 msgstr "Количество не может быть меньше уже взятых %(taken)s шт."
 
-msgid "The price cannot be changed while contracts for this order wait for acceptance."
+#: manager_actions.py
+msgid ""
+"The price cannot be changed while contracts for this order wait for "
+"acceptance."
 msgstr "Цену нельзя менять, пока контракты по этому заказу ожидают принятия."
 
+#: manager_actions.py
 msgid "This order is already cancelled."
 msgstr "Этот заказ уже отменён."
 
+#: manager_actions.py
 msgid "You cannot delete this order."
 msgstr "Вы не можете удалить этот заказ."
 
+#: models.py
 msgid "Corporate"
 msgstr "Корпоративный"
 
+#: models.py
 msgid "Private"
 msgstr "Личный"
 
+#: models.py
 msgid "New"
 msgstr ""
 
+#: models.py templates/evebuilders/my_orders.html
+#: templates/evebuilders/order_detail.html
 msgid "In progress"
 msgstr ""
 
+#: models.py
 msgid "Distributed"
 msgstr ""
 
-msgid "Completed"
-msgstr ""
-
-msgid "Cancelled"
-msgstr ""
-
-msgid "Low"
-msgstr ""
-
-msgid "Medium"
-msgstr ""
-
-msgid "High"
-msgstr ""
-
-msgid "Base"
-msgstr ""
-
-msgid "Middle"
-msgstr ""
-
-msgid "Senior"
-msgstr ""
-
-msgid "Corporation"
-msgstr "Корпорация"
-
-msgid "User"
-msgstr "Пользователь"
-
-msgid "Order created"
-msgstr "Заказ создан"
-
-msgid "Order updated"
-msgstr "Заказ изменён"
-
-msgid "Order cancelled"
-msgstr "Заказ отменён"
-
-msgid "Taken"
-msgstr "Взято"
-
-msgid "Discarded"
-msgstr "Отказ от части"
-
-msgid "Share released by manager"
-msgstr "Часть освобождена менеджером"
-
-msgid "Contract found"
-msgstr "Контракт найден"
-
-msgid "Contract invalid"
-msgstr "Некорректный контракт"
-
-msgid "Contract closed"
-msgstr "Контракт закрыт"
-
-msgid "Credited"
-msgstr ""
-
-msgid "Credited manually"
-msgstr "Зачтено вручную"
-
-msgid "Builder level changed"
-msgstr "Уровень строителя изменён"
-
-msgid "ESI token problem"
-msgstr "Проблема с токеном ESI"
-
-msgid "Waiting for acceptance"
-msgstr ""
-
-msgid "Invalid"
-msgstr ""
-
-msgid "Closed without credit"
-msgstr ""
-
-msgid "The corporation is unknown. Please set a main character first."
-msgstr "Корпорация неизвестна. Сначала укажите основного персонажа."
-
-msgid "You are not allowed to take orders."
-msgstr "Вам нельзя брать заказы."
-
-msgid "This order is not available to you."
-msgstr "Этот заказ вам недоступен."
-
-msgid "This order is closed."
-msgstr "Этот заказ закрыт."
-
-msgid "The quantity must be at least 1."
-msgstr "Количество должно быть не меньше 1."
-
-msgid "Only %(free)s items are free in this order."
-msgstr "В этом заказе свободно только %(free)s шт."
-
-msgid "You have not taken this order."
-msgstr "Вы не брали этот заказ."
-
-msgid "It is too late to give this order back: more than half of the time until the due date has passed. Please ask a manager."
-msgstr "Вернуть заказ уже поздно: прошло больше половины времени до срока сдачи. Обратитесь к менеджеру."
-
-msgid "There is nothing to give back: everything is delivered or waits for a contract to be accepted."
-msgstr "Возвращать нечего: всё сдано или ожидает принятия контракта."
-
-msgid "You can give back between 1 and %(available)s items."
-msgstr "Можно вернуть от 1 до %(available)s шт."
-
-msgid "This station is not in that system."
-msgstr "Эта станция находится не в этой системе."
-
-msgid "This place is already in the list."
-msgstr "Это место уже есть в списке."
-
-msgid "The contract is %(status)s."
-msgstr "Статус контракта: %(status)s."
-
-msgid "The contract title has no order number."
-msgstr "В названии контракта нет номера заказа."
-
-msgid "The contract title has more than one order number."
-msgstr "В названии контракта больше одного номера заказа."
-
-msgid "There is no order with the number %(number)s."
-msgstr "Заказа с номером %(number)s нет."
-
-msgid "The character that made the contract is not on an Auth account."
-msgstr "Персонаж, создавший контракт, не привязан к аккаунту Auth."
-
-msgid "The builder has not taken this order."
-msgstr "Строитель не брал этот заказ."
-
-msgid "The contract does not contain %(item)s."
-msgstr "В контракте нет предмета %(item)s."
-
-msgid "The price must be %(expected)s ISK for %(quantity)s items."
-msgstr "Цена должна быть %(expected)s ISK за %(quantity)s шт."
-
-msgid "Only %(available)s items are left to deliver, the contract has %(quantity)s."
-msgstr "Осталось сдать только %(available)s шт., а в контракте %(quantity)s."
-
-msgid "The items are no longer available to deliver."
-msgstr "Эти предметы больше недоступны для сдачи."
-
-msgid "The order was cancelled."
-msgstr "Заказ отменён."
-
-msgid "No ESI source is connected."
-msgstr "ESI-источник не подключён."
-
-msgid "EVE Builders"
-msgstr "EVE Builders"
-
-msgid "Management"
-msgstr "Управление"
-
-msgid "Settings"
-msgstr "Настройки"
-
-msgid "Builder levels"
-msgstr "Уровни строителей"
-
-msgid "People are listed here when their groups, their state or their own permissions give them the Builder or Manager access (give the permission in the Auth group settings). A builder sees and takes the orders up to his level; without a setting the level is Base."
-msgstr "Здесь перечислены люди, которым группы, статус (state) или собственные права дают доступ строителя или менеджера (право выдаётся в настройках групп Auth). Строитель видит и берёт заказы до своего уровня; без настройки уровень — Base."
-
-msgid "Name"
-msgstr "Имя"
-
-msgid "Access"
-msgstr "Доступ"
-
-msgid "Level"
-msgstr "Уровень"
-
-msgid "Manager"
-msgstr "Менеджер"
-
-msgid "Builder"
-msgstr "Строитель"
-
-msgid "Save"
-msgstr "Сохранить"
-
-msgid "Nobody has the builder or manager access yet."
-msgstr "Пока ни у кого нет доступа строителя или менеджера."
-
-msgid "Contracts that need attention"
-msgstr "Контракты, требующие внимания"
-
-msgid "These contracts were found but cannot be credited (a missing order number, a wrong price, a cancelled order ...). Open the order and credit the contract by hand if it is fine. A contract that is deleted in the game disappears from this list."
-msgstr "Эти контракты найдены, но не могут быть зачтены (нет номера заказа, неверная цена, отменённый заказ ...). Откройте заказ и зачтите контракт вручную, если с ним всё в порядке. Контракт, удалённый в игре, пропадает из этого списка."
-
-msgid "Issued"
-msgstr "Создан"
-
-msgid "Contract"
-msgstr "Контракт"
-
-msgid "Title"
-msgstr "Название"
-
-msgid "Made by"
-msgstr "Создал"
-
-msgid "Problem"
-msgstr "Проблема"
-
-msgid "Orders"
-msgstr "Заказы"
-
-msgid "Nothing needs attention."
-msgstr "Ничего не требует внимания."
-
-msgid "Order"
-msgstr "Заказ"
-
-msgid "Price"
-msgstr "Цена"
-
-msgid "No contracts are waiting for acceptance."
-msgstr "Нет контрактов, ожидающих принятия."
-
-msgid "Latest activity"
-msgstr "Последняя активность"
-
-msgid "When"
-msgstr "Когда"
-
-msgid "Event"
-msgstr "Событие"
-
-msgid "By"
-msgstr "Кто"
-
-msgid "Details"
-msgstr "Подробности"
-
-msgid "Nothing has happened yet."
-msgstr "Пока ничего не происходило."
-
-msgid "Contracts were last checked %(when)s."
-msgstr "Контракты проверялись %(when)s."
-
-msgid "The next automatic check is around %(when)s (server time), right after ESI refreshes its data. A contract that you create, or that is accepted in the game, shows up after that."
-msgstr "Следующая автоматическая проверка примерно в %(when)s (время сервера), сразу после обновления данных ESI. Контракт, который вы создали или который приняли в игре, появится после этого."
-
-msgid "The last contract check failed:"
-msgstr "Последняя проверка контрактов не удалась:"
-
-msgid "The contracts have not been checked yet."
-msgstr "Контракты ещё не проверялись."
-
-msgid "ESI is not connected yet. A manager can connect it in the settings."
-msgstr "ESI ещё не подключён. Менеджер может подключить его в настройках."
-
-msgid "Sync contracts"
-msgstr "Проверить контракты"
-
-msgid "When your items are ready, create an item exchange contract to the corporation. Put the order number into the contract title and set the price to the price per unit multiplied by the quantity. Then press \"Sync contracts\"."
-msgstr "Когда предметы готовы, создайте контракт «обмен предметами» на корпорацию. Впишите номер заказа в название контракта, а цену поставьте равной цене за единицу, умноженной на количество. Затем нажмите «Проверить контракты»."
-
-msgid "Status"
-msgstr "Статус"
-
-msgid "Price per unit"
-msgstr "Цена за единицу"
-
-msgid "Total price"
-msgstr "Общая цена"
-
-msgid "Ready"
-msgstr "Зачтено"
-
-msgid "In contracts"
-msgstr "В контрактах"
-
-msgid "Can be given back"
-msgstr "Можно вернуть"
-
-msgid "Give back until"
-msgstr "Вернуть до"
-
-msgid "Under review"
-msgstr ""
-
+#: models.py templates/evebuilders/my_orders.html
+#: templates/evebuilders/order_detail.html
 msgid "Done"
 msgstr ""
 
+#: models.py templates/evebuilders/my_orders.html
+#: templates/evebuilders/order_detail.html
+msgid "Cancelled"
+msgstr ""
+
+#: models.py
+msgid "Low"
+msgstr ""
+
+#: models.py
+msgid "Medium"
+msgstr ""
+
+#: models.py
+msgid "High"
+msgstr ""
+
+#: models.py
+msgid "Base"
+msgstr ""
+
+#: models.py
+msgid "Middle"
+msgstr ""
+
+#: models.py
+msgid "Senior"
+msgstr ""
+
+#: models.py templates/evebuilders/builder_levels.html
+#: templates/evebuilders/settings.html
+msgid "Corporation"
+msgstr "Корпорация"
+
+#: models.py
+msgid "User"
+msgstr "Пользователь"
+
+#: models.py
+msgid "Order created"
+msgstr "Заказ создан"
+
+#: models.py
+msgid "Order updated"
+msgstr "Заказ изменён"
+
+#: models.py
+msgid "Order cancelled"
+msgstr "Заказ отменён"
+
+#: models.py templates/evebuilders/my_orders.html
+#: templates/evebuilders/order_detail.html
+#: templates/evebuilders/order_list.html
+msgid "Taken"
+msgstr "Взято"
+
+#: models.py
+msgid "Discarded"
+msgstr "Отказ от части"
+
+#: models.py
+msgid "Share released by manager"
+msgstr "Часть освобождена менеджером"
+
+#: models.py
+msgid "Contract found"
+msgstr "Контракт найден"
+
+#: models.py
+msgid "Contract invalid"
+msgstr "Некорректный контракт"
+
+#: models.py
+msgid "Contract closed"
+msgstr "Контракт закрыт"
+
+#: models.py
+msgid "Credited"
+msgstr ""
+
+#: models.py
+msgid "Credited manually"
+msgstr "Зачтено вручную"
+
+#: models.py
+msgid "Builder level changed"
+msgstr "Уровень строителя изменён"
+
+#: models.py
+msgid "ESI token problem"
+msgstr "Проблема с токеном ESI"
+
+#: models.py templates/evebuilders/management.html
+msgid "Waiting for acceptance"
+msgstr ""
+
+#: models.py
+msgid "Invalid"
+msgstr ""
+
+#: models.py
+msgid "Closed without credit"
+msgstr ""
+
+#: orders.py
+msgid "The corporation is unknown. Please set a main character first."
+msgstr "Корпорация неизвестна. Сначала укажите основного персонажа."
+
+#: orders.py
+msgid "You are not allowed to take orders."
+msgstr "Вам нельзя брать заказы."
+
+#: orders.py
+msgid "This order is not available to you."
+msgstr "Этот заказ вам недоступен."
+
+#: orders.py
+msgid "This order is closed."
+msgstr "Этот заказ закрыт."
+
+#: orders.py
+msgid "The quantity must be at least 1."
+msgstr "Количество должно быть не меньше 1."
+
+#: orders.py
+#, python-format
+msgid "Only %(free)s items are free in this order."
+msgstr "В этом заказе свободно только %(free)s шт."
+
+#: orders.py
+msgid "You have not taken this order."
+msgstr "Вы не брали этот заказ."
+
+#: orders.py
+msgid ""
+"It is too late to give this order back: more than half of the time until the "
+"due date has passed. Please ask a manager."
+msgstr ""
+"Вернуть заказ уже поздно: прошло больше половины времени до срока сдачи. "
+"Обратитесь к менеджеру."
+
+#: orders.py
+msgid ""
+"There is nothing to give back: everything is delivered or waits for a "
+"contract to be accepted."
+msgstr "Возвращать нечего: всё сдано или ожидает принятия контракта."
+
+#: orders.py
+#, python-format
+msgid "You can give back between 1 and %(available)s items."
+msgstr "Можно вернуть от 1 до %(available)s шт."
+
+#: places.py
+msgid "This station is not in that system."
+msgstr "Эта станция находится не в этой системе."
+
+#: places.py
+msgid "This place is already in the list."
+msgstr "Это место уже есть в списке."
+
+#: reasons.py
+#, python-format
+msgid "The contract is %(status)s."
+msgstr "Статус контракта: %(status)s."
+
+#: reasons.py
+msgid "The contract title has no order number."
+msgstr "В названии контракта нет номера заказа."
+
+#: reasons.py
+msgid "The contract title has more than one order number."
+msgstr "В названии контракта больше одного номера заказа."
+
+#: reasons.py
+#, python-format
+msgid "There is no order with the number %(number)s."
+msgstr "Заказа с номером %(number)s нет."
+
+#: reasons.py
+msgid "The character that made the contract is not on an Auth account."
+msgstr "Персонаж, создавший контракт, не привязан к аккаунту Auth."
+
+#: reasons.py
+msgid "The builder has not taken this order."
+msgstr "Строитель не брал этот заказ."
+
+#: reasons.py
+#, python-format
+msgid "The contract does not contain %(item)s."
+msgstr "В контракте нет предмета %(item)s."
+
+#: reasons.py
+#, python-format
+msgid "The price must be %(expected)s ISK for %(quantity)s items."
+msgstr "Цена должна быть %(expected)s ISK за %(quantity)s шт."
+
+#: reasons.py
+#, python-format
+msgid ""
+"Only %(available)s items are left to deliver, the contract has %(quantity)s."
+msgstr "Осталось сдать только %(available)s шт., а в контракте %(quantity)s."
+
+#: reasons.py
+msgid "The items are no longer available to deliver."
+msgstr "Эти предметы больше недоступны для сдачи."
+
+#: reasons.py
+msgid "The order was cancelled."
+msgstr "Заказ отменён."
+
+#: sync.py
+msgid "No ESI source is connected."
+msgstr "ESI-источник не подключён."
+
+#: templates/evebuilders/base.html
+msgid "EVE Builders"
+msgstr "EVE Builders"
+
+#: templates/evebuilders/base.html
+msgid "Management"
+msgstr "Управление"
+
+#: templates/evebuilders/base.html
+msgid "Settings"
+msgstr "Настройки"
+
+#: templates/evebuilders/builder_levels.html
+#: templates/evebuilders/settings_tabs.html
+msgid "Builder levels"
+msgstr "Уровни строителей"
+
+#: templates/evebuilders/builder_levels.html
+msgid ""
+"People are listed here when their groups, their state or their own "
+"permissions give them the Builder or Manager access (give the permission in "
+"the Auth group settings). A builder sees and takes the orders up to his "
+"level; without a setting the level is Base."
+msgstr ""
+"Здесь перечислены люди, которым группы, статус (state) или собственные права "
+"дают доступ строителя или менеджера (право выдаётся в настройках групп "
+"Auth). Строитель видит и берёт заказы до своего уровня; без настройки "
+"уровень — Base."
+
+#: templates/evebuilders/builder_levels.html
+#: templates/evebuilders/settings.html
+msgid "Name"
+msgstr "Имя"
+
+#: templates/evebuilders/builder_levels.html
+msgid "Access"
+msgstr "Доступ"
+
+#: templates/evebuilders/builder_levels.html
+msgid "Level"
+msgstr "Уровень"
+
+#: templates/evebuilders/builder_levels.html
+msgid "Manager"
+msgstr "Менеджер"
+
+#: templates/evebuilders/builder_levels.html
+#: templates/evebuilders/management.html
+#: templates/evebuilders/order_detail.html
+msgid "Builder"
+msgstr "Строитель"
+
+#: templates/evebuilders/builder_levels.html
+msgid "Save"
+msgstr "Сохранить"
+
+#: templates/evebuilders/builder_levels.html
+msgid "Nobody has the builder or manager access yet."
+msgstr "Пока ни у кого нет доступа строителя или менеджера."
+
+#: templates/evebuilders/management.html
+msgid "Contracts that need attention"
+msgstr "Контракты, требующие внимания"
+
+#: templates/evebuilders/management.html
+msgid ""
+"These contracts were found but cannot be credited (a missing order number, a "
+"wrong price, a cancelled order ...). Open the order and credit the contract "
+"by hand if it is fine. A contract that is deleted in the game disappears "
+"from this list."
+msgstr ""
+"Эти контракты найдены, но не могут быть зачтены (нет номера заказа, неверная "
+"цена, отменённый заказ ...). Откройте заказ и зачтите контракт вручную, если "
+"с ним всё в порядке. Контракт, удалённый в игре, пропадает из этого списка."
+
+#: templates/evebuilders/management.html templates/evebuilders/my_orders.html
+#: templates/evebuilders/order_detail.html
+msgid "Issued"
+msgstr "Создан"
+
+#: templates/evebuilders/management.html
+#: templates/evebuilders/order_detail.html
+msgid "Contract"
+msgstr "Контракт"
+
+#: templates/evebuilders/management.html templates/evebuilders/my_orders.html
+#: templates/evebuilders/order_detail.html
+msgid "Title"
+msgstr "Название"
+
+#: templates/evebuilders/management.html
+msgid "Made by"
+msgstr "Создал"
+
+#: templates/evebuilders/management.html templates/evebuilders/my_orders.html
+#: templates/evebuilders/order_detail.html templates/evebuilders/settings.html
+msgid "Problem"
+msgstr "Проблема"
+
+#: templates/evebuilders/management.html
+msgid "Orders"
+msgstr "Заказы"
+
+#: templates/evebuilders/management.html
+msgid "Nothing needs attention."
+msgstr "Ничего не требует внимания."
+
+#: templates/evebuilders/management.html templates/evebuilders/my_orders.html
+#: templates/evebuilders/order_detail.html
+#: templates/evebuilders/order_list.html
+msgid "Order"
+msgstr "Заказ"
+
+#: templates/evebuilders/management.html templates/evebuilders/my_orders.html
+#: templates/evebuilders/order_detail.html
+msgid "Price"
+msgstr "Цена"
+
+#: templates/evebuilders/management.html
+msgid "No contracts are waiting for acceptance."
+msgstr "Нет контрактов, ожидающих принятия."
+
+#: templates/evebuilders/management.html
+msgid "Latest activity"
+msgstr "Последняя активность"
+
+#: templates/evebuilders/management.html
+#: templates/evebuilders/order_detail.html
+msgid "When"
+msgstr "Когда"
+
+#: templates/evebuilders/management.html
+#: templates/evebuilders/order_detail.html
+msgid "Event"
+msgstr "Событие"
+
+#: templates/evebuilders/management.html
+#: templates/evebuilders/order_detail.html
+msgid "By"
+msgstr "Кто"
+
+#: templates/evebuilders/management.html
+#: templates/evebuilders/order_detail.html
+msgid "Details"
+msgstr "Подробности"
+
+#: templates/evebuilders/management.html
+msgid "Nothing has happened yet."
+msgstr "Пока ничего не происходило."
+
+#: templates/evebuilders/my_orders.html
+#, python-format
+msgid "Contracts were last checked %(when)s."
+msgstr "Контракты проверялись %(when)s."
+
+#: templates/evebuilders/my_orders.html
+#, python-format
+msgid ""
+"The next automatic check is around %(when)s (server time), right after ESI "
+"refreshes its data. A contract that you create, or that is accepted in the "
+"game, shows up after that."
+msgstr ""
+"Следующая автоматическая проверка примерно в %(when)s (время сервера), сразу "
+"после обновления данных ESI. Контракт, который вы создали или который "
+"приняли в игре, появится после этого."
+
+#: templates/evebuilders/my_orders.html
+msgid "The last contract check failed:"
+msgstr "Последняя проверка контрактов не удалась:"
+
+#: templates/evebuilders/my_orders.html
+msgid "The contracts have not been checked yet."
+msgstr "Контракты ещё не проверялись."
+
+#: templates/evebuilders/my_orders.html
+msgid "ESI is not connected yet. A manager can connect it in the settings."
+msgstr "ESI ещё не подключён. Менеджер может подключить его в настройках."
+
+#: templates/evebuilders/my_orders.html
+msgid "Sync contracts"
+msgstr "Проверить контракты"
+
+#: templates/evebuilders/my_orders.html
+msgid ""
+"When your items are ready, create an item exchange contract to the "
+"corporation. Put the order number into the contract title and set the price "
+"to the price per unit multiplied by the quantity. Then press \"Sync "
+"contracts\"."
+msgstr ""
+"Когда предметы готовы, создайте контракт «обмен предметами» на корпорацию. "
+"Впишите номер заказа в название контракта, а цену поставьте равной цене за "
+"единицу, умноженной на количество. Затем нажмите «Проверить контракты»."
+
+#: templates/evebuilders/my_orders.html templates/evebuilders/order_detail.html
+#: templates/evebuilders/order_list.html
+msgid "Status"
+msgstr "Статус"
+
+#: templates/evebuilders/my_orders.html templates/evebuilders/order_detail.html
+#: templates/evebuilders/order_list.html
+msgid "Price per unit"
+msgstr "Цена за единицу"
+
+#: templates/evebuilders/my_orders.html
+msgid "Total price"
+msgstr "Общая цена"
+
+#: templates/evebuilders/my_orders.html templates/evebuilders/order_detail.html
+#: templates/evebuilders/order_list.html
+msgid "Ready"
+msgstr "Зачтено"
+
+#: templates/evebuilders/my_orders.html templates/evebuilders/order_detail.html
+msgid "In contracts"
+msgstr "В контрактах"
+
+#: templates/evebuilders/my_orders.html
+msgid "Can be given back"
+msgstr "Можно вернуть"
+
+#: templates/evebuilders/my_orders.html
+msgid "Give back until"
+msgstr "Вернуть до"
+
+#: templates/evebuilders/my_orders.html templates/evebuilders/order_detail.html
+msgid "Under review"
+msgstr ""
+
+#: templates/evebuilders/my_orders.html
 msgid "Give back the items that are not delivered yet?"
 msgstr "Вернуть предметы, которые ещё не сданы?"
 
+#: templates/evebuilders/my_orders.html
 msgid "Discard"
 msgstr "Отказаться"
 
+#: templates/evebuilders/my_orders.html
 msgid "You have not taken any orders yet."
 msgstr "Вы ещё не брали заказы."
 
+#: templates/evebuilders/my_orders.html
 msgid "Contracts that could not be counted"
 msgstr "Контракты, которые не удалось засчитать"
 
-msgid "These contracts were found, but they cannot be credited. The title of a contract cannot be changed, so create a new one with the order number in the title and the right price. A contract that is deleted disappears from this list."
-msgstr "Эти контракты найдены, но их нельзя зачесть. Название контракта изменить нельзя, поэтому создайте новый контракт с номером заказа в названии и правильной ценой. Удалённый контракт пропадает из этого списка."
+#: templates/evebuilders/my_orders.html
+msgid ""
+"These contracts were found, but they cannot be credited. The title of a "
+"contract cannot be changed, so create a new one with the order number in the "
+"title and the right price. A contract that is deleted disappears from this "
+"list."
+msgstr ""
+"Эти контракты найдены, но их нельзя зачесть. Название контракта изменить "
+"нельзя, поэтому создайте новый контракт с номером заказа в названии и "
+"правильной ценой. Удалённый контракт пропадает из этого списка."
 
+#: templates/evebuilders/order_detail.html
+#: templates/evebuilders/order_form.html
 msgid "Edit order"
 msgstr "Изменить заказ"
 
+#: templates/evebuilders/order_detail.html
 msgid "taken"
 msgstr "взято"
 
+#: templates/evebuilders/order_detail.html
 msgid "ready"
 msgstr "зачтено"
 
+#: templates/evebuilders/order_detail.html
 msgid "on review"
 msgstr ""
 
+#: templates/evebuilders/order_detail.html
 msgid "free"
 msgstr "свободно"
 
+#: templates/evebuilders/order_detail.html
 msgid "Created"
 msgstr "Создан"
 
+#: templates/evebuilders/order_detail.html
 msgid "Builders"
 msgstr "Строители"
 
+#: templates/evebuilders/order_detail.html
 msgid "Open"
 msgstr "Осталось"
 
+#: templates/evebuilders/order_detail.html
 msgid "Actions"
 msgstr "Действия"
 
+#: templates/evebuilders/order_detail.html
 msgid "all"
 msgstr "все"
 
+#: templates/evebuilders/order_detail.html
 msgid "Release"
 msgstr "Освободить"
 
+#: templates/evebuilders/order_detail.html
 msgid "quantity"
 msgstr "количество"
 
+#: templates/evebuilders/order_detail.html
 msgid "no contract"
 msgstr "без контракта"
 
+#: templates/evebuilders/order_detail.html
 msgid "comment"
 msgstr "комментарий"
 
+#: templates/evebuilders/order_detail.html
 msgid "Credit manually"
 msgstr "Зачесть вручную"
 
+#: templates/evebuilders/order_detail.html
 msgid "Nobody has taken this order."
 msgstr "Этот заказ никто не брал."
 
+#: templates/evebuilders/order_detail.html
 msgid "Contracts"
 msgstr "Контракты"
 
+#: templates/evebuilders/order_detail.html
 msgid "State"
 msgstr "Состояние"
 
+#: templates/evebuilders/order_detail.html
 msgid "Accepted by"
 msgstr "Принял"
 
+#: templates/evebuilders/order_detail.html
 msgid "No contracts for this order yet."
 msgstr "По этому заказу пока нет контрактов."
 
+#: templates/evebuilders/order_detail.html
 msgid "History"
 msgstr "История"
 
+#: templates/evebuilders/order_detail.html
 msgid "Nothing has happened to this order yet."
 msgstr "С этим заказом пока ничего не происходило."
 
+#: templates/evebuilders/order_detail.html
 msgid "Delete order"
 msgstr "Удалить заказ"
 
-msgid "The order is cancelled: builders can no longer take it, contracts for it are not credited automatically (you can credit them by hand), and everyone is told in Discord. It stays in the list and in the history."
-msgstr "Заказ будет отменён: строители больше не смогут его взять, контракты по нему не будут зачитываться автоматически (их можно зачесть вручную), а все получат уведомление в Discord. Заказ остаётся в списке и в истории."
+#: templates/evebuilders/order_detail.html
+msgid ""
+"The order is cancelled: builders can no longer take it, contracts for it are "
+"not credited automatically (you can credit them by hand), and everyone is "
+"told in Discord. It stays in the list and in the history."
+msgstr ""
+"Заказ будет отменён: строители больше не смогут его взять, контракты по нему "
+"не будут зачитываться автоматически (их можно зачесть вручную), а все "
+"получат уведомление в Discord. Заказ остаётся в списке и в истории."
 
+#: templates/evebuilders/order_detail.html
 msgid "Delete this order? Builders will not be able to take it any more."
 msgstr "Удалить этот заказ? Строители больше не смогут его взять."
 
+#: templates/evebuilders/order_detail.html
 msgid "reason (optional)"
 msgstr "причина (необязательно)"
 
+#: templates/evebuilders/order_form.html
 msgid "New corporate order"
 msgstr "Новый корпоративный заказ"
 
-msgid "The item cannot be changed because builders already took or delivered this order."
-msgstr "Предмет изменить нельзя, потому что строители уже взяли или сдали этот заказ."
+#: templates/evebuilders/order_form.html
+msgid ""
+"The item cannot be changed because builders already took or delivered this "
+"order."
+msgstr ""
+"Предмет изменить нельзя, потому что строители уже взяли или сдали этот заказ."
 
+#: templates/evebuilders/order_form.html
 msgid "Save changes"
 msgstr "Сохранить изменения"
 
+#: templates/evebuilders/order_form.html templates/evebuilders/order_list.html
 msgid "Create order"
 msgstr "Создать заказ"
 
+#: templates/evebuilders/order_list.html
 msgid "Free"
 msgstr "Свободно"
 
+#: templates/evebuilders/order_list.html
 msgid "On review"
 msgstr ""
 
+#: templates/evebuilders/order_list.html
 msgid "Take"
 msgstr "Взять"
 
+#: templates/evebuilders/order_list.html
 msgid "No orders to show."
 msgstr "Нет заказов для показа."
 
+#: templates/evebuilders/settings.html
 msgid "ESI connection"
 msgstr "Подключение ESI"
 
-msgid "The contracts of the corporation are read with the token of one corporation member (no in-game role is needed). This is how the plugin finds the contracts of the builders and credits them."
-msgstr "Контракты корпорации читаются токеном одного участника корпорации (роль в игре не нужна). Так плагин находит контракты строителей и засчитывает их."
+#: templates/evebuilders/settings.html
+msgid ""
+"The contracts of the corporation are read with the token of one corporation "
+"member (no in-game role is needed). This is how the plugin finds the "
+"contracts of the builders and credits them."
+msgstr ""
+"Контракты корпорации читаются токеном одного участника корпорации (роль в "
+"игре не нужна). Так плагин находит контракты строителей и засчитывает их."
 
+#: templates/evebuilders/settings.html
 msgid "Connected by"
 msgstr "Подключил"
 
+#: templates/evebuilders/settings.html
 msgid "Token"
 msgstr "Токен"
 
+#: templates/evebuilders/settings.html
 msgid "OK"
 msgstr "OK"
 
+#: templates/evebuilders/settings.html
 msgid "Last check"
 msgstr "Последняя проверка"
 
+#: templates/evebuilders/settings.html
 msgid "never"
 msgstr "никогда"
 
+#: templates/evebuilders/settings.html
 msgid "Last successful check"
 msgstr "Последняя успешная проверка"
 
+#: templates/evebuilders/settings.html
 msgid "ESI answer valid until"
 msgstr "Ответ ESI действителен до"
 
+#: templates/evebuilders/settings.html
 msgid "Last problem"
 msgstr "Последняя проблема"
 
-msgid "Not connected yet: the contracts cannot be read, so nothing is credited automatically."
-msgstr "Ещё не подключено: контракты не читаются, поэтому ничего не засчитывается автоматически."
+#: templates/evebuilders/settings.html
+msgid ""
+"Not connected yet: the contracts cannot be read, so nothing is credited "
+"automatically."
+msgstr ""
+"Ещё не подключено: контракты не читаются, поэтому ничего не засчитывается "
+"автоматически."
 
+#: templates/evebuilders/settings.html
 msgid "Reconnect"
 msgstr "Подключить заново"
 
+#: templates/evebuilders/settings.html
 msgid "Connect"
 msgstr "Подключить"
 
+#: templates/evebuilders/settings.html
 msgid "Item catalog"
 msgstr "Каталог предметов"
 
-msgid "The item picker in the order form uses this catalog. It is refreshed automatically once a day; use the button to refresh it right now. Loading runs in the background and can take several minutes."
-msgstr "Выбор предмета в форме заказа использует этот каталог. Он обновляется автоматически раз в сутки; кнопка обновляет его прямо сейчас. Загрузка идёт в фоне и может занять несколько минут."
+#: templates/evebuilders/settings.html
+msgid ""
+"The item picker in the order form uses this catalog. It is refreshed "
+"automatically once a day; use the button to refresh it right now. Loading "
+"runs in the background and can take several minutes."
+msgstr ""
+"Выбор предмета в форме заказа использует этот каталог. Он обновляется "
+"автоматически раз в сутки; кнопка обновляет его прямо сейчас. Загрузка идёт "
+"в фоне и может занять несколько минут."
 
+#: templates/evebuilders/settings.html
 msgid "Last started"
 msgstr "Последний запуск"
 
+#: templates/evebuilders/settings.html
 msgid "Never"
 msgstr "Никогда"
 
+#: templates/evebuilders/settings.html
 msgid "Update catalog"
 msgstr "Обновить каталог"
 
+#: templates/evebuilders/settings.html
+#, python-format
 msgid "A new update can be started %(minutes)s minutes after the previous one."
-msgstr "Новое обновление можно запустить через %(minutes)s мин. после предыдущего."
+msgstr ""
+"Новое обновление можно запустить через %(minutes)s мин. после предыдущего."
 
+#: templates/evebuilders/settings.html
 msgid "Configured categories and groups"
 msgstr "Настроенные категории и группы"
 
+#: templates/evebuilders/settings.html templates/evebuilders/stations.html
 msgid "Kind"
 msgstr "Вид"
 
+#: templates/evebuilders/settings.html
 msgid "ID"
 msgstr "ID"
 
+#: templates/evebuilders/settings.html
 msgid "Loaded items"
 msgstr "Загружено предметов"
 
+#: templates/evebuilders/settings.html
 msgid "Category"
 msgstr "Категория"
 
+#: templates/evebuilders/settings.html
 msgid "Group"
 msgstr "Группа"
 
+#: templates/evebuilders/settings.html
 msgid "not loaded yet"
 msgstr "ещё не загружено"
 
+#: templates/evebuilders/settings_tabs.html
 msgid "ESI and catalog"
 msgstr "ESI и каталог"
 
+#: templates/evebuilders/settings_tabs.html
 msgid "Stations"
 msgstr "Станции"
 
+#: templates/evebuilders/stations.html
 msgid "Places orders can be delivered to"
 msgstr "Места доставки заказов"
 
-msgid "The destination of an order is picked from this list. While the list is empty, the destination is typed by hand."
-msgstr "Место доставки заказа выбирается из этого списка. Пока список пуст, место вписывается вручную."
+#: templates/evebuilders/stations.html
+msgid ""
+"The destination of an order is picked from this list. While the list is "
+"empty, the destination is typed by hand."
+msgstr ""
+"Место доставки заказа выбирается из этого списка. Пока список пуст, место "
+"вписывается вручную."
 
+#: templates/evebuilders/stations.html
 msgid "Place"
 msgstr "Место"
 
+#: templates/evebuilders/stations.html
 msgid "System"
 msgstr "Система"
 
+#: templates/evebuilders/stations.html
 msgid "Station"
 msgstr "Станция"
 
+#: templates/evebuilders/stations.html
 msgid "Structure"
 msgstr "Структура"
 
+#: templates/evebuilders/stations.html
 msgid "Remove this place from the list?"
 msgstr "Убрать это место из списка?"
 
+#: templates/evebuilders/stations.html
 msgid "Remove"
 msgstr "Убрать"
 
+#: templates/evebuilders/stations.html
 msgid "No places yet."
 msgstr "Пока нет мест."
 
+#: templates/evebuilders/stations.html
 msgid "Add a place"
 msgstr "Добавить место"
 
+#: templates/evebuilders/stations.html
 msgid "Name of the system, or a part of it"
 msgstr "Название системы или его часть"
 
+#: templates/evebuilders/stations.html
 msgid "Search"
 msgstr "Найти"
 
+#: templates/evebuilders/stations.html
 msgid "Add"
 msgstr "Добавить"
 
+#: templates/evebuilders/stations.html
 msgid "This system has no NPC stations."
 msgstr "В этой системе нет NPC-станций."
 
+#: templates/evebuilders/stations.html
 msgid "Name of a structure (optional)"
 msgstr "Название структуры (необязательно)"
 
+#: templates/evebuilders/stations.html
 msgid "Add the system"
 msgstr "Добавить систему"
 
+#: templates/evebuilders/stations.html
 msgid "Several systems match, pick one:"
 msgstr "Подходит несколько систем, выберите одну:"
 
+#: templates/evebuilders/stations.html
 msgid "Type at least 3 letters."
 msgstr "Введите не менее 3 букв."
 
+#: templates/evebuilders/stations.html
 msgid "No systems found."
 msgstr "Системы не найдены."
 
+#: views.py
+#, python-format
 msgid "Order %(number)s created."
 msgstr "Заказ %(number)s создан."
 
-msgid "Catalog sync started. Loading runs in the background and can take several minutes."
-msgstr "Обновление каталога запущено. Загрузка идёт в фоне и может занять несколько минут."
+#: views.py
+msgid ""
+"Catalog sync started. Loading runs in the background and can take several "
+"minutes."
+msgstr ""
+"Обновление каталога запущено. Загрузка идёт в фоне и может занять несколько "
+"минут."
 
+#: views.py
+#, python-format
 msgid "A sync was started less than %(minutes)s minutes ago, please wait."
 msgstr "Обновление запускалось менее %(minutes)s мин. назад, подождите."
 
+#: views.py
 msgid "ESI appears to be offline, try again later."
 msgstr "Похоже, ESI недоступен, попробуйте позже."
 
+#: views.py
 msgid "No categories or groups are configured, nothing to load."
 msgstr "Категории и группы не настроены, загружать нечего."
 
+#: views.py
+#, python-format
 msgid "Could not start the sync: %(error)s"
 msgstr "Не удалось запустить обновление: %(error)s"
 
+#: views.py
 msgid "Please enter how many items you take."
 msgstr "Укажите, сколько штук вы берёте."
 
-msgid "You took %(quantity)s x %(item)s of order %(number)s. When they are ready, create an item exchange contract to the corporation and put %(number)s into its title."
-msgstr "Вы взяли %(quantity)s × %(item)s из заказа %(number)s. Когда они будут готовы, создайте контракт «обмен предметами» на корпорацию и впишите %(number)s в его название."
+#: views.py
+#, python-format
+msgid ""
+"You took %(quantity)s x %(item)s of order %(number)s. When they are ready, "
+"create an item exchange contract to the corporation and put %(number)s into "
+"its title."
+msgstr ""
+"Вы взяли %(quantity)s × %(item)s из заказа %(number)s. Когда они будут "
+"готовы, создайте контракт «обмен предметами» на корпорацию и впишите "
+"%(number)s в его название."
 
+#: views.py
+#, python-format
 msgid "You gave back %(quantity)s items of order %(number)s."
 msgstr "Вы вернули %(quantity)s шт. из заказа %(number)s."
 
-msgid "The corporation contracts are now read with the token of %(name)s (%(corporation)s)."
-msgstr "Контракты корпорации теперь читаются токеном %(name)s (%(corporation)s)."
+#: views.py
+#, python-format
+msgid ""
+"The corporation contracts are now read with the token of %(name)s "
+"(%(corporation)s)."
+msgstr ""
+"Контракты корпорации теперь читаются токеном %(name)s (%(corporation)s)."
 
+#: views.py
+#, python-format
 msgid "%(count)s contract(s) credited (%(items)s items)."
 msgstr "Зачтено контрактов: %(count)s (%(items)s шт.)."
 
+#: views.py
+#, python-format
 msgid "%(count)s new contract(s) wait for acceptance."
 msgstr "Новых контрактов, ожидающих принятия: %(count)s."
 
+#: views.py
+#, python-format
 msgid "%(count)s contract(s) ended without being accepted."
 msgstr "Контрактов, завершившихся без принятия: %(count)s."
 
+#: views.py
+#, python-format
 msgid "%(count)s contract(s) cannot be counted, see the list below."
 msgstr "Контрактов, которые нельзя засчитать: %(count)s, см. список ниже."
 
+#: views.py
 msgid "Nothing changed since the last check."
 msgstr "С прошлой проверки ничего не изменилось."
 
+#: views.py
 msgid "a few minutes"
 msgstr "несколько минут"
 
-msgid "Right now %(waiting)s contract(s) wait for acceptance (%(items)s items) and %(problems)s cannot be counted. ESI keeps this answer until %(until)s. The plugin checks again automatically right after that."
-msgstr "Сейчас ожидают принятия контрактов: %(waiting)s (%(items)s шт.), не удаётся засчитать: %(problems)s. ESI хранит этот ответ до %(until)s. Плагин проверит снова автоматически сразу после этого."
+#: views.py
+#, python-format
+msgid ""
+"Right now %(waiting)s contract(s) wait for acceptance (%(items)s items) and "
+"%(problems)s cannot be counted. ESI keeps this answer until %(until)s. The "
+"plugin checks again automatically right after that."
+msgstr ""
+"Сейчас ожидают принятия контрактов: %(waiting)s (%(items)s шт.), не удаётся "
+"засчитать: %(problems)s. ESI хранит этот ответ до %(until)s. Плагин проверит "
+"снова автоматически сразу после этого."
 
-msgid "The contracts were checked a moment ago. Please wait %(seconds)s seconds."
+#: views.py
+#, python-format
+msgid ""
+"The contracts were checked a moment ago. Please wait %(seconds)s seconds."
 msgstr "Контракты только что проверялись. Подождите %(seconds)s сек."
 
+#: views.py
+#, python-format
 msgid "The contracts could not be read: %(error)s"
 msgstr "Не удалось прочитать контракты: %(error)s"
 
+#: views.py
 msgid "Please pick a level."
 msgstr "Выберите уровень."
 
+#: views.py
+#, python-format
 msgid "The level of %(name)s is now %(level)s."
 msgstr "Уровень %(name)s теперь: %(level)s."
 
+#: views.py
+#, python-format
 msgid "The level of %(name)s did not change."
 msgstr "Уровень %(name)s не изменился."
 
+#: views.py
 msgid "Please check the numbers."
 msgstr "Проверьте числа."
 
+#: views.py
+#, python-format
 msgid "%(quantity)s items of order %(number)s are free again."
 msgstr "%(quantity)s шт. из заказа %(number)s снова свободны."
 
+#: views.py
+#, python-format
 msgid "%(quantity)s items of order %(number)s were credited."
 msgstr "Зачтено %(quantity)s шт. из заказа %(number)s."
 
+#: views.py
+#, python-format
 msgid "Order %(number)s was changed."
 msgstr "Заказ %(number)s изменён."
 
+#: views.py
 msgid "Nothing was changed."
 msgstr "Ничего не изменено."
 
+#: views.py
+#, python-format
 msgid "Order %(number)s was deleted."
 msgstr "Заказ %(number)s удалён."
 
+#: views.py
+#, python-format
 msgid "ESI could not be read: %(error)s"
 msgstr "Не удалось прочитать ESI: %(error)s"
 
+#: views.py
+#, python-format
 msgid "%(place)s was added."
 msgstr "%(place)s добавлено."
 
+#: views.py
+#, python-format
 msgid "%(place)s was removed from the list. Orders that have it keep it."
-msgstr "%(place)s убрано из списка. У заказов, где оно указано, оно сохраняется."
+msgstr ""
+"%(place)s убрано из списка. У заказов, где оно указано, оно сохраняется."

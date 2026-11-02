@@ -57,7 +57,7 @@ class Order(models.Model):
         NEW = "NEW", _("New")
         IN_PROGRESS = "IN_PROGRESS", _("In progress")
         DISTRIBUTED = "DISTRIBUTED", _("Distributed")
-        COMPLETED = "COMPLETED", _("Completed")
+        COMPLETED = "COMPLETED", _("Done")
         CANCELLED = "CANCELLED", _("Cancelled")
 
     class Priority(models.TextChoices):
