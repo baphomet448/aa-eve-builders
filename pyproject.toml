@@ -6,11 +6,15 @@ requires = [
 
 [project]
 name = "aa-eve-builders"
-description = "EVE Builders plugin for Alliance Auth: corporate and private build orders"
+description = "Corporate build orders for Alliance Auth: builders take parts of an order and deliver them through in-game contracts that the plugin checks and credits"
 readme = "README.md"
 keywords = [
     "allianceauth",
     "evebuilders",
+    "eve online",
+    "industry",
+    "build orders",
+    "contracts",
 ]
 license = { file = "LICENSE" }
 authors = [
@@ -40,8 +44,11 @@ dynamic = [
 dependencies = [
     "allianceauth>=5",
     "django-eveuniverse>=2.2",
+    "requests",
 ]
 urls.Changelog = "https://github.com/baphomet448/aa-eve-builders/blob/main/CHANGELOG.md"
+urls.Homepage = "https://github.com/baphomet448/aa-eve-builders"
+urls.Source = "https://github.com/baphomet448/aa-eve-builders"
 urls.Tracker = "https://github.com/baphomet448/aa-eve-builders/issues"
 
 [tool.hatch]
