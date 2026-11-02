@@ -1,17 +1,26 @@
 """What a manager can do with the shares and contracts of an order"""
 
+# Standard Library
+from typing import Any, NamedTuple
 # Django
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext as _
 
 # AA EVE Builders
-from evebuilders.messages import display_name, manual_credit_payload, released_payload
+from evebuilders.messages import (
+    FIELD_LABELS,
+    display_name,
+    manual_credit_payload,
+    order_changed_payload,
+    released_payload,
+    show_value,
+)
 from evebuilders.models import ContractRecord, Order, OrderAssignment, OrderEvent
-from evebuilders.notifications import CHANNEL_COMPLETE, notify
-from evebuilders.orders import recalculate_status, releasable_quantity
+from evebuilders.notifications import CHANNEL_COMPLETE, CHANNEL_NEW_ORDER, notify
+from evebuilders.orders import OPEN_STATUSES, recalculate_status, releasable_quantity
 from evebuilders.permissions import MANAGE_ACCESS
 
 
@@ -216,3 +225,125 @@ def credit_manually(
         )
 
     return quantity
+
+# The fields of an order that a manager may change
+EDITABLE_FIELDS = tuple(FIELD_LABELS)
+
+
+class Change(NamedTuple):
+    """One changed field of an order"""
+
+    field: str
+    old: Any
+    new: Any
+
+
+def item_is_locked(order: Order) -> bool:
+    """
+    Whether the item of an order can no longer be changed: builders took or
+    delivered it, or there are contracts for it.
+    """
+
+    return (
+        order.assignments.filter(Q(taken__gt=0) | Q(credited__gt=0)).exists()
+        or ContractRecord.objects.filter(order=order).exists()
+    )
+
+
+def update_order(*, actor, order_id: int, values: dict) -> list[Change]:
+    """
+    A manager changes fields of an order.
+
+    Only fields that really differ are changed; when nothing differs nothing
+    is written and nothing is announced. The quantity cannot go below what is
+    taken, the item cannot change once builders took the order, and the price
+    cannot change while contracts wait for acceptance.
+
+    :param values: New values by field name (see EDITABLE_FIELDS); fields that
+        are missing are left alone
+    :raises django.core.exceptions.ValidationError: When the change is not
+        allowed or the values are not valid. Nothing is changed in that case.
+    :return: The changes that were made, empty if there were none
+    """
+
+    if not actor.has_perm(MANAGE_ACCESS):
+        raise ValidationError(_("Only managers can do this."))
+
+    with transaction.atomic():
+        order = (
+            Order.objects.select_for_update()
+            .select_related("eve_type")
+            .get(pk=order_id, kind=Order.Kind.CORPORATE)
+        )
+
+        if order.status not in OPEN_STATUSES:
+            raise ValidationError(_("A finished or cancelled order cannot be changed."))
+
+        changes = [
+            Change(field, getattr(order, field), values[field])
+            for field in EDITABLE_FIELDS
+            if field in values and values[field] != getattr(order, field)
+        ]
+        if not changes:
+            return []
+
+        changed = {change.field: change for change in changes}
+
+        if "eve_type" in changed and item_is_locked(order):
+            raise ValidationError(
+                _(
+                    "The item cannot be changed: builders already took or "
+                    "delivered this order."
+                )
+            )
+
+        if "quantity" in changed:
+            taken = _sum(order.assignments, "taken")
+            if changed["quantity"].new < taken:
+                raise ValidationError(
+                    _(
+                        "The quantity cannot be lower than the %(taken)s items "
+                        "that are already taken."
+                    )
+                    % {"taken": taken}
+                )
+
+        if (
+            "unit_price" in changed
+            and ContractRecord.objects.filter(
+                order=order, state=ContractRecord.State.OUTSTANDING
+            ).exists()
+        ):
+            raise ValidationError(
+                _(
+                    "The price cannot be changed while contracts for this order "
+                    "wait for acceptance."
+                )
+            )
+
+        for change in changes:
+            setattr(order, change.field, change.new)
+        order.updated_by = actor
+        order.full_clean(exclude=["number"])
+        order.save()
+
+        description = "Order changed: " + "; ".join(
+            f"{FIELD_LABELS[change.field][0]}: "
+            f"{show_value(change.field, change.old, '(empty)')} -> "
+            f"{show_value(change.field, change.new, '(empty)')}"
+            for change in changes
+        )
+        OrderEvent.objects.create(
+            order=order,
+            kind=OrderEvent.Kind.UPDATED,
+            actor=actor,
+            description=description,
+        )
+        recalculate_status(order)
+
+        notify(
+            CHANNEL_NEW_ORDER,
+            order_changed_payload(manager=actor, order=order, changes=changes),
+        )
+
+    return changes

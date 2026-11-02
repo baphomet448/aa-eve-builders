@@ -250,3 +250,55 @@ def manual_credit_payload(
     return build_payload(
         lines, [("Заказ", order.number), ("Наименование", order.eve_type.name)]
     )
+
+# The fields a manager may change on an order: (name in the history, name in Discord)
+FIELD_LABELS = {
+    "eve_type": ("item", "Наименование"),
+    "quantity": ("quantity", "Количество"),
+    "unit_price": ("price per unit", "Цена"),
+    "priority": ("priority", "Приоритет"),
+    "due_date": ("due date", "Срок сдачи"),
+    "access_level": ("access level", "Уровень доступа"),
+    "destination": ("destination", "Доставка"),
+    "note": ("note", "Примечание"),
+}
+
+
+def show_value(field: str, value, empty: str = "<пусто>") -> str:
+    """A value of an order field as plain text, for the history and for Discord"""
+
+    if value is None or value == "":
+        return empty
+    if field == "eve_type":
+        return value.name
+    if field == "access_level":
+        return Order.AccessLevel(value).label
+    if field == "unit_price":
+        return format(value.normalize(), "f")  # 1000000, not 1000000.00 or 1E+6
+    if field == "due_date":
+        return value.isoformat()
+
+    return str(value)
+
+
+def order_changed_payload(*, manager, order: Order, changes) -> dict:
+    """
+    The message about a changed order.
+
+    :param changes: Objects with ``field``, ``old`` and ``new``
+    """
+
+    return build_payload(
+        [
+            f"Заказ {order.number} был изменен {display_name(manager)}",
+            "Измененные поля:",
+        ],
+        [
+            (
+                FIELD_LABELS[change.field][1],
+                f"{show_value(change.field, change.old)} -> "
+                f"{show_value(change.field, change.new)}",
+            )
+            for change in changes
+        ],
+    )

@@ -84,3 +84,37 @@ class OrderForm(forms.Form):
                 cleaned_data["eve_type"] = eve_type
 
         return cleaned_data
+
+class OrderEditForm(OrderForm):
+    """
+    Change an order. The same fields as when creating one, with two
+    differences: the item is fixed once builders took the order, and the due
+    date may stay as it is even when it has passed.
+    """
+
+    def __init__(self, *args, order, item_locked: bool, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.order = order
+        self.item_locked = item_locked
+
+        if item_locked:
+            # A disabled field always has its initial value, whatever is posted
+            self.fields["item_text"].disabled = True
+            self.fields["eve_type_id"].disabled = True
+
+    def clean_due_date(self):
+        due_date = self.cleaned_data["due_date"]
+        if due_date != self.order.due_date and due_date < timezone.localdate():
+            raise forms.ValidationError(_("The due date cannot be in the past."))
+
+        return due_date
+
+    def clean(self):
+        if self.item_locked:
+            # The item is the order's own, it need not be in the catalog (anymore)
+            cleaned_data = forms.Form.clean(self)
+            cleaned_data["eve_type"] = self.order.eve_type
+
+            return cleaned_data
+
+        return super().clean()

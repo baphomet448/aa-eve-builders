@@ -32,9 +32,14 @@ from evebuilders.catalog import (
     start_catalog_sync,
 )
 from evebuilders.contracts import CONTRACTS_SCOPE, connect_source
-from evebuilders.forms import OrderForm
+from evebuilders.forms import OrderEditForm, OrderForm
 from evebuilders.levels import builder_users, level_rows, set_builder_level
-from evebuilders.manager_actions import credit_manually, release_share
+from evebuilders.manager_actions import (
+    credit_manually,
+    item_is_locked,
+    release_share,
+    update_order,
+)
 from evebuilders.order_detail import contract_rows, event_rows, share_rows
 from evebuilders.models import CatalogSync, ContractSource, Order
 from evebuilders.orders import (
@@ -555,3 +560,73 @@ def credit_view(request: WSGIRequest, order_id: int) -> HttpResponse:
         )
 
     return redirect("evebuilders:order_detail", order_id=order.pk)
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+def edit_order(request: WSGIRequest, order_id: int) -> HttpResponse:
+    """
+    Change an order (managers only)
+    :param request:
+    :param order_id: The order
+    :return:
+    """
+
+    order = get_object_or_404(
+        Order.objects.select_related("eve_type"),
+        pk=order_id,
+        kind=Order.Kind.CORPORATE,
+    )
+    locked = item_is_locked(order)
+    initial = {
+        "item_text": order.eve_type.name,
+        "eve_type_id": order.eve_type_id,
+        "quantity": order.quantity,
+        "unit_price": order.unit_price,
+        "priority": order.priority,
+        "due_date": order.due_date,
+        "access_level": order.access_level,
+        "destination": order.destination,
+        "note": order.note,
+    }
+
+    if request.method == "POST":
+        form = OrderEditForm(
+            request.POST, initial=initial, order=order, item_locked=locked
+        )
+
+        if form.is_valid():
+            data = form.cleaned_data
+            values = {
+                "eve_type": data["eve_type"],
+                "quantity": data["quantity"],
+                "unit_price": data["unit_price"],
+                "priority": data["priority"],
+                "due_date": data["due_date"],
+                "access_level": data["access_level"],
+                "destination": data["destination"],
+                "note": data["note"],
+            }
+
+            try:
+                changes = update_order(
+                    actor=request.user, order_id=order.pk, values=values
+                )
+            except ValidationError as ex:
+                for message in ex.messages:
+                    form.add_error(None, message)
+            else:
+                if changes:
+                    messages.success(
+                        request,
+                        _("Order %(number)s was changed.") % {"number": order.number},
+                    )
+                else:
+                    messages.info(request, _("Nothing was changed."))
+
+                return redirect("evebuilders:order_detail", order_id=order.pk)
+    else:
+        form = OrderEditForm(initial=initial, order=order, item_locked=locked)
+
+    context = {"form": form, "order": order, "editing": True, "item_locked": locked}
+
+    return render(request, "evebuilders/order_form.html", context)
