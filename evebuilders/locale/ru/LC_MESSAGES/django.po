@@ -112,37 +112,37 @@ msgid "Private"
 msgstr "Личный"
 
 msgid "New"
-msgstr "Новый"
+msgstr ""
 
 msgid "In progress"
-msgstr "В работе"
+msgstr ""
 
 msgid "Distributed"
-msgstr "Распределён"
+msgstr ""
 
 msgid "Completed"
-msgstr "Завершён"
+msgstr ""
 
 msgid "Cancelled"
-msgstr "Отменён"
+msgstr ""
 
 msgid "Low"
-msgstr "Низкий"
+msgstr ""
 
 msgid "Medium"
-msgstr "Средний"
+msgstr ""
 
 msgid "High"
-msgstr "Высокий"
+msgstr ""
 
 msgid "Base"
-msgstr "Базовый"
+msgstr ""
 
 msgid "Middle"
-msgstr "Средний"
+msgstr ""
 
 msgid "Senior"
-msgstr "Старший"
+msgstr ""
 
 msgid "Corporation"
 msgstr "Корпорация"
@@ -178,7 +178,7 @@ msgid "Contract closed"
 msgstr "Контракт закрыт"
 
 msgid "Credited"
-msgstr "Зачтено"
+msgstr ""
 
 msgid "Credited manually"
 msgstr "Зачтено вручную"
@@ -190,13 +190,13 @@ msgid "ESI token problem"
 msgstr "Проблема с токеном ESI"
 
 msgid "Waiting for acceptance"
-msgstr "Ожидает принятия"
+msgstr ""
 
 msgid "Invalid"
-msgstr "Некорректный"
+msgstr ""
 
 msgid "Closed without credit"
-msgstr "Закрыт без зачёта"
+msgstr ""
 
 msgid "The corporation is unknown. Please set a main character first."
 msgstr "Корпорация неизвестна. Сначала укажите основного персонажа."
@@ -283,7 +283,7 @@ msgid "Builder levels"
 msgstr "Уровни строителей"
 
 msgid "People are listed here when their groups, their state or their own permissions give them the Builder or Manager access (give the permission in the Auth group settings). A builder sees and takes the orders up to his level; without a setting the level is Base."
-msgstr "Здесь перечислены люди, которым группы, статус (state) или собственные права дают доступ строителя или менеджера (право выдаётся в настройках групп Auth). Строитель видит и берёт заказы до своего уровня; без настройки уровень — Базовый."
+msgstr "Здесь перечислены люди, которым группы, статус (state) или собственные права дают доступ строителя или менеджера (право выдаётся в настройках групп Auth). Строитель видит и берёт заказы до своего уровня; без настройки уровень — Base."
 
 msgid "Name"
 msgstr "Имя"
@@ -403,10 +403,10 @@ msgid "Give back until"
 msgstr "Вернуть до"
 
 msgid "Under review"
-msgstr "На рассмотрении"
+msgstr ""
 
 msgid "Done"
-msgstr "Готово"
+msgstr ""
 
 msgid "Give back the items that are not delivered yet?"
 msgstr "Вернуть предметы, которые ещё не сданы?"
@@ -433,7 +433,7 @@ msgid "ready"
 msgstr "зачтено"
 
 msgid "on review"
-msgstr "на рассмотрении"
+msgstr ""
 
 msgid "free"
 msgstr "свободно"
@@ -517,7 +517,7 @@ msgid "Free"
 msgstr "Свободно"
 
 msgid "On review"
-msgstr "На рассмотрении"
+msgstr ""
 
 msgid "Take"
 msgstr "Взять"
