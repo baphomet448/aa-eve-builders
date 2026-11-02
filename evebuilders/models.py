@@ -404,3 +404,33 @@ class CatalogSync(models.Model):
 
     def __str__(self) -> str:
         return f"Catalog sync (started {self.started_at})"
+
+class Destination(models.Model):
+    """
+    A place orders can be delivered to, added by a manager in the settings.
+
+    Either an NPC station found through ESI, or a solar system (with the name
+    of a structure typed by hand: player structures are not in the public ESI).
+    The label is what the order form shows and what an order stores.
+    """
+
+    label = models.CharField(max_length=255, unique=True)
+    system_id = models.PositiveIntegerField()
+    system_name = models.CharField(max_length=100)
+    station_id = models.PositiveIntegerField(null=True, blank=True)
+    structure_name = models.CharField(max_length=200, blank=True, default="")
+    created_by = models.ForeignKey(
+        "auth.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        default_permissions = ()
+        ordering = ["label"]
+
+    def __str__(self) -> str:
+        return self.label
