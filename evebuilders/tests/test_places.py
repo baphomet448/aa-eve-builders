@@ -1,6 +1,7 @@
 """Places orders can be delivered to (the public ESI is mocked out)"""
 
 # Standard Library
+from io import StringIO
 from unittest.mock import MagicMock, patch
 
 # Third Party
@@ -8,16 +9,19 @@ import requests
 
 # Django
 from django.core.exceptions import ValidationError
+from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.test import SimpleTestCase, TestCase
 
 # AA EVE Builders
 from evebuilders.contracts import ESI_BASE_URL, EsiUnavailable
-from evebuilders.models import Destination
+from evebuilders.models import Destination, SolarSystem
 from evebuilders.places import (
     PlaceNotFound,
     add_destination,
     fetch_station,
     fetch_system,
+    load_system_index,
     search_systems,
     system_stations,
 )
@@ -25,10 +29,15 @@ from evebuilders.tests.test_views import make_user
 
 REQUEST = "evebuilders.places.requests.request"
 JITA = 30000142
+WORMHOLE = 31000005
+JITAVILLE = 30000999
 JITA_STATION = 60003760
 JITA_OTHER = 60000361
 STATION_NAME = "Jita IV - Moon 4 - Caldari Navy Assembly Plant"
 OTHER_NAME = "Jita IV - Moon 4 - Another Station"
+
+SYSTEMS = {JITA: "Jita", WORMHOLE: "J100357", JITAVILLE: "Jitaville"}
+STATIONS = {JITA_STATION: STATION_NAME, JITA_OTHER: OTHER_NAME}
 
 
 class FakeEsi:
@@ -38,14 +47,15 @@ class FakeEsi:
         self.routes = {}
         self.calls = []
 
-    def add(self, method, path, data=None, status=200, strict=None):
-        self.routes[(method, path, strict)] = (status, data)
+    def add(self, method, path, data=None, status=200):
+        self.routes[(method, path)] = (status, data)
 
     def __call__(self, method, url, **kwargs):
         path = url.removeprefix(ESI_BASE_URL)
-        strict = (kwargs.get("params") or {}).get("strict") if path == "/search/" else None
-        self.calls.append((method, path, strict))
-        status, data = self.routes.get((method, path, strict), (404, None))
+        self.calls.append((method, path))
+        status, data = self.routes.get((method, path), (404, None))
+        if callable(data):
+            data = data(kwargs)
 
         response = MagicMock()
         response.status_code = status
@@ -58,26 +68,103 @@ class FakeEsi:
         return [call[1] for call in self.calls]
 
 
+def names_answer(kwargs):
+    """What POST /universe/names/ answers for the IDs it was given"""
+
+    entries = []
+    for entity_id in kwargs["json"]:
+        if entity_id in SYSTEMS:
+            entries.append(
+                {"category": "solar_system", "id": entity_id, "name": SYSTEMS[entity_id]}
+            )
+        if entity_id in STATIONS:
+            entries.append(
+                {"category": "station", "id": entity_id, "name": STATIONS[entity_id]}
+            )
+
+    return entries
+
+
 def jita_esi() -> FakeEsi:
-    """Jita (two stations) and a second system that has no stations"""
+    """Three systems (Jita has two stations) and the lookups for them"""
 
     esi = FakeEsi()
-    esi.add("GET", f"/universe/systems/{JITA}/", {"name": "Jita", "stations": [JITA_STATION, JITA_OTHER]})
-    esi.add("GET", "/universe/systems/31000005/", {"name": "J100357"})
-    esi.add("GET", f"/universe/stations/{JITA_STATION}/", {"name": STATION_NAME, "system_id": JITA})
+    esi.add("GET", "/universe/systems/", list(SYSTEMS))
     esi.add(
-        "POST",
-        "/universe/names/",
-        [
-            {"category": "station", "id": JITA_OTHER, "name": OTHER_NAME},
-            {"category": "station", "id": JITA_STATION, "name": STATION_NAME},
-        ],
+        "GET",
+        f"/universe/systems/{JITA}/",
+        {"name": "Jita", "stations": [JITA_STATION, JITA_OTHER]},
     )
+    esi.add("GET", f"/universe/systems/{WORMHOLE}/", {"name": "J100357"})
+    esi.add(
+        "GET",
+        f"/universe/stations/{JITA_STATION}/",
+        {"name": STATION_NAME, "system_id": JITA},
+    )
+    esi.add("POST", "/universe/names/", names_answer)
 
     return esi
 
 
-class TestSearchSystems(SimpleTestCase):
+class TestSystemIndex(TestCase):
+    """load_system_index"""
+
+    def test_it_copies_the_names_of_the_systems(self):
+        with patch(REQUEST, side_effect=jita_esi()):
+            count = load_system_index()
+
+        self.assertEqual(count, 3)
+        self.assertEqual(
+            dict(SolarSystem.objects.values_list("id", "name")), SYSTEMS
+        )
+
+    def test_it_replaces_the_old_names(self):
+        SolarSystem.objects.create(id=1, name="Stale")
+
+        with patch(REQUEST, side_effect=jita_esi()):
+            load_system_index()
+
+        self.assertFalse(SolarSystem.objects.filter(id=1).exists())
+
+    def test_names_that_are_not_systems_are_left_out(self):
+        esi = jita_esi()
+        esi.add(
+            "POST",
+            "/universe/names/",
+            lambda kwargs: [
+                {"category": "solar_system", "id": JITA, "name": "Jita"},
+                {"category": "station", "id": JITA_STATION, "name": STATION_NAME},
+            ],
+        )
+
+        with patch(REQUEST, side_effect=esi):
+            load_system_index()
+
+        self.assertEqual(SolarSystem.objects.count(), 1)
+
+    def test_a_failure_keeps_the_old_index(self):
+        SolarSystem.objects.create(id=1, name="Old")
+        esi = jita_esi()
+        esi.add("POST", "/universe/names/", None, status=500)
+
+        with patch(REQUEST, side_effect=esi):
+            with self.assertRaises(EsiUnavailable):
+                load_system_index()
+
+        self.assertEqual(SolarSystem.objects.get().name, "Old")
+
+    def test_the_ids_are_asked_in_chunks(self):
+        esi = FakeEsi()
+        esi.add("GET", "/universe/systems/", list(range(1, 2501)))
+        esi.add("POST", "/universe/names/", lambda kwargs: [])
+
+        with patch(REQUEST, side_effect=esi):
+            load_system_index()
+
+        self.assertEqual(esi.paths().count("/universe/names/"), 3)  # 1000 + 1000 + 500
+
+
+class TestSearchSystems(TestCase):
     """search_systems"""
 
     def test_a_short_query_asks_nobody(self):
@@ -89,65 +176,50 @@ class TestSearchSystems(SimpleTestCase):
 
         self.assertEqual(esi.calls, [])
 
-    def test_an_exact_name_wins(self):
+    def test_the_index_is_loaded_the_first_time_only(self):
         esi = jita_esi()
-        esi.add("GET", "/search/", {"solar_system": [JITA]}, strict="true")
 
         with patch(REQUEST, side_effect=esi):
-            result = search_systems("Jita")
+            search_systems("Jita")
+            search_systems("Jita")
 
-        self.assertEqual(
-            result, [{"id": JITA, "name": "Jita", "station_ids": [JITA_STATION, JITA_OTHER]}]
-        )
-        self.assertNotIn(("GET", "/search/", "false"), esi.calls)
+        self.assertEqual(esi.paths().count("/universe/systems/"), 1)
+
+    def test_an_exact_name_wins_whatever_the_letter_case(self):
+        with patch(REQUEST, side_effect=jita_esi()):
+            result = search_systems("jita")
+
+        self.assertEqual(result, [{"id": JITA, "name": "Jita"}])
 
     def test_a_part_of_the_name_finds_several_systems_sorted_by_name(self):
-        esi = jita_esi()
-        esi.add("GET", "/search/", {}, strict="true")
-        esi.add("GET", "/search/", {"solar_system": [31000005, JITA]}, strict="false")
-
-        with patch(REQUEST, side_effect=esi):
-            result = search_systems("J")
-
-        self.assertEqual(result, [])  # one letter is too short
-
-        with patch(REQUEST, side_effect=esi):
+        with patch(REQUEST, side_effect=jita_esi()):
             result = search_systems("Jit")
 
-        self.assertEqual([system["name"] for system in result], ["J100357", "Jita"])
+        self.assertEqual([system["name"] for system in result], ["Jita", "Jitaville"])
+
+    def test_a_part_of_a_wormhole_name(self):
+        with patch(REQUEST, side_effect=jita_esi()):
+            result = search_systems("j1003")
+
+        self.assertEqual(result, [{"id": WORMHOLE, "name": "J100357"}])
 
     def test_nothing_found(self):
-        esi = FakeEsi()
-        esi.add("GET", "/search/", {}, strict="true")
-        esi.add("GET", "/search/", {}, strict="false")
-
-        with patch(REQUEST, side_effect=esi):
+        with patch(REQUEST, side_effect=jita_esi()):
             self.assertEqual(search_systems("Nowhere"), [])
 
     def test_at_most_ten_systems_are_shown(self):
-        esi = FakeEsi()
-        ids = list(range(31000001, 31000016))
-        esi.add("GET", "/search/", {}, strict="true")
-        esi.add("GET", "/search/", {"solar_system": ids}, strict="false")
-        for system_id in ids:
-            esi.add("GET", f"/universe/systems/{system_id}/", {"name": f"J{system_id}"})
+        SolarSystem.objects.bulk_create(
+            [SolarSystem(id=i, name=f"Jxx{i:03d}") for i in range(15)]
+        )
 
-        with patch(REQUEST, side_effect=esi):
-            result = search_systems("J31")
-
-        self.assertEqual(len(result), 10)
+        self.assertEqual(len(search_systems("Jxx")), 10)
 
     def test_esi_problems_are_reported(self):
-        esi = FakeEsi()
-        esi.add("GET", "/search/", None, status=500, strict="true")
-
-        with patch(REQUEST, side_effect=esi):
-            with self.assertRaises(EsiUnavailable):
-                search_systems("Jita")
-
         with patch(REQUEST, side_effect=requests.ConnectionError("no network")):
             with self.assertRaises(EsiUnavailable):
                 search_systems("Jita")
+
+        self.assertFalse(SolarSystem.objects.exists())
 
 
 class TestSystemStations(SimpleTestCase):
@@ -161,7 +233,8 @@ class TestSystemStations(SimpleTestCase):
 
         self.assertEqual(result["system"], {"id": JITA, "name": "Jita"})
         self.assertEqual(
-            [station["name"] for station in result["stations"]], [OTHER_NAME, STATION_NAME]
+            [station["name"] for station in result["stations"]],
+            [OTHER_NAME, STATION_NAME],
         )
         self.assertEqual(esi.paths().count("/universe/names/"), 1)
 
@@ -169,7 +242,7 @@ class TestSystemStations(SimpleTestCase):
         esi = jita_esi()
 
         with patch(REQUEST, side_effect=esi):
-            result = system_stations(31000005)
+            result = system_stations(WORMHOLE)
 
         self.assertEqual(result["stations"], [])
         self.assertNotIn("/universe/names/", esi.paths())
@@ -180,10 +253,8 @@ class TestSystemStations(SimpleTestCase):
                 system_stations(1)
 
     def test_single_lookups(self):
-        esi = jita_esi()
-
-        with patch(REQUEST, side_effect=esi):
-            self.assertEqual(fetch_system(31000005)["station_ids"], [])
+        with patch(REQUEST, side_effect=jita_esi()):
+            self.assertEqual(fetch_system(WORMHOLE)["station_ids"], [])
             self.assertEqual(
                 fetch_station(JITA_STATION),
                 {"id": JITA_STATION, "name": STATION_NAME, "system_id": JITA},
@@ -214,19 +285,19 @@ class TestAddDestination(TestCase):
 
     def test_a_station_of_another_system_is_refused(self):
         with self.assertRaises(ValidationError):
-            self._add(system_id=31000005, station_id=JITA_STATION)
+            self._add(system_id=WORMHOLE, station_id=JITA_STATION)
 
         self.assertFalse(Destination.objects.exists())
 
     def test_a_system_with_a_structure_name(self):
-        place = self._add(system_id=31000005, structure_name="  Fortizar   Alpha ")
+        place = self._add(system_id=WORMHOLE, structure_name="  Fortizar   Alpha ")
 
         self.assertEqual(place.label, "J100357 - Fortizar Alpha")
         self.assertIsNone(place.station_id)
         self.assertEqual(place.structure_name, "Fortizar Alpha")
 
     def test_a_system_alone(self):
-        place = self._add(system_id=31000005)
+        place = self._add(system_id=WORMHOLE)
 
         self.assertEqual(place.label, "J100357")
         self.assertEqual(place.structure_name, "")
@@ -251,3 +322,24 @@ class TestAddDestination(TestCase):
                 add_destination(actor=self.manager, system_id=1)
 
         self.assertFalse(Destination.objects.exists())
+
+
+class TestLoadSystemsCommand(SimpleTestCase):
+    """evebuilders_load_systems"""
+
+    COMMAND = "evebuilders.management.commands.evebuilders_load_systems"
+
+    def test_it_says_how_many_systems_are_known(self):
+        out = StringIO()
+
+        with patch(f"{self.COMMAND}.load_system_index", return_value=8472):
+            call_command("evebuilders_load_systems", stdout=out)
+
+        self.assertIn("8472 solar systems", out.getvalue())
+
+    def test_an_esi_problem_becomes_a_command_error(self):
+        with patch(
+            f"{self.COMMAND}.load_system_index", side_effect=EsiUnavailable("down")
+        ):
+            with self.assertRaises(CommandError):
+                call_command("evebuilders_load_systems", stdout=StringIO())

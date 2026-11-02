@@ -5,17 +5,19 @@ import requests
 
 # Django
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.utils.translation import gettext as _
 
 # AA EVE Builders
 from evebuilders import __version__
 from evebuilders.contracts import ESI_BASE_URL, EsiError, EsiUnavailable
-from evebuilders.models import Destination
+from evebuilders.models import Destination, SolarSystem
 from evebuilders.permissions import MANAGE_ACCESS
 
 PLACES_TIMEOUT = 15  # seconds
 SEARCH_MIN_LENGTH = 3
 SEARCH_LIMIT = 10  # systems shown for a search
+NAMES_CHUNK = 1000  # how many IDs ESI resolves to names in one request
 
 
 class PlaceNotFound(EsiError):
@@ -67,32 +69,57 @@ def fetch_station(station_id: int) -> dict:
     return {"id": station_id, "name": data["name"], "system_id": data["system_id"]}
 
 
+def load_system_index() -> int:
+    """
+    Copy the names of all solar systems from ESI into the local index. The
+    old index is replaced only when everything was read.
+
+    :raises evebuilders.contracts.EsiError: When ESI cannot be read
+    :return: How many systems are in the index now
+    """
+
+    system_ids = _call("GET", "/universe/systems/")
+
+    systems = []
+    for start in range(0, len(system_ids), NAMES_CHUNK):
+        chunk = system_ids[start : start + NAMES_CHUNK]
+        for entry in _call("POST", "/universe/names/", json=chunk):
+            if entry.get("category") == "solar_system":
+                systems.append(SolarSystem(id=entry["id"], name=entry["name"]))
+
+    with transaction.atomic():
+        SolarSystem.objects.all().delete()
+        SolarSystem.objects.bulk_create(systems, batch_size=1000)
+
+    return len(systems)
+
+
 def search_systems(query: str) -> list[dict]:
     """
     Solar systems whose name matches the query, sorted by name.
 
-    An exact name wins: if there is one, only it is returned. Otherwise the
-    systems that contain the text are returned (at most SEARCH_LIMIT).
+    An exact name (any letter case) wins: if there is one, only it is
+    returned. Otherwise the systems whose name contains the text are returned
+    (at most SEARCH_LIMIT). The names come from the local index, which is
+    loaded from ESI the first time it is needed.
+
+    :return: [{"id", "name"}, ...]
     """
 
     query = query.strip()
     if len(query) < SEARCH_MIN_LENGTH:
         return []
 
-    system_ids: list = []
-    for strict in ("true", "false"):
-        found = _call(
-            "GET",
-            "/search/",
-            params={"categories": "solar_system", "search": query, "strict": strict},
-        )
-        system_ids = found.get("solar_system", [])
-        if system_ids:
-            break
+    if not SolarSystem.objects.exists():
+        load_system_index()
 
-    systems = [fetch_system(system_id) for system_id in system_ids[:SEARCH_LIMIT]]
+    found = list(SolarSystem.objects.filter(name__iexact=query)) or list(
+        SolarSystem.objects.filter(name__icontains=query).order_by("name")[
+            :SEARCH_LIMIT
+        ]
+    )
 
-    return sorted(systems, key=lambda system: system["name"].lower())
+    return [{"id": system.id, "name": system.name} for system in found]
 
 
 def system_stations(system_id: int) -> dict:
@@ -156,7 +183,9 @@ def add_destination(
         structure_name = ""
     else:
         structure_name = " ".join((structure_name or "").split())[:150]
-        label = f"{system['name']} - {structure_name}" if structure_name else system["name"]
+        label = (
+            f"{system['name']} - {structure_name}" if structure_name else system["name"]
+        )
 
     if Destination.objects.filter(label=label).exists():
         raise ValidationError(_("This place is already in the list."))

@@ -434,3 +434,19 @@ class Destination(models.Model):
 
     def __str__(self) -> str:
         return self.label
+
+class SolarSystem(models.Model):
+    """
+    The name of a solar system, copied from ESI. ESI cannot search systems by
+    a part of the name, so the plugin keeps the names itself.
+    """
+
+    id = models.PositiveIntegerField(primary_key=True)
+    name = models.CharField(max_length=100, db_index=True)
+
+    class Meta:
+        default_permissions = ()
+        ordering = ["name"]
+
+    def __str__(self) -> str:
+        return self.name
