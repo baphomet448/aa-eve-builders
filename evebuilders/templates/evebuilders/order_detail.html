@@ -201,7 +201,7 @@
                                     <td class="text-end">{{ row.record.price|intcomma }}</td>
                                     <td>{{ row.acceptor|default:"-" }}</td>
                                     <td class="text-nowrap">{{ row.record.issued_at|date:"Y-m-d H:i" }}</td>
-                                    <td class="text-danger">{{ row.record.reason }}</td>
+                                    <td class="text-danger">{{ row.record.reason_text }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

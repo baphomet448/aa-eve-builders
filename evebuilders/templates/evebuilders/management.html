@@ -39,7 +39,7 @@
                                     <td class="text-nowrap">{{ row.record.contract_id|unlocalize }}</td>
                                     <td>{{ row.record.title|default:"-" }}</td>
                                     <td>{{ row.issuer }}</td>
-                                    <td class="text-danger">{{ row.record.reason }}</td>
+                                    <td class="text-danger">{{ row.record.reason_text }}</td>
                                     <td>
                                         {% for order in row.orders %}
                                             <a href="{% url 'evebuilders:order_detail' order.pk %}">{{ order.number }}</a>{% if not forloop.last %}, {% endif %}

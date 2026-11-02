@@ -7,7 +7,7 @@ verdicts (records, crediting) is done separately.
 
 # Standard Library
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum
 from typing import Callable
@@ -17,14 +17,15 @@ from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from django.utils.translation import gettext as _
 
 # Alliance Auth
 from allianceauth.authentication.models import CharacterOwnership
 
 # AA EVE Builders
+from evebuilders import reasons
 from evebuilders.models import ContractRecord, Order, OrderAssignment
 from evebuilders.orders import OPEN_STATUSES, releasable_quantity
+from evebuilders.reasons import reason_text
 
 # An order number in the title of a contract, e.g. N20261027-2
 ORDER_NUMBER_RE = re.compile(r"(?<![A-Za-z0-9])N\d{8}-\d+")
@@ -48,11 +49,18 @@ class Verdict:
     """The decision about one contract"""
 
     outcome: Outcome
-    reason: str = ""
+    reason_code: str = ""  # one of evebuilders.reasons
+    reason_data: dict = field(default_factory=dict)
     order: Order | None = None
     share: OrderAssignment | None = None
     quantity: int = 0
     price: Decimal = Decimal("0")
+
+    @property
+    def reason(self) -> str:
+        """The reason in the current language, empty if there is none"""
+
+        return reason_text(self.reason_code, self.reason_data)
 
 
 def find_order_numbers(title: str) -> set[str]:
@@ -140,7 +148,8 @@ def classify_contract(
 
         return Verdict(
             Outcome.CLOSED,
-            reason=_("The contract is %(status)s.") % {"status": status},
+            reason_code=reasons.CLOSED,
+            reason_data={"status": str(status)},
             order=existing.order,
             share=existing.assignment,
             quantity=existing.quantity,
@@ -154,17 +163,12 @@ def classify_contract(
         # Foreign contracts are none of our business; but a builder who still
         # has something to deliver should hear that the number is missing
         if issuer is not None and _has_open_share(issuer):
-            return Verdict(
-                Outcome.INVALID, reason=_("The contract title has no order number.")
-            )
+            return Verdict(Outcome.INVALID, reason_code=reasons.NO_NUMBER)
 
         return Verdict(Outcome.IGNORE)
 
     if len(numbers) > 1:
-        return Verdict(
-            Outcome.INVALID,
-            reason=_("The contract title has more than one order number."),
-        )
+        return Verdict(Outcome.INVALID, reason_code=reasons.MANY_NUMBERS)
 
     number = next(iter(numbers))
     order = Order.objects.filter(number=number, kind=Order.Kind.CORPORATE).first()
@@ -174,33 +178,27 @@ def classify_contract(
 
         return Verdict(
             Outcome.INVALID,
-            reason=_("There is no order with the number %(number)s.")
-            % {"number": number},
+            reason_code=reasons.UNKNOWN_ORDER,
+            reason_data={"number": number},
         )
 
     if issuer is None:
         return Verdict(
-            Outcome.INVALID,
-            reason=_("The character that made the contract is not on an Auth account."),
-            order=order,
+            Outcome.INVALID, reason_code=reasons.NOT_ON_ACCOUNT, order=order
         )
 
     share = OrderAssignment.objects.filter(order=order, builder=issuer).first()
     if share is None or share.taken < 1:
-        return Verdict(
-            Outcome.INVALID,
-            reason=_("The builder has not taken this order."),
-            order=order,
-        )
-    
+        return Verdict(Outcome.INVALID, reason_code=reasons.NOT_TAKEN, order=order)
+
     if order.status == Order.Status.CANCELLED:
         return Verdict(
             Outcome.INVALID,
-            reason=_("The order was cancelled."),
+            reason_code=reasons.ORDER_CANCELLED,
             order=order,
             share=share,
         )
-    
+
     items = items_loader(contract_id)
     quantity = sum(
         item.get("quantity", 0)
@@ -212,8 +210,8 @@ def classify_contract(
     if quantity < 1:
         return Verdict(
             Outcome.INVALID,
-            reason=_("The contract does not contain %(item)s.")
-            % {"item": order.eve_type.name},
+            reason_code=reasons.NO_ITEM,
+            reason_data={"item": order.eve_type.name},
             order=order,
             share=share,
             price=price,
@@ -223,8 +221,8 @@ def classify_contract(
     if abs(price - expected) > PRICE_TOLERANCE:
         return Verdict(
             Outcome.INVALID,
-            reason=_("The price must be %(expected)s ISK for %(quantity)s items.")
-            % {"expected": expected, "quantity": quantity},
+            reason_code=reasons.WRONG_PRICE,
+            reason_data={"expected": str(expected), "quantity": quantity},
             order=order,
             share=share,
             quantity=quantity,
@@ -240,11 +238,8 @@ def classify_contract(
     if quantity > available:
         return Verdict(
             Outcome.INVALID,
-            reason=_(
-                "Only %(available)s items are left to deliver, "
-                "the contract has %(quantity)s."
-            )
-            % {"available": max(available, 0), "quantity": quantity},
+            reason_code=reasons.TOO_MANY,
+            reason_data={"available": max(available, 0), "quantity": quantity},
             order=order,
             share=share,
             quantity=quantity,

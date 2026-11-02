@@ -48,6 +48,7 @@ from evebuilders.messages import (
 )
 from evebuilders.notifications import CHANNEL_COMPLETE, notify
 from evebuilders.orders import recalculate_status
+from evebuilders.reasons import NOT_AVAILABLE, reason_fields
 
 logger = logging.getLogger(__name__)
 
@@ -179,7 +180,7 @@ def _apply_invalid(contract: dict, verdict: Verdict) -> bool:
             defaults={
                 **values,
                 "state": ContractRecord.State.INVALID,
-                "reason": verdict.reason,
+                **reason_fields(verdict.reason_code, verdict.reason_data),
             },
         )
         changed = created
@@ -190,19 +191,23 @@ def _apply_invalid(contract: dict, verdict: Verdict) -> bool:
 
             changed = (
                 record.state != ContractRecord.State.INVALID
-                or record.reason != verdict.reason
+                or record.reason_code != verdict.reason_code
+                or record.reason_data != verdict.reason_data
             )
             for field, value in values.items():
                 setattr(record, field, value)
             record.state = ContractRecord.State.INVALID
-            record.reason = verdict.reason
+            for name, value in reason_fields(
+                verdict.reason_code, verdict.reason_data
+            ).items():
+                setattr(record, name, value)
             record.save()
 
         if changed:
             _add_event(
                 record,
                 OrderEvent.Kind.CONTRACT_INVALID,
-                f"Contract {record.contract_id} cannot be counted: {verdict.reason}",
+                f"Contract {record.contract_id} cannot be counted: {record.reason}",
             )
             _announce_invalid(record)
 
@@ -225,7 +230,10 @@ def _apply_closed(contract: dict, verdict: Verdict) -> bool:
             return False
 
         record.state = ContractRecord.State.CLOSED
-        record.reason = verdict.reason
+        for name, value in reason_fields(
+            verdict.reason_code, verdict.reason_data
+        ).items():
+            setattr(record, name, value)
         record.esi_status = contract.get("status") or ""
         record.save()
         _add_event(
@@ -273,7 +281,8 @@ def _apply_credit(contract: dict, verdict: Verdict, now) -> int:
         if verdict.quantity > available:
             # Things changed since the verdict was made (e.g. items were given back)
             record.state = ContractRecord.State.INVALID
-            record.reason = _("The items are no longer available to deliver.")
+            for name, value in reason_fields(NOT_AVAILABLE).items():
+                setattr(record, name, value)
             record.save()
             _add_event(
                 record,
@@ -526,7 +535,7 @@ def _announce_invalid(record: ContractRecord) -> None:
             order=record.order,
             quantity=record.quantity,
             price=record.price,
-            reason=record.reason,
+            reason=record.reason_in("ru"),
         ),
     )
 

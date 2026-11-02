@@ -163,7 +163,7 @@
                                     <td class="text-nowrap">{{ contract.order.number|default:"-" }}</td>
                                     <td class="text-end">{{ contract.quantity|intcomma }}</td>
                                     <td class="text-end">{{ contract.price|intcomma }}</td>
-                                    <td class="text-danger">{{ contract.reason }}</td>
+                                    <td class="text-danger">{{ contract.reason_text }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

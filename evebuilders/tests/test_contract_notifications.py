@@ -11,7 +11,7 @@ from django.utils import timezone
 
 # AA EVE Builders
 from evebuilders.contracts import EsiTokenError, EsiUnavailable
-from evebuilders.models import ContractSource
+from evebuilders.models import ContractRecord, ContractSource
 from evebuilders.notifications import CHANNEL_COMPLETE
 from evebuilders.orders import create_order, take_order
 from evebuilders.sync import sync_contracts
@@ -108,7 +108,9 @@ class TestContractNotifications(SettingsMixin, SyncTestCase):
         self.assertEqual(len(first), 1)
         fields = fields_of(first[0][1])
         self.assertEqual(fields["Заказ"], self.order.number)
-        self.assertIn("price", fields["Причина"])
+        self.assertEqual(
+            fields["Причина"], ContractRecord.objects.get().reason_in("ru")
+        )
         self.assertIn("не засчитан", self._description(first[0]))
         self.assertEqual(again, [])
 

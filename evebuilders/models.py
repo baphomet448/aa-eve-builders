@@ -8,8 +8,10 @@ from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import F, Q
+from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
+from evebuilders.reasons import reason_text
 
 class General(models.Model):
     """Meta model for app permissions"""
@@ -281,6 +283,13 @@ class ContractRecord(models.Model):
         max_length=16, choices=State.choices, default=State.OUTSTANDING, db_index=True
     )
     reason = models.TextField(blank=True, default="")
+
+    # Why the contract cannot be counted, as a code with parameters, so that the
+    # text can be shown in the language of the reader. `reason` keeps the English
+    # text: older records have only that, and it is the fallback.
+    reason_code = models.CharField(max_length=40, blank=True, default="")
+    reason_data = models.JSONField(blank=True, default=dict)
+    
     issued_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -295,6 +304,29 @@ class ContractRecord(models.Model):
     def __str__(self) -> str:
         return f"{self.contract_id} ({self.state})"
 
+
+    def save(self, *args, **kwargs):
+        # No reason, no code: a contract that became valid has no problem left
+        if not self.reason:
+            self.reason_code = ""
+            self.reason_data = {}
+
+        super().save(*args, **kwargs)
+
+    def reason_in(self, language: str) -> str:
+        """The reason in a language. Older records have only the English text."""
+
+        if not self.reason_code:
+            return self.reason
+
+        with translation.override(language):
+            return reason_text(self.reason_code, self.reason_data)
+
+    @property
+    def reason_text(self) -> str:
+        """The reason in the language of the current request"""
+
+        return self.reason_in(translation.get_language() or "en")
 
 class ContractSource(models.Model):
     """The single ESI source (corporation + token) used to read contracts"""
