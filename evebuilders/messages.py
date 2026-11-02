@@ -193,3 +193,60 @@ def taken_payload(*, user, order: Order, quantity: int, free: int) -> dict:
             ("Срок сдачи до", order.due_date.isoformat()),
         ],
     )
+
+def released_payload(*, manager, builder, order: Order, quantity: int, free: int) -> dict:
+    """A manager took items back from a builder
+
+    :param quantity: How many items were taken back
+    :param free: How many items are free in the order now
+    """
+
+    total = order.unit_price * quantity
+
+    return build_payload(
+        [
+            f"Отчет от - {display_name(builder)}",
+            f"Менеджер {display_name(manager)} снял с исполнителя "
+            f"{positions_for(quantity)}",
+            f"Сумма {format_isk(total)} {isk_in_words(total)}",
+            "ОТМЕНА",
+        ],
+        [
+            ("Заказ", f"{order.number} - Освобождено"),
+            ("Наименование", order.eve_type.name),
+            ("Свободно в заказе", f"{free} шт"),
+        ],
+    )
+
+
+def manual_credit_payload(
+    *,
+    manager,
+    builder,
+    order: Order,
+    quantity: int,
+    remaining: int,
+    comment: str = "",
+) -> dict:
+    """A manager counted items as delivered by hand
+
+    :param remaining: How many items of the order are still not credited
+    """
+
+    total = order.unit_price * quantity
+    lines = [
+        f"Отчет от - {display_name(builder)}",
+        f"Зачтено вручную - {quantity} шт",
+        f"Сумма {format_isk(total)} {isk_in_words(total)}",
+        f"Зачёл - {display_name(manager)}",
+    ]
+    if comment:
+        lines.append(f"Комментарий - {comment}")
+    if remaining <= 0:
+        lines.append(f"Заказ завершен полностью - {order.quantity} шт")
+    else:
+        lines.append(f"Остаток по заказу - {remaining} шт")
+
+    return build_payload(
+        lines, [("Заказ", order.number), ("Наименование", order.eve_type.name)]
+    )
