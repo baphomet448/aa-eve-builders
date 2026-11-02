@@ -1,0 +1,760 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: aa-eve-builders 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-02 17:41+0000\n"
+"PO-Revision-Date: 2026-11-02 18:00+0000\n"
+"Last-Translator: baphomet448\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "Corporate orders"
+msgstr "Корпоративные заказы"
+
+msgid "My orders"
+msgstr "Мои заказы"
+
+msgid "The character %(name)s is not on your Auth account. Add it there first and connect again."
+msgstr "Персонаж %(name)s не привязан к вашему аккаунту Auth. Сначала добавьте его там и подключитесь снова."
+
+msgid "Item"
+msgstr "Предмет"
+
+msgid "Start typing the item name"
+msgstr "Начните вводить название предмета"
+
+msgid "Please pick an item from the list."
+msgstr "Выберите предмет из списка."
+
+msgid "Quantity"
+msgstr "Количество"
+
+msgid "Price per unit (ISK)"
+msgstr "Цена за единицу (ISK)"
+
+msgid "Priority"
+msgstr "Приоритет"
+
+msgid "Due date"
+msgstr "Срок сдачи"
+
+msgid "Access level"
+msgstr "Уровень доступа"
+
+msgid "Builders below this level will not see the order."
+msgstr "Строители ниже этого уровня не увидят заказ."
+
+msgid "Destination"
+msgstr "Доставка"
+
+msgid "Note"
+msgstr "Примечание"
+
+msgid "The due date cannot be in the past."
+msgstr "Срок сдачи не может быть в прошлом."
+
+msgid "This item is not in the catalog."
+msgstr "Этого предмета нет в каталоге."
+
+msgid "Unknown access level."
+msgstr "Неизвестный уровень доступа."
+
+msgid "Only managers can do this."
+msgstr "Это могут делать только менеджеры."
+
+msgid "This share does not belong to the order."
+msgstr "Эта часть не относится к этому заказу."
+
+msgid "There is nothing to release: everything is delivered or waits for a contract to be accepted."
+msgstr "Нечего освобождать: всё сдано или ожидает принятия контракта."
+
+msgid "You can release between 1 and %(available)s items."
+msgstr "Можно освободить от 1 до %(available)s шт."
+
+msgid "The contract %(id)s is not known to the plugin."
+msgstr "Контракт %(id)s плагину неизвестен."
+
+msgid "This contract is already credited."
+msgstr "Этот контракт уже зачтён."
+
+msgid "There is nothing left to credit: everything is already credited or waits in other contracts."
+msgstr "Зачитывать нечего: всё уже зачтено или находится в других контрактах."
+
+msgid "You can credit between 1 and %(available)s items."
+msgstr "Можно зачесть от 1 до %(available)s шт."
+
+msgid "A finished or cancelled order cannot be changed."
+msgstr "Завершённый или отменённый заказ изменить нельзя."
+
+msgid "The item cannot be changed: builders already took or delivered this order."
+msgstr "Предмет изменить нельзя: строители уже взяли или сдали этот заказ."
+
+msgid "The quantity cannot be lower than the %(taken)s items that are already taken."
+msgstr "Количество не может быть меньше уже взятых %(taken)s шт."
+
+msgid "The price cannot be changed while contracts for this order wait for acceptance."
+msgstr "Цену нельзя менять, пока контракты по этому заказу ожидают принятия."
+
+msgid "This order is already cancelled."
+msgstr "Этот заказ уже отменён."
+
+msgid "You cannot delete this order."
+msgstr "Вы не можете удалить этот заказ."
+
+msgid "Corporate"
+msgstr "Корпоративный"
+
+msgid "Private"
+msgstr "Личный"
+
+msgid "New"
+msgstr "Новый"
+
+msgid "In progress"
+msgstr "В работе"
+
+msgid "Distributed"
+msgstr "Распределён"
+
+msgid "Completed"
+msgstr "Завершён"
+
+msgid "Cancelled"
+msgstr "Отменён"
+
+msgid "Low"
+msgstr "Низкий"
+
+msgid "Medium"
+msgstr "Средний"
+
+msgid "High"
+msgstr "Высокий"
+
+msgid "Base"
+msgstr "Базовый"
+
+msgid "Middle"
+msgstr "Средний"
+
+msgid "Senior"
+msgstr "Старший"
+
+msgid "Corporation"
+msgstr "Корпорация"
+
+msgid "User"
+msgstr "Пользователь"
+
+msgid "Order created"
+msgstr "Заказ создан"
+
+msgid "Order updated"
+msgstr "Заказ изменён"
+
+msgid "Order cancelled"
+msgstr "Заказ отменён"
+
+msgid "Taken"
+msgstr "Взято"
+
+msgid "Discarded"
+msgstr "Отказ от части"
+
+msgid "Share released by manager"
+msgstr "Часть освобождена менеджером"
+
+msgid "Contract found"
+msgstr "Контракт найден"
+
+msgid "Contract invalid"
+msgstr "Некорректный контракт"
+
+msgid "Contract closed"
+msgstr "Контракт закрыт"
+
+msgid "Credited"
+msgstr "Зачтено"
+
+msgid "Credited manually"
+msgstr "Зачтено вручную"
+
+msgid "Builder level changed"
+msgstr "Уровень строителя изменён"
+
+msgid "ESI token problem"
+msgstr "Проблема с токеном ESI"
+
+msgid "Waiting for acceptance"
+msgstr "Ожидает принятия"
+
+msgid "Invalid"
+msgstr "Некорректный"
+
+msgid "Closed without credit"
+msgstr "Закрыт без зачёта"
+
+msgid "The corporation is unknown. Please set a main character first."
+msgstr "Корпорация неизвестна. Сначала укажите основного персонажа."
+
+msgid "You are not allowed to take orders."
+msgstr "Вам нельзя брать заказы."
+
+msgid "This order is not available to you."
+msgstr "Этот заказ вам недоступен."
+
+msgid "This order is closed."
+msgstr "Этот заказ закрыт."
+
+msgid "The quantity must be at least 1."
+msgstr "Количество должно быть не меньше 1."
+
+msgid "Only %(free)s items are free in this order."
+msgstr "В этом заказе свободно только %(free)s шт."
+
+msgid "You have not taken this order."
+msgstr "Вы не брали этот заказ."
+
+msgid "It is too late to give this order back: more than half of the time until the due date has passed. Please ask a manager."
+msgstr "Вернуть заказ уже поздно: прошло больше половины времени до срока сдачи. Обратитесь к менеджеру."
+
+msgid "There is nothing to give back: everything is delivered or waits for a contract to be accepted."
+msgstr "Возвращать нечего: всё сдано или ожидает принятия контракта."
+
+msgid "You can give back between 1 and %(available)s items."
+msgstr "Можно вернуть от 1 до %(available)s шт."
+
+msgid "This station is not in that system."
+msgstr "Эта станция находится не в этой системе."
+
+msgid "This place is already in the list."
+msgstr "Это место уже есть в списке."
+
+msgid "The contract is %(status)s."
+msgstr "Статус контракта: %(status)s."
+
+msgid "The contract title has no order number."
+msgstr "В названии контракта нет номера заказа."
+
+msgid "The contract title has more than one order number."
+msgstr "В названии контракта больше одного номера заказа."
+
+msgid "There is no order with the number %(number)s."
+msgstr "Заказа с номером %(number)s нет."
+
+msgid "The character that made the contract is not on an Auth account."
+msgstr "Персонаж, создавший контракт, не привязан к аккаунту Auth."
+
+msgid "The builder has not taken this order."
+msgstr "Строитель не брал этот заказ."
+
+msgid "The contract does not contain %(item)s."
+msgstr "В контракте нет предмета %(item)s."
+
+msgid "The price must be %(expected)s ISK for %(quantity)s items."
+msgstr "Цена должна быть %(expected)s ISK за %(quantity)s шт."
+
+msgid "Only %(available)s items are left to deliver, the contract has %(quantity)s."
+msgstr "Осталось сдать только %(available)s шт., а в контракте %(quantity)s."
+
+msgid "The items are no longer available to deliver."
+msgstr "Эти предметы больше недоступны для сдачи."
+
+msgid "The order was cancelled."
+msgstr "Заказ отменён."
+
+msgid "No ESI source is connected."
+msgstr "ESI-источник не подключён."
+
+msgid "EVE Builders"
+msgstr "EVE Builders"
+
+msgid "Management"
+msgstr "Управление"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "Builder levels"
+msgstr "Уровни строителей"
+
+msgid "People are listed here when their groups, their state or their own permissions give them the Builder or Manager access (give the permission in the Auth group settings). A builder sees and takes the orders up to his level; without a setting the level is Base."
+msgstr "Здесь перечислены люди, которым группы, статус (state) или собственные права дают доступ строителя или менеджера (право выдаётся в настройках групп Auth). Строитель видит и берёт заказы до своего уровня; без настройки уровень — Базовый."
+
+msgid "Name"
+msgstr "Имя"
+
+msgid "Access"
+msgstr "Доступ"
+
+msgid "Level"
+msgstr "Уровень"
+
+msgid "Manager"
+msgstr "Менеджер"
+
+msgid "Builder"
+msgstr "Строитель"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Nobody has the builder or manager access yet."
+msgstr "Пока ни у кого нет доступа строителя или менеджера."
+
+msgid "Contracts that need attention"
+msgstr "Контракты, требующие внимания"
+
+msgid "These contracts were found but cannot be credited (a missing order number, a wrong price, a cancelled order ...). Open the order and credit the contract by hand if it is fine. A contract that is deleted in the game disappears from this list."
+msgstr "Эти контракты найдены, но не могут быть зачтены (нет номера заказа, неверная цена, отменённый заказ ...). Откройте заказ и зачтите контракт вручную, если с ним всё в порядке. Контракт, удалённый в игре, пропадает из этого списка."
+
+msgid "Issued"
+msgstr "Создан"
+
+msgid "Contract"
+msgstr "Контракт"
+
+msgid "Title"
+msgstr "Название"
+
+msgid "Made by"
+msgstr "Создал"
+
+msgid "Problem"
+msgstr "Проблема"
+
+msgid "Orders"
+msgstr "Заказы"
+
+msgid "Nothing needs attention."
+msgstr "Ничего не требует внимания."
+
+msgid "Order"
+msgstr "Заказ"
+
+msgid "Price"
+msgstr "Цена"
+
+msgid "No contracts are waiting for acceptance."
+msgstr "Нет контрактов, ожидающих принятия."
+
+msgid "Latest activity"
+msgstr "Последняя активность"
+
+msgid "When"
+msgstr "Когда"
+
+msgid "Event"
+msgstr "Событие"
+
+msgid "By"
+msgstr "Кто"
+
+msgid "Details"
+msgstr "Подробности"
+
+msgid "Nothing has happened yet."
+msgstr "Пока ничего не происходило."
+
+msgid "Contracts were last checked %(when)s."
+msgstr "Контракты проверялись %(when)s."
+
+msgid "The next automatic check is around %(when)s (server time), right after ESI refreshes its data. A contract that you create, or that is accepted in the game, shows up after that."
+msgstr "Следующая автоматическая проверка примерно в %(when)s (время сервера), сразу после обновления данных ESI. Контракт, который вы создали или который приняли в игре, появится после этого."
+
+msgid "The last contract check failed:"
+msgstr "Последняя проверка контрактов не удалась:"
+
+msgid "The contracts have not been checked yet."
+msgstr "Контракты ещё не проверялись."
+
+msgid "ESI is not connected yet. A manager can connect it in the settings."
+msgstr "ESI ещё не подключён. Менеджер может подключить его в настройках."
+
+msgid "Sync contracts"
+msgstr "Проверить контракты"
+
+msgid "When your items are ready, create an item exchange contract to the corporation. Put the order number into the contract title and set the price to the price per unit multiplied by the quantity. Then press \"Sync contracts\"."
+msgstr "Когда предметы готовы, создайте контракт «обмен предметами» на корпорацию. Впишите номер заказа в название контракта, а цену поставьте равной цене за единицу, умноженной на количество. Затем нажмите «Проверить контракты»."
+
+msgid "Status"
+msgstr "Статус"
+
+msgid "Price per unit"
+msgstr "Цена за единицу"
+
+msgid "Total price"
+msgstr "Общая цена"
+
+msgid "Ready"
+msgstr "Зачтено"
+
+msgid "In contracts"
+msgstr "В контрактах"
+
+msgid "Can be given back"
+msgstr "Можно вернуть"
+
+msgid "Give back until"
+msgstr "Вернуть до"
+
+msgid "Under review"
+msgstr "На рассмотрении"
+
+msgid "Done"
+msgstr "Готово"
+
+msgid "Give back the items that are not delivered yet?"
+msgstr "Вернуть предметы, которые ещё не сданы?"
+
+msgid "Discard"
+msgstr "Отказаться"
+
+msgid "You have not taken any orders yet."
+msgstr "Вы ещё не брали заказы."
+
+msgid "Contracts that could not be counted"
+msgstr "Контракты, которые не удалось засчитать"
+
+msgid "These contracts were found, but they cannot be credited. The title of a contract cannot be changed, so create a new one with the order number in the title and the right price. A contract that is deleted disappears from this list."
+msgstr "Эти контракты найдены, но их нельзя зачесть. Название контракта изменить нельзя, поэтому создайте новый контракт с номером заказа в названии и правильной ценой. Удалённый контракт пропадает из этого списка."
+
+msgid "Edit order"
+msgstr "Изменить заказ"
+
+msgid "taken"
+msgstr "взято"
+
+msgid "ready"
+msgstr "зачтено"
+
+msgid "on review"
+msgstr "на рассмотрении"
+
+msgid "free"
+msgstr "свободно"
+
+msgid "Created"
+msgstr "Создан"
+
+msgid "Builders"
+msgstr "Строители"
+
+msgid "Open"
+msgstr "Осталось"
+
+msgid "Actions"
+msgstr "Действия"
+
+msgid "all"
+msgstr "все"
+
+msgid "Release"
+msgstr "Освободить"
+
+msgid "quantity"
+msgstr "количество"
+
+msgid "no contract"
+msgstr "без контракта"
+
+msgid "comment"
+msgstr "комментарий"
+
+msgid "Credit manually"
+msgstr "Зачесть вручную"
+
+msgid "Nobody has taken this order."
+msgstr "Этот заказ никто не брал."
+
+msgid "Contracts"
+msgstr "Контракты"
+
+msgid "State"
+msgstr "Состояние"
+
+msgid "Accepted by"
+msgstr "Принял"
+
+msgid "No contracts for this order yet."
+msgstr "По этому заказу пока нет контрактов."
+
+msgid "History"
+msgstr "История"
+
+msgid "Nothing has happened to this order yet."
+msgstr "С этим заказом пока ничего не происходило."
+
+msgid "Delete order"
+msgstr "Удалить заказ"
+
+msgid "The order is cancelled: builders can no longer take it, contracts for it are not credited automatically (you can credit them by hand), and everyone is told in Discord. It stays in the list and in the history."
+msgstr "Заказ будет отменён: строители больше не смогут его взять, контракты по нему не будут зачитываться автоматически (их можно зачесть вручную), а все получат уведомление в Discord. Заказ остаётся в списке и в истории."
+
+msgid "Delete this order? Builders will not be able to take it any more."
+msgstr "Удалить этот заказ? Строители больше не смогут его взять."
+
+msgid "reason (optional)"
+msgstr "причина (необязательно)"
+
+msgid "New corporate order"
+msgstr "Новый корпоративный заказ"
+
+msgid "The item cannot be changed because builders already took or delivered this order."
+msgstr "Предмет изменить нельзя, потому что строители уже взяли или сдали этот заказ."
+
+msgid "Save changes"
+msgstr "Сохранить изменения"
+
+msgid "Create order"
+msgstr "Создать заказ"
+
+msgid "Free"
+msgstr "Свободно"
+
+msgid "On review"
+msgstr "На рассмотрении"
+
+msgid "Take"
+msgstr "Взять"
+
+msgid "No orders to show."
+msgstr "Нет заказов для показа."
+
+msgid "ESI connection"
+msgstr "Подключение ESI"
+
+msgid "The contracts of the corporation are read with the token of one corporation member (no in-game role is needed). This is how the plugin finds the contracts of the builders and credits them."
+msgstr "Контракты корпорации читаются токеном одного участника корпорации (роль в игре не нужна). Так плагин находит контракты строителей и засчитывает их."
+
+msgid "Connected by"
+msgstr "Подключил"
+
+msgid "Token"
+msgstr "Токен"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "Last check"
+msgstr "Последняя проверка"
+
+msgid "never"
+msgstr "никогда"
+
+msgid "Last successful check"
+msgstr "Последняя успешная проверка"
+
+msgid "ESI answer valid until"
+msgstr "Ответ ESI действителен до"
+
+msgid "Last problem"
+msgstr "Последняя проблема"
+
+msgid "Not connected yet: the contracts cannot be read, so nothing is credited automatically."
+msgstr "Ещё не подключено: контракты не читаются, поэтому ничего не засчитывается автоматически."
+
+msgid "Reconnect"
+msgstr "Подключить заново"
+
+msgid "Connect"
+msgstr "Подключить"
+
+msgid "Item catalog"
+msgstr "Каталог предметов"
+
+msgid "The item picker in the order form uses this catalog. It is refreshed automatically once a day; use the button to refresh it right now. Loading runs in the background and can take several minutes."
+msgstr "Выбор предмета в форме заказа использует этот каталог. Он обновляется автоматически раз в сутки; кнопка обновляет его прямо сейчас. Загрузка идёт в фоне и может занять несколько минут."
+
+msgid "Last started"
+msgstr "Последний запуск"
+
+msgid "Never"
+msgstr "Никогда"
+
+msgid "Update catalog"
+msgstr "Обновить каталог"
+
+msgid "A new update can be started %(minutes)s minutes after the previous one."
+msgstr "Новое обновление можно запустить через %(minutes)s мин. после предыдущего."
+
+msgid "Configured categories and groups"
+msgstr "Настроенные категории и группы"
+
+msgid "Kind"
+msgstr "Вид"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Loaded items"
+msgstr "Загружено предметов"
+
+msgid "Category"
+msgstr "Категория"
+
+msgid "Group"
+msgstr "Группа"
+
+msgid "not loaded yet"
+msgstr "ещё не загружено"
+
+msgid "ESI and catalog"
+msgstr "ESI и каталог"
+
+msgid "Stations"
+msgstr "Станции"
+
+msgid "Places orders can be delivered to"
+msgstr "Места доставки заказов"
+
+msgid "The destination of an order is picked from this list. While the list is empty, the destination is typed by hand."
+msgstr "Место доставки заказа выбирается из этого списка. Пока список пуст, место вписывается вручную."
+
+msgid "Place"
+msgstr "Место"
+
+msgid "System"
+msgstr "Система"
+
+msgid "Station"
+msgstr "Станция"
+
+msgid "Structure"
+msgstr "Структура"
+
+msgid "Remove this place from the list?"
+msgstr "Убрать это место из списка?"
+
+msgid "Remove"
+msgstr "Убрать"
+
+msgid "No places yet."
+msgstr "Пока нет мест."
+
+msgid "Add a place"
+msgstr "Добавить место"
+
+msgid "Name of the system, or a part of it"
+msgstr "Название системы или его часть"
+
+msgid "Search"
+msgstr "Найти"
+
+msgid "Add"
+msgstr "Добавить"
+
+msgid "This system has no NPC stations."
+msgstr "В этой системе нет NPC-станций."
+
+msgid "Name of a structure (optional)"
+msgstr "Название структуры (необязательно)"
+
+msgid "Add the system"
+msgstr "Добавить систему"
+
+msgid "Several systems match, pick one:"
+msgstr "Подходит несколько систем, выберите одну:"
+
+msgid "Type at least 3 letters."
+msgstr "Введите не менее 3 букв."
+
+msgid "No systems found."
+msgstr "Системы не найдены."
+
+msgid "Order %(number)s created."
+msgstr "Заказ %(number)s создан."
+
+msgid "Catalog sync started. Loading runs in the background and can take several minutes."
+msgstr "Обновление каталога запущено. Загрузка идёт в фоне и может занять несколько минут."
+
+msgid "A sync was started less than %(minutes)s minutes ago, please wait."
+msgstr "Обновление запускалось менее %(minutes)s мин. назад, подождите."
+
+msgid "ESI appears to be offline, try again later."
+msgstr "Похоже, ESI недоступен, попробуйте позже."
+
+msgid "No categories or groups are configured, nothing to load."
+msgstr "Категории и группы не настроены, загружать нечего."
+
+msgid "Could not start the sync: %(error)s"
+msgstr "Не удалось запустить обновление: %(error)s"
+
+msgid "Please enter how many items you take."
+msgstr "Укажите, сколько штук вы берёте."
+
+msgid "You took %(quantity)s x %(item)s of order %(number)s. When they are ready, create an item exchange contract to the corporation and put %(number)s into its title."
+msgstr "Вы взяли %(quantity)s × %(item)s из заказа %(number)s. Когда они будут готовы, создайте контракт «обмен предметами» на корпорацию и впишите %(number)s в его название."
+
+msgid "You gave back %(quantity)s items of order %(number)s."
+msgstr "Вы вернули %(quantity)s шт. из заказа %(number)s."
+
+msgid "The corporation contracts are now read with the token of %(name)s (%(corporation)s)."
+msgstr "Контракты корпорации теперь читаются токеном %(name)s (%(corporation)s)."
+
+msgid "%(count)s contract(s) credited (%(items)s items)."
+msgstr "Зачтено контрактов: %(count)s (%(items)s шт.)."
+
+msgid "%(count)s new contract(s) wait for acceptance."
+msgstr "Новых контрактов, ожидающих принятия: %(count)s."
+
+msgid "%(count)s contract(s) ended without being accepted."
+msgstr "Контрактов, завершившихся без принятия: %(count)s."
+
+msgid "%(count)s contract(s) cannot be counted, see the list below."
+msgstr "Контрактов, которые нельзя засчитать: %(count)s, см. список ниже."
+
+msgid "Nothing changed since the last check."
+msgstr "С прошлой проверки ничего не изменилось."
+
+msgid "a few minutes"
+msgstr "несколько минут"
+
+msgid "Right now %(waiting)s contract(s) wait for acceptance (%(items)s items) and %(problems)s cannot be counted. ESI keeps this answer until %(until)s. The plugin checks again automatically right after that."
+msgstr "Сейчас ожидают принятия контрактов: %(waiting)s (%(items)s шт.), не удаётся засчитать: %(problems)s. ESI хранит этот ответ до %(until)s. Плагин проверит снова автоматически сразу после этого."
+
+msgid "The contracts were checked a moment ago. Please wait %(seconds)s seconds."
+msgstr "Контракты только что проверялись. Подождите %(seconds)s сек."
+
+msgid "The contracts could not be read: %(error)s"
+msgstr "Не удалось прочитать контракты: %(error)s"
+
+msgid "Please pick a level."
+msgstr "Выберите уровень."
+
+msgid "The level of %(name)s is now %(level)s."
+msgstr "Уровень %(name)s теперь: %(level)s."
+
+msgid "The level of %(name)s did not change."
+msgstr "Уровень %(name)s не изменился."
+
+msgid "Please check the numbers."
+msgstr "Проверьте числа."
+
+msgid "%(quantity)s items of order %(number)s are free again."
+msgstr "%(quantity)s шт. из заказа %(number)s снова свободны."
+
+msgid "%(quantity)s items of order %(number)s were credited."
+msgstr "Зачтено %(quantity)s шт. из заказа %(number)s."
+
+msgid "Order %(number)s was changed."
+msgstr "Заказ %(number)s изменён."
+
+msgid "Nothing was changed."
+msgstr "Ничего не изменено."
+
+msgid "Order %(number)s was deleted."
+msgstr "Заказ %(number)s удалён."
+
+msgid "ESI could not be read: %(error)s"
+msgstr "Не удалось прочитать ESI: %(error)s"
+
+msgid "%(place)s was added."
+msgstr "%(place)s добавлено."
+
+msgid "%(place)s was removed from the list. Orders that have it keep it."
+msgstr "%(place)s убрано из списка. У заказов, где оно указано, оно сохраняется."
