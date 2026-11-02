@@ -75,7 +75,11 @@ def names_answer(kwargs):
     for entity_id in kwargs["json"]:
         if entity_id in SYSTEMS:
             entries.append(
-                {"category": "solar_system", "id": entity_id, "name": SYSTEMS[entity_id]}
+                {
+                    "category": "solar_system",
+                    "id": entity_id,
+                    "name": SYSTEMS[entity_id],
+                }
             )
         if entity_id in STATIONS:
             entries.append(
@@ -114,9 +118,7 @@ class TestSystemIndex(TestCase):
             count = load_system_index()
 
         self.assertEqual(count, 3)
-        self.assertEqual(
-            dict(SolarSystem.objects.values_list("id", "name")), SYSTEMS
-        )
+        self.assertEqual(dict(SolarSystem.objects.values_list("id", "name")), SYSTEMS)
 
     def test_it_replaces_the_old_names(self):
         SolarSystem.objects.create(id=1, name="Stale")

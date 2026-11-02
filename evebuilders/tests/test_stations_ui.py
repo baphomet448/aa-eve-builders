@@ -83,9 +83,14 @@ class TestStationsPage(PlacesTestCase):
         self.assertContains(self._get(), "No places yet.")
 
     def test_one_system_shows_its_stations_and_the_system_form(self):
-        found = {"system": {"id": JITA, "name": "Jita"}, "stations": [{"id": JITA_STATION, "name": STATION_NAME}]}
+        found = {
+            "system": {"id": JITA, "name": "Jita"},
+            "stations": [{"id": JITA_STATION, "name": STATION_NAME}],
+        }
 
-        with patch(f"{VIEWS}.search_systems", return_value=[{"id": JITA, "name": "Jita"}]):
+        with patch(
+            f"{VIEWS}.search_systems", return_value=[{"id": JITA, "name": "Jita"}]
+        ):
             with patch(f"{VIEWS}.system_stations", return_value=found):
                 response = self._get(q="Jita")
 
@@ -103,7 +108,10 @@ class TestStationsPage(PlacesTestCase):
         self.assertContains(response, "Jitaville")
 
     def test_a_picked_system_shows_its_stations(self):
-        found = {"system": {"id": JITA, "name": "Jita"}, "stations": [{"id": JITA_STATION, "name": STATION_NAME}]}
+        found = {
+            "system": {"id": JITA, "name": "Jita"},
+            "stations": [{"id": JITA_STATION, "name": STATION_NAME}],
+        }
 
         with patch(f"{VIEWS}.system_stations", return_value=found):
             response = self._get(system=str(JITA))

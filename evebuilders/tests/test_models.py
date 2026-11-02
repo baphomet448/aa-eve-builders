@@ -4,15 +4,16 @@
 import datetime
 from decimal import Decimal
 
+# Third Party
+# EVE Universe
+from eveuniverse.models import EveCategory, EveGroup, EveType
+
 # Django
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.db import IntegrityError, transaction
 from django.db.models import F
 from django.test import TestCase
-
-# EVE Universe
-from eveuniverse.models import EveCategory, EveGroup, EveType
 
 # AA EVE Builders
 from evebuilders import app_settings
@@ -175,6 +176,7 @@ class TestPermissions(TestCase):
 
     def test_manage_access(self):
         self.assertTrue(has_any_access(self._user_with("manage_access")))
+
 
 class TestCatalogSync(TestCase):
     """Catalog sync state keeps a single row"""

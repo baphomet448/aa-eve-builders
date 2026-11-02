@@ -1,15 +1,17 @@
 """Catalog sync tests"""
 
+# Standard Library
 from datetime import timedelta
 from unittest.mock import patch
+
+# Third Party
+# EVE Universe
+from eveuniverse.models import EveCategory, EveGroup, EveType
 
 # Django
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils import timezone
-
-# EVE Universe
-from eveuniverse.models import EveCategory, EveGroup, EveType
 
 # AA EVE Builders
 from evebuilders import app_settings
@@ -100,6 +102,7 @@ class TestStartCatalogSync(TestCase):
 
         self.mock_load.delay.side_effect = None
         self.assertEqual(start_catalog_sync(), SyncResult.STARTED)
+
 
 class TestCatalogOverview(TestCase):
     """Rows for the settings page"""

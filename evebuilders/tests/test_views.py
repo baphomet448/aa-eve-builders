@@ -25,9 +25,7 @@ _character_ids = count(90000001)
 # A plain storage is enough for rendering pages in tests.
 TEST_STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
-    },
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
 }
 
 
@@ -61,6 +59,7 @@ def make_user(username: str, *codenames: str):
         )
 
     return User.objects.get(pk=user.pk)  # fresh instance: drops the permission cache
+
 
 @override_settings(STORAGES=TEST_STORAGES)
 class TestSettingsPage(TestCase):

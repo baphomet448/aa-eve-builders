@@ -180,6 +180,11 @@ repos:
         name: EditorConfig Checker
         description: Check for compliance with the definitions in the EditorConfig file.
 
+        # Django templates align the attributes of long tags, and mdformat indents
+        # wrapped numbered lists with three spaces: both break the indent rule, so
+        # templates and Markdown files are left out of this one check.
+        exclude: '\.(html|md)$'
+
   - repo: https://github.com/adamchainz/django-upgrade
     rev: 5a815b88d9286ba45b8c1a4b56e695ff5645c65e  # frozen: 1.33.0
     hooks:

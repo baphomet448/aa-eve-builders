@@ -76,16 +76,18 @@ def waiting_contract_rows(limit: int = LIST_LIMIT) -> list[dict]:
 
     records = (
         ContractRecord.objects.filter(state=ContractRecord.State.OUTSTANDING)
-        .select_related("order__eve_type", "assignment__builder__profile__main_character")
+        .select_related(
+            "order__eve_type", "assignment__builder__profile__main_character"
+        )
         .order_by("-issued_at", "-created_at")[:limit]
     )
 
     return [
         {
             "record": record,
-            "builder": display_name(record.assignment.builder)
-            if record.assignment
-            else "",
+            "builder": (
+                display_name(record.assignment.builder) if record.assignment else ""
+            ),
         }
         for record in records
     ]

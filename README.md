@@ -158,10 +158,10 @@ Add it to the application if it is not there yet.
 Give these permissions in the Auth admin to groups or states. They appear as
 "EVE Builders ... | general | ...":
 
-| Permission | Who | What it allows |
-| --- | --- | --- |
-| `evebuilders.builder_access` | builders | View and take corporate build orders |
-| `evebuilders.manage_access` | managers | Manage orders and the plugin settings |
+| Permission                   | Who      | What it allows                        |
+| ---------------------------- | -------- | ------------------------------------- |
+| `evebuilders.builder_access` | builders | View and take corporate build orders  |
+| `evebuilders.manage_access`  | managers | Manage orders and the plugin settings |
 
 Menu entries ("Corporate orders" and "My orders") are shown only to people with one of
 them. If you group the menu in folders (Auth admin, Menu), put them in a folder of
@@ -186,17 +186,17 @@ Then try the **Create order** button.
 
 All settings are optional. Put them in `local.py`.
 
-| Setting | Default | Meaning |
-| --- | --- | --- |
-| `EVEBUILDERS_CATALOG_CATEGORY_IDS` | `[4, 6, 7, 8, 18, 22, 32, 65, 66, 87]` | EVE categories kept in the item catalog |
-| `EVEBUILDERS_CATALOG_GROUP_IDS` | `[]` | Extra single groups (for example `1136`, Fuel Block) |
-| `EVEBUILDERS_CATALOG_MIN_INTERVAL_MINUTES` | `15` | Shortest time between two catalog updates |
-| `EVEBUILDERS_SYNC_MIN_INTERVAL_SECONDS` | `60` | Shortest time between two contract syncs (button and schedule) |
-| `EVEBUILDERS_DISCORD_NEW_ORDER_WEBHOOK_URL` | empty | Webhook for new, changed and deleted orders |
-| `EVEBUILDERS_DISCORD_NEW_ORDER_THREAD_ID` | empty | Thread ID of that channel, if the webhook posts into a thread |
-| `EVEBUILDERS_DISCORD_COMPLETE_WEBHOOK_URL` | empty | Webhook for the reports about contracts and deliveries |
-| `EVEBUILDERS_DISCORD_COMPLETE_THREAD_ID` | empty | Thread ID of that channel |
-| `EVEBUILDERS_DISCORD_NOTIFY_TAKEN` | `True` | Announce that a builder took a part of an order |
+| Setting                                     | Default                                | Meaning                                                        |
+| ------------------------------------------- | -------------------------------------- | -------------------------------------------------------------- |
+| `EVEBUILDERS_CATALOG_CATEGORY_IDS`          | `[4, 6, 7, 8, 18, 22, 32, 65, 66, 87]` | EVE categories kept in the item catalog                        |
+| `EVEBUILDERS_CATALOG_GROUP_IDS`             | `[]`                                   | Extra single groups (for example `1136`, Fuel Block)           |
+| `EVEBUILDERS_CATALOG_MIN_INTERVAL_MINUTES`  | `15`                                   | Shortest time between two catalog updates                      |
+| `EVEBUILDERS_SYNC_MIN_INTERVAL_SECONDS`     | `60`                                   | Shortest time between two contract syncs (button and schedule) |
+| `EVEBUILDERS_DISCORD_NEW_ORDER_WEBHOOK_URL` | empty                                  | Webhook for new, changed and deleted orders                    |
+| `EVEBUILDERS_DISCORD_NEW_ORDER_THREAD_ID`   | empty                                  | Thread ID of that channel, if the webhook posts into a thread  |
+| `EVEBUILDERS_DISCORD_COMPLETE_WEBHOOK_URL`  | empty                                  | Webhook for the reports about contracts and deliveries         |
+| `EVEBUILDERS_DISCORD_COMPLETE_THREAD_ID`    | empty                                  | Thread ID of that channel                                      |
+| `EVEBUILDERS_DISCORD_NOTIFY_TAKEN`          | `True`                                 | Announce that a builder took a part of an order                |
 
 The default categories are Material, Ship, Module, Charge, Drone, Deployable,
 Subsystem, Structure, Structure Module and Fighter.
@@ -221,10 +221,10 @@ python manage.py evebuilders_test_notification --help
 Messages are sent in the background with several retries when Discord is busy. They
 are written in **Russian**. Links in the messages use `SITE_URL` of your Auth.
 
-| Channel | What is sent |
-| --- | --- |
-| New order | an order was created, changed or deleted |
-| Complete | a builder took a part, gave it back, a manager released it; a contract waits for acceptance, was accepted and credited, or cannot be counted (with the reason); the ESI token stopped working |
+| Channel   | What is sent                                                                                                                                                                                  |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| New order | an order was created, changed or deleted                                                                                                                                                      |
+| Complete  | a builder took a part, gave it back, a manager released it; a contract waits for acceptance, was accepted and credited, or cannot be counted (with the reason); the ESI token stopped working |
 
 ## Contract rules
 

@@ -50,7 +50,12 @@ class TestDefaultOrdering(SortingTestCase):
         pks = self._pks()
 
         self.assertEqual(
-            [pk for pk in pks if pk in {o.pk for o in (new, in_progress, distributed, completed, cancelled)}],
+            [
+                pk
+                for pk in pks
+                if pk
+                in {o.pk for o in (new, in_progress, distributed, completed, cancelled)}
+            ],
             [new.pk, in_progress.pk, distributed.pk, completed.pk, cancelled.pk],
         )
 

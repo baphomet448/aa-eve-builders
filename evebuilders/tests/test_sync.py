@@ -6,14 +6,15 @@ from decimal import Decimal
 from io import StringIO
 from unittest.mock import MagicMock, patch
 
+# Third Party
+# EVE Universe
+from eveuniverse.models import EveCategory, EveGroup, EveType
+
 # Django
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
 from django.utils import timezone as dj_timezone
-
-# EVE Universe
-from eveuniverse.models import EveCategory, EveGroup, EveType
 
 # AA EVE Builders
 from evebuilders.contracts import EsiTokenError, EsiUnavailable, FetchResult

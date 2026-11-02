@@ -165,16 +165,16 @@ class TestLevelRows(ViewsTestCase):
         self.assertEqual(rows[self.builder.pk]["level"], Order.AccessLevel.BASE)
         self.assertFalse(rows[self.builder.pk]["is_manager"])
         self.assertTrue(rows[self.manager.pk]["is_manager"])
-        self.assertEqual(
-            rows[self.builder.pk]["name"], display_name(self.builder)
-        )
+        self.assertEqual(rows[self.builder.pk]["name"], display_name(self.builder))
 
     def test_rows_show_the_level_that_was_set(self):
         set_builder_level(
             actor=self.manager, user=self.builder, level=Order.AccessLevel.SENIOR
         )
 
-        self.assertEqual(self._rows()[self.builder.pk]["level"], Order.AccessLevel.SENIOR)
+        self.assertEqual(
+            self._rows()[self.builder.pk]["level"], Order.AccessLevel.SENIOR
+        )
 
 
 @override_settings(STORAGES=TEST_STORAGES)

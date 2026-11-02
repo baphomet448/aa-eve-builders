@@ -3,12 +3,13 @@
 # Standard Library
 from datetime import timedelta
 
+# Third Party
+# EVE Universe
+from eveuniverse.models import EveCategory, EveGroup, EveType
+
 # Django
 from django.test import TestCase
 from django.utils import timezone
-
-# EVE Universe
-from eveuniverse.models import EveCategory, EveGroup, EveType
 
 # AA EVE Builders
 from evebuilders.forms import OrderForm

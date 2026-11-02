@@ -123,6 +123,7 @@ class OrderSequenceAdmin(admin.ModelAdmin):
 
     list_display = ("date", "last_number")
 
+
 @admin.register(CatalogSync)
 class CatalogSyncAdmin(admin.ModelAdmin):
     """Item catalog sync state (single row)"""

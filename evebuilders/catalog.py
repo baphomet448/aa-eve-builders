@@ -5,15 +5,16 @@ import logging
 from datetime import timedelta
 from enum import Enum
 
-# Django
-from django.db import transaction
-from django.db.models import Case, Count, IntegerField, Q, When
-from django.utils import timezone
-
+# Third Party
 # EVE Universe
 from eveuniverse.core.esitools import is_esi_online
 from eveuniverse.models import EveCategory, EveGroup, EveType
 from eveuniverse.tasks import load_eve_types
+
+# Django
+from django.db import transaction
+from django.db.models import Case, Count, IntegerField, Q, When
+from django.utils import timezone
 
 # AA EVE Builders
 from evebuilders import app_settings
@@ -96,6 +97,7 @@ def start_catalog_sync(user=None) -> SyncResult:
     )
     return SyncResult.STARTED
 
+
 def catalog_overview() -> list[dict]:
     """
     One row per configured category and group with the number of loaded types.
@@ -147,6 +149,7 @@ def catalog_overview() -> list[dict]:
 
     return rows
 
+
 ITEM_SEARCH_MIN_LENGTH = 2
 ITEM_SEARCH_LIMIT = 20
 
@@ -190,6 +193,7 @@ def search_items(query: str, limit: int = ITEM_SEARCH_LIMIT) -> list[dict]:
         }
         for eve_type in eve_types
     ]
+
 
 def catalog_types():
     """

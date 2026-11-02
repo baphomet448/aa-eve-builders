@@ -115,6 +115,7 @@ class TestIskInWords(SimpleTestCase):
     def test_nothing_gives_no_words(self):
         self.assertEqual(isk_in_words(None), "")
 
+
 class TestPositions(SimpleTestCase):
     """positions_for and positions_of"""
 
@@ -147,12 +148,14 @@ class TestPositions(SimpleTestCase):
             with self.subTest(count=count):
                 self.assertEqual(positions_of(count), expected)
 
+
 class TestBuildPayload(SimpleTestCase):
     """build_payload"""
 
     def test_shape(self):
         payload = build_payload(
-            ["Отчет от - Ivan"], [("Заказ", "N20261027-1"), ("Наименование", "Punisher")]
+            ["Отчет от - Ivan"],
+            [("Заказ", "N20261027-1"), ("Наименование", "Punisher")],
         )
 
         self.assertEqual(payload["content"], "@everyone")
@@ -184,9 +187,7 @@ class TestBuildPayload(SimpleTestCase):
         self.assertEqual(embed["description"], "first\nsecond")
 
     def test_long_texts_are_cut_to_the_discord_limits(self):
-        embed = build_payload(
-            ["d" * 5000], [("n" * 300, "v" * 2000)]
-        )["embeds"][0]
+        embed = build_payload(["d" * 5000], [("n" * 300, "v" * 2000)])["embeds"][0]
 
         self.assertEqual(len(embed["description"]), 4096)
         self.assertTrue(embed["description"].endswith("..."))

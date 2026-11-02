@@ -49,7 +49,9 @@ class OrderForm(forms.Form):
         initial=Order.AccessLevel.BASE,
         help_text=_("Builders below this level will not see the order."),
     )
-    destination = forms.CharField(label=_("Destination"), max_length=255, required=False)
+    destination = forms.CharField(
+        label=_("Destination"), max_length=255, required=False
+    )
     note = forms.CharField(
         label=_("Note"), required=False, widget=forms.Textarea(attrs={"rows": 3})
     )
@@ -62,7 +64,9 @@ class OrderForm(forms.Form):
             if isinstance(field.widget, forms.HiddenInput):
                 continue
             css_class = (
-                "form-select" if isinstance(field.widget, forms.Select) else "form-control"
+                "form-select"
+                if isinstance(field.widget, forms.Select)
+                else "form-control"
             )
             field.widget.attrs["class"] = css_class
 
@@ -87,7 +91,7 @@ class OrderForm(forms.Form):
             required=False,
             choices=[("", "---------")] + [(label, label) for label in labels],
         )
-        
+
     def clean_due_date(self):
         due_date = self.cleaned_data["due_date"]
         if due_date < timezone.localdate():
@@ -107,6 +111,7 @@ class OrderForm(forms.Form):
                 cleaned_data["eve_type"] = eve_type
 
         return cleaned_data
+
 
 class OrderEditForm(OrderForm):
     """

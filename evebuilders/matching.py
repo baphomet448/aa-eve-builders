@@ -7,10 +7,10 @@ verdicts (records, crediting) is done separately.
 
 # Standard Library
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum
-from typing import Callable
 
 # Django
 from django.db.models import Sum
@@ -183,9 +183,7 @@ def classify_contract(
         )
 
     if issuer is None:
-        return Verdict(
-            Outcome.INVALID, reason_code=reasons.NOT_ON_ACCOUNT, order=order
-        )
+        return Verdict(Outcome.INVALID, reason_code=reasons.NOT_ON_ACCOUNT, order=order)
 
     share = OrderAssignment.objects.filter(order=order, builder=issuer).first()
     if share is None or share.taken < 1:

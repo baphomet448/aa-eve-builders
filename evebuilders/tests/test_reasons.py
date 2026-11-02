@@ -76,7 +76,9 @@ class TestReasonText(SimpleTestCase):
         self.assertEqual(text, "The contract title has no order number.")
 
     def test_the_fields_of_a_record(self):
-        fields = reason_fields(reasons.WRONG_PRICE, {"expected": "500.00", "quantity": 5})
+        fields = reason_fields(
+            reasons.WRONG_PRICE, {"expected": "500.00", "quantity": 5}
+        )
 
         self.assertEqual(
             fields,
@@ -150,9 +152,7 @@ class TestVerdictCodes(MatchingTestCase):
         verdict, _loader = self._classify(self._contract(price=499.0))
 
         self.assertEqual(verdict.reason_code, reasons.WRONG_PRICE)
-        self.assertEqual(
-            verdict.reason_data, {"expected": "500.00", "quantity": 5}
-        )
+        self.assertEqual(verdict.reason_data, {"expected": "500.00", "quantity": 5})
         self.assertEqual(verdict.reason, PRICE)
 
     def test_too_many_items(self):

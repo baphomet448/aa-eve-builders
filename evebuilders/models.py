@@ -11,7 +11,9 @@ from django.db.models import F, Q
 from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
+# AA EVE Builders
 from evebuilders.reasons import reason_text
+
 
 class General(models.Model):
     """Meta model for app permissions"""
@@ -81,9 +83,7 @@ class Order(models.Model):
         USER = "USER", _("User")
 
     number = models.CharField(max_length=32, unique=True)
-    kind = models.CharField(
-        max_length=16, choices=Kind.choices, default=Kind.CORPORATE
-    )
+    kind = models.CharField(max_length=16, choices=Kind.choices, default=Kind.CORPORATE)
     eve_type = models.ForeignKey(
         "eveuniverse.EveType", on_delete=models.PROTECT, related_name="+"
     )
@@ -133,7 +133,6 @@ class Order(models.Model):
 
     def __str__(self) -> str:
         return self.number
-
 
 
 class OrderAssignment(models.Model):
@@ -289,7 +288,7 @@ class ContractRecord(models.Model):
     # text: older records have only that, and it is the fallback.
     reason_code = models.CharField(max_length=40, blank=True, default="")
     reason_data = models.JSONField(blank=True, default=dict)
-    
+
     issued_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -303,7 +302,6 @@ class ContractRecord(models.Model):
 
     def __str__(self) -> str:
         return f"{self.contract_id} ({self.state})"
-
 
     def save(self, *args, **kwargs):
         # No reason, no code: a contract that became valid has no problem left
@@ -327,6 +325,7 @@ class ContractRecord(models.Model):
         """The reason in the language of the current request"""
 
         return self.reason_in(translation.get_language() or "en")
+
 
 class ContractSource(models.Model):
     """The single ESI source (corporation + token) used to read contracts"""
@@ -396,6 +395,7 @@ class BuilderProfile(models.Model):
     def __str__(self) -> str:
         return f"{self.user_id}: {self.get_level_display()}"
 
+
 class CatalogSync(models.Model):
     """
     State of the item catalog sync (single row).
@@ -437,6 +437,7 @@ class CatalogSync(models.Model):
     def __str__(self) -> str:
         return f"Catalog sync (started {self.started_at})"
 
+
 class Destination(models.Model):
     """
     A place orders can be delivered to, added by a manager in the settings.
@@ -466,6 +467,7 @@ class Destination(models.Model):
 
     def __str__(self) -> str:
         return self.label
+
 
 class SolarSystem(models.Model):
     """

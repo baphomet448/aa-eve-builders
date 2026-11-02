@@ -5,12 +5,13 @@ from datetime import timedelta
 from decimal import Decimal
 from unittest.mock import MagicMock
 
+# Third Party
+# EVE Universe
+from eveuniverse.models import EveCategory, EveGroup, EveType
+
 # Django
 from django.test import TestCase
 from django.utils import timezone
-
-# EVE Universe
-from eveuniverse.models import EveCategory, EveGroup, EveType
 
 # AA EVE Builders
 from evebuilders.matching import Outcome, classify_contract, find_order_numbers

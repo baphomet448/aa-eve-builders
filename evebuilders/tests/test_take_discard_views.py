@@ -4,14 +4,15 @@
 from datetime import timedelta
 from decimal import Decimal
 
+# Third Party
+# EVE Universe
+from eveuniverse.models import EveCategory, EveGroup, EveType
+
 # Django
 from django.contrib.messages import constants, get_messages
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
-
-# EVE Universe
-from eveuniverse.models import EveCategory, EveGroup, EveType
 
 # AA EVE Builders
 from evebuilders.models import ContractRecord, Order, OrderAssignment
@@ -61,7 +62,9 @@ class ViewsTestCase(TestCase):
         return [m.level for m in get_messages(response.wsgi_request)]
 
     def _take(self, user, quantity, order=None):
-        return take_order(user=user, order_id=(order or self.order).pk, quantity=quantity)
+        return take_order(
+            user=user, order_id=(order or self.order).pk, quantity=quantity
+        )
 
 
 @override_settings(STORAGES=TEST_STORAGES)

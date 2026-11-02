@@ -19,12 +19,12 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_POST
 
+# Alliance Auth
 # Alliance Auth (External Libs)
 from esi.decorators import token_required
 
 # AA EVE Builders
 from evebuilders import app_settings
-from evebuilders.messages import display_name
 from evebuilders.catalog import (
     SyncResult,
     catalog_overview,
@@ -41,13 +41,9 @@ from evebuilders.manager_actions import (
     release_share,
     update_order,
 )
-from evebuilders.order_detail import contract_rows, event_rows, share_rows
-from evebuilders.overview import (
-    problem_contract_rows,
-    recent_events,
-    waiting_contract_rows,
-)
+from evebuilders.messages import display_name
 from evebuilders.models import CatalogSync, ContractSource, Destination, Order
+from evebuilders.order_detail import contract_rows, event_rows, share_rows
 from evebuilders.orders import (
     create_order,
     discard_share,
@@ -55,6 +51,11 @@ from evebuilders.orders import (
     problem_contracts,
     take_order,
     visible_orders,
+)
+from evebuilders.overview import (
+    problem_contract_rows,
+    recent_events,
+    waiting_contract_rows,
 )
 from evebuilders.permissions import MANAGE_ACCESS, has_any_access
 from evebuilders.places import (
@@ -217,7 +218,6 @@ def item_search(request: WSGIRequest) -> JsonResponse:
     return JsonResponse({"results": search_items(request.GET.get("q", ""))})
 
 
-
 @login_required
 @user_passes_test(has_any_access)
 @require_POST
@@ -309,6 +309,7 @@ def my_orders(request: WSGIRequest) -> HttpResponse:
 
     return render(request, "evebuilders/my_orders.html", context)
 
+
 @login_required
 @permission_required(MANAGE_ACCESS)
 @token_required(scopes=CONTRACTS_SCOPE, new=True)
@@ -339,6 +340,7 @@ def connect_esi(request: WSGIRequest, token) -> HttpResponse:
         )
 
     return redirect("evebuilders:settings")
+
 
 def _report_messages(request: WSGIRequest, report) -> None:
     """Tell the user what a contract sync did and what the state is now"""
@@ -410,7 +412,9 @@ def sync_contracts_view(request: WSGIRequest) -> HttpResponse:
     if attempt.too_soon:
         messages.warning(
             request,
-            _("The contracts were checked a moment ago. Please wait %(seconds)s seconds.")
+            _(
+                "The contracts were checked a moment ago. Please wait %(seconds)s seconds."
+            )
             % {"seconds": attempt.wait_seconds},
         )
     elif attempt.report.error:
@@ -423,6 +427,7 @@ def sync_contracts_view(request: WSGIRequest) -> HttpResponse:
         _report_messages(request, attempt.report)
 
     return redirect("evebuilders:my_orders")
+
 
 @login_required
 @permission_required(MANAGE_ACCESS)
@@ -466,11 +471,10 @@ def set_level_view(request: WSGIRequest, user_id: int) -> HttpResponse:
                 request, _("The level of %(name)s is now %(level)s.") % text
             )
         else:
-            messages.info(
-                request, _("The level of %(name)s did not change.") % text
-            )
+            messages.info(request, _("The level of %(name)s did not change.") % text)
 
     return redirect("evebuilders:builder_levels")
+
 
 @login_required
 @permission_required(MANAGE_ACCESS)
@@ -573,6 +577,7 @@ def credit_view(request: WSGIRequest, order_id: int) -> HttpResponse:
 
     return redirect("evebuilders:order_detail", order_id=order.pk)
 
+
 @login_required
 @permission_required(MANAGE_ACCESS)
 def edit_order(request: WSGIRequest, order_id: int) -> HttpResponse:
@@ -643,6 +648,7 @@ def edit_order(request: WSGIRequest, order_id: int) -> HttpResponse:
 
     return render(request, "evebuilders/order_form.html", context)
 
+
 @login_required
 @permission_required(MANAGE_ACCESS)
 @require_POST
@@ -674,6 +680,7 @@ def delete_order(request: WSGIRequest, order_id: int) -> HttpResponse:
 
     return redirect("evebuilders:orders")
 
+
 @login_required
 @permission_required(MANAGE_ACCESS)
 def management(request: WSGIRequest) -> HttpResponse:
@@ -691,6 +698,7 @@ def management(request: WSGIRequest) -> HttpResponse:
     }
 
     return render(request, "evebuilders/management.html", context)
+
 
 @login_required
 @permission_required(MANAGE_ACCESS)
@@ -762,9 +770,7 @@ def add_station_view(request: WSGIRequest) -> HttpResponse:
     except EsiError as ex:
         messages.error(request, _("ESI could not be read: %(error)s") % {"error": ex})
     else:
-        messages.success(
-            request, _("%(place)s was added.") % {"place": place.label}
-        )
+        messages.success(request, _("%(place)s was added.") % {"place": place.label})
 
     return redirect("evebuilders:stations")
 

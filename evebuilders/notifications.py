@@ -259,6 +259,7 @@ def notify(channel: str, payload: dict) -> None:
 
     transaction.on_commit(queue)
 
+
 def _count_form(count: int, one: str, few: str, many: str) -> str:
     """The Russian word form for a whole number: 1 / 2-4 / 5+ (21 is like 1)"""
 

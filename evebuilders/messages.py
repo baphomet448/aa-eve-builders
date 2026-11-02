@@ -77,7 +77,6 @@ def discard_payload(*, user, order: Order, quantity: int, free: int) -> dict:
     )
 
 
-
 def _settings_url() -> str:
     """The link to the plugin settings in Auth, empty if the site URL is not known"""
 
@@ -93,12 +92,14 @@ def _contract_lines(builder: str, quantity: int, price) -> list[str]:
 
     return [
         f"Отчет от - {builder}",
-         f"Контракт на {positions_for(quantity)}",
+        f"Контракт на {positions_for(quantity)}",
         f"Контракт {format_isk(price)} {isk_in_words(price)}",
     ]
 
 
-def contract_waiting_payload(*, builder: str, order: Order, quantity: int, price) -> dict:
+def contract_waiting_payload(
+    *, builder: str, order: Order, quantity: int, price
+) -> dict:
     """A valid contract waits for acceptance"""
 
     return build_payload(
@@ -170,6 +171,7 @@ def token_failure_payload(*, corporation: str, error: str) -> dict:
         [("Корпорация", corporation), ("Причина", error), ("Что делать", what_to_do)],
     )
 
+
 def taken_payload(*, user, order: Order, quantity: int, free: int) -> dict:
     """
     A builder took (a part of) an order.
@@ -195,7 +197,10 @@ def taken_payload(*, user, order: Order, quantity: int, free: int) -> dict:
         ],
     )
 
-def released_payload(*, manager, builder, order: Order, quantity: int, free: int) -> dict:
+
+def released_payload(
+    *, manager, builder, order: Order, quantity: int, free: int
+) -> dict:
     """A manager took items back from a builder
 
     :param quantity: How many items were taken back
@@ -252,6 +257,7 @@ def manual_credit_payload(
         lines, [("Заказ", order.number), ("Наименование", order.eve_type.name)]
     )
 
+
 # The fields a manager may change on an order: (name in the history, name in Discord)
 FIELD_LABELS = {
     "eve_type": ("item", "Наименование"),
@@ -303,6 +309,7 @@ def order_changed_payload(*, manager, order: Order, changes) -> dict:
             for change in changes
         ],
     )
+
 
 def order_cancelled_payload(
     *, manager, order: Order, taken: int, reason: str = ""

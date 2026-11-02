@@ -6,15 +6,18 @@ requires = [
 
 [project]
 name = "aa-eve-builders"
-description = "Corporate build orders for Alliance Auth: builders take parts of an order and deliver them through in-game contracts that the plugin checks and credits"
+description = """\
+    Corporate build orders for Alliance Auth: builders take parts of an order and deliver them through in-game \
+    contracts that the plugin checks and credits\
+    """
 readme = "README.md"
 keywords = [
     "allianceauth",
-    "evebuilders",
-    "eve online",
-    "industry",
     "build orders",
     "contracts",
+    "eve online",
+    "evebuilders",
+    "industry",
 ]
 license = { file = "LICENSE" }
 authors = [

@@ -13,6 +13,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
 
+# Alliance Auth
 # Alliance Auth (External Libs)
 from esi.models import Token
 

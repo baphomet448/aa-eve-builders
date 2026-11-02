@@ -32,19 +32,19 @@ from evebuilders.matching import (
     classify_contract,
     user_of_character,
 )
-from evebuilders.models import (
-    ContractRecord,
-    ContractSource,
-    Order,
-    OrderAssignment,
-    OrderEvent,
-)
 from evebuilders.messages import (
     contract_credited_payload,
     contract_invalid_payload,
     contract_waiting_payload,
     display_name,
     token_failure_payload,
+)
+from evebuilders.models import (
+    ContractRecord,
+    ContractSource,
+    Order,
+    OrderAssignment,
+    OrderEvent,
 )
 from evebuilders.notifications import CHANNEL_COMPLETE, notify
 from evebuilders.orders import recalculate_status
@@ -296,7 +296,9 @@ def _apply_credit(contract: dict, verdict: Verdict, now) -> int:
         acceptor_id = contract.get("acceptor_id") or None
         record.acceptor_character_id = acceptor_id
         record.acceptor_user = user_of_character(acceptor_id) if acceptor_id else None
-        record.completed_at = parse_datetime(contract.get("date_completed") or "") or now
+        record.completed_at = (
+            parse_datetime(contract.get("date_completed") or "") or now
+        )
         record.state = ContractRecord.State.CREDITED
         record.reason = ""
         record.save()
@@ -465,6 +467,7 @@ def sync_contracts(source: ContractSource | None = None) -> SyncReport:
 
     return report
 
+
 def _fill_current_state(report: SyncReport) -> None:
     """Put the current numbers of waiting and problem contracts into the report"""
 
@@ -477,6 +480,7 @@ def _fill_current_state(report: SyncReport) -> None:
     report.problem_contracts = ContractRecord.objects.filter(
         state=ContractRecord.State.INVALID
     ).count()
+
 
 @dataclass
 class SyncAttempt:
@@ -513,12 +517,15 @@ def sync_now(min_interval: int | None = None) -> SyncAttempt:
         if locked.last_sync_at is not None:
             elapsed = (now - locked.last_sync_at).total_seconds()
             if elapsed < min_interval:
-                return SyncAttempt(too_soon=True, wait_seconds=ceil(min_interval - elapsed))
+                return SyncAttempt(
+                    too_soon=True, wait_seconds=ceil(min_interval - elapsed)
+                )
 
         locked.last_sync_at = now
         locked.save(update_fields=["last_sync_at"])
 
     return SyncAttempt(report=sync_contracts(source))
+
 
 def _announce_invalid(record: ContractRecord) -> None:
     """Tell Discord that a contract cannot be counted"""
@@ -538,7 +545,6 @@ def _announce_invalid(record: ContractRecord) -> None:
             reason=record.reason_in("ru"),
         ),
     )
-
 
 
 # After ESI's cached answer expires, wait this long (clock differences) before asking

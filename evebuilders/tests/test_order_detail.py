@@ -177,7 +177,11 @@ class TestReleaseView(DetailTestCase):
         self.assertEqual(self.share.taken, 400)
 
     def test_bad_numbers_are_an_error(self):
-        for data in ({"share": "abc"}, {"share": "", "quantity": "5"}, {"share": self.share.pk, "quantity": "x"}):
+        for data in (
+            {"share": "abc"},
+            {"share": "", "quantity": "5"},
+            {"share": self.share.pk, "quantity": "x"},
+        ):
             with self.subTest(data=data):
                 response = self._post("release", data)
 
@@ -236,7 +240,11 @@ class TestCreditView(DetailTestCase):
         self.assertEqual(self.share.credited, 0)
 
     def test_bad_numbers_are_an_error(self):
-        for data in ({"share": self.share.pk, "quantity": ""}, {"share": self.share.pk, "quantity": "x"}, {"share": self.share.pk, "quantity": "5", "contract": "zz"}):
+        for data in (
+            {"share": self.share.pk, "quantity": ""},
+            {"share": self.share.pk, "quantity": "x"},
+            {"share": self.share.pk, "quantity": "5", "contract": "zz"},
+        ):
             with self.subTest(data=data):
                 response = self._post("credit", data)
 

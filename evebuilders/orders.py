@@ -4,6 +4,10 @@
 from datetime import date
 from decimal import Decimal
 
+# Third Party
+# EVE Universe
+from eveuniverse.models import EveType
+
 # Django
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -24,10 +28,9 @@ from django.utils.translation import gettext as _
 # Alliance Auth
 from allianceauth.authentication.models import CharacterOwnership
 
-# EVE Universe
-from eveuniverse.models import EveType
-
 # AA EVE Builders
+from evebuilders import app_settings
+from evebuilders.messages import discard_payload, new_order_payload, taken_payload
 from evebuilders.models import (
     BuilderProfile,
     ContractRecord,
@@ -37,8 +40,6 @@ from evebuilders.models import (
     OrderEvent,
     OrderSequence,
 )
-from evebuilders import app_settings
-from evebuilders.messages import discard_payload, new_order_payload, taken_payload
 from evebuilders.notifications import CHANNEL_COMPLETE, CHANNEL_NEW_ORDER, notify
 from evebuilders.permissions import MANAGE_ACCESS, has_any_access
 
@@ -202,6 +203,7 @@ def visible_orders(user):
         .order_by("status_rank", "priority_rank", "-pk")
     )
 
+
 def recalculate_status(order: Order) -> None:
     """
     Set the order status from its shares.
@@ -299,7 +301,6 @@ def take_order(*, user, order_id: int, quantity: int) -> OrderAssignment:
     return share
 
 
-
 def pending_quantity(share: OrderAssignment) -> int:
     """P: items of the share that sit in contracts waiting for acceptance."""
 
@@ -345,9 +346,11 @@ def discard_share(*, user, order_id: int, quantity: int | None = None) -> int:
         order = Order.objects.select_for_update().get(
             pk=order_id, kind=Order.Kind.CORPORATE
         )
-        share = OrderAssignment.objects.select_for_update().filter(
-            order=order, builder=user
-        ).first()
+        share = (
+            OrderAssignment.objects.select_for_update()
+            .filter(order=order, builder=user)
+            .first()
+        )
 
         if share is None:
             raise ValidationError(_("You have not taken this order."))
@@ -401,6 +404,7 @@ def discard_share(*, user, order_id: int, quantity: int | None = None) -> int:
 
     return quantity
 
+
 def my_shares(user) -> list[dict]:
     """
     The user's own shares for the "My orders" page.
@@ -449,7 +453,6 @@ def my_shares(user) -> list[dict]:
     )
 
     return rows
-
 
 
 def _waiting_quantity():
@@ -508,6 +511,7 @@ def problem_contracts(user):
         .order_by("-issued_at", "-created_at")
     )
 
+
 # The order of the list: new orders first, finished and cancelled ones last
 STATUS_ORDER = (
     Order.Status.NEW,
@@ -531,6 +535,7 @@ def _rank(field: str, values) -> Case:
         default=Value(len(values)),
         output_field=IntegerField(),
     )
+
 
 # The order of the shares on the "My orders" page: what is still to be delivered
 # first, finished and cancelled ones last

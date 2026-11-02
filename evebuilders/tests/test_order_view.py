@@ -3,14 +3,15 @@
 # Standard Library
 from datetime import timedelta
 
+# Third Party
+# EVE Universe
+from eveuniverse.models import EveCategory, EveGroup, EveType
+
 # Django
 from django.contrib.messages import constants, get_messages
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
-
-# EVE Universe
-from eveuniverse.models import EveCategory, EveGroup, EveType
 
 # AA EVE Builders
 from evebuilders.models import Order, OrderEvent

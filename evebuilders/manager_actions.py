@@ -3,6 +3,7 @@
 # Standard Library
 from datetime import timedelta
 from typing import Any, NamedTuple
+
 # Django
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -229,6 +230,7 @@ def credit_manually(
 
     return quantity
 
+
 # The fields of an order that a manager may change
 EDITABLE_FIELDS = tuple(FIELD_LABELS)
 
@@ -350,6 +352,7 @@ def update_order(*, actor, order_id: int, values: dict) -> list[Change]:
         )
 
     return changes
+
 
 # How long the creator of an order who is not a manager may still delete it
 DELETE_WINDOW = timedelta(hours=1)

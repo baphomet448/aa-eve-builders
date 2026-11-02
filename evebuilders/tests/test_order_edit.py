@@ -6,15 +6,16 @@ from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import patch
 
+# Third Party
+# EVE Universe
+from eveuniverse.models import EveType
+
 # Django
 from django.contrib.messages import constants, get_messages
 from django.core.exceptions import ValidationError
 from django.test import Client, SimpleTestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
-
-# EVE Universe
-from eveuniverse.models import EveType
 
 # AA EVE Builders
 from evebuilders.forms import OrderEditForm
@@ -166,7 +167,11 @@ class TestUpdateOrder(EditTestCase):
         self.assertEqual(self.order.quantity, 1000)
 
     def test_invalid_values_are_refused_and_nothing_changes(self):
-        for values in ({"quantity": 0}, {"unit_price": Decimal("-1")}, {"access_level": 9}):
+        for values in (
+            {"quantity": 0},
+            {"unit_price": Decimal("-1")},
+            {"access_level": 9},
+        ):
             with self.subTest(values=values):
                 with self.assertRaises(ValidationError):
                     self._update(**values)

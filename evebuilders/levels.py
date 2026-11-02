@@ -54,7 +54,9 @@ def level_rows() -> list[dict]:
             {
                 "user": user,
                 "name": display_name(user),
-                "corporation": main_character.corporation_name if main_character else "",
+                "corporation": (
+                    main_character.corporation_name if main_character else ""
+                ),
                 "level": levels.get(user.pk, Order.AccessLevel.BASE),
                 "is_manager": user.has_perm(MANAGE_ACCESS),
             }

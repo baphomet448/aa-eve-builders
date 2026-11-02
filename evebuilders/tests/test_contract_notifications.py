@@ -98,12 +98,8 @@ class TestContractNotifications(SettingsMixin, SyncTestCase):
         self.assertIn("Контракт принял", self._description(sent[1]))
 
     def test_an_invalid_contract_is_announced_once_with_the_reason(self):
-        first = self._announced(
-            lambda: self._process([self._contract(price=499.0)])
-        )
-        again = self._announced(
-            lambda: self._process([self._contract(price=499.0)])
-        )
+        first = self._announced(lambda: self._process([self._contract(price=499.0)]))
+        again = self._announced(lambda: self._process([self._contract(price=499.0)]))
 
         self.assertEqual(len(first), 1)
         fields = fields_of(first[0][1])

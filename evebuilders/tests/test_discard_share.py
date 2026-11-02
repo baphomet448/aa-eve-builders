@@ -4,13 +4,14 @@
 from datetime import timedelta
 from decimal import Decimal
 
+# Third Party
+# EVE Universe
+from eveuniverse.models import EveCategory, EveGroup, EveType
+
 # Django
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
-
-# EVE Universe
-from eveuniverse.models import EveCategory, EveGroup, EveType
 
 # AA EVE Builders
 from evebuilders.models import ContractRecord, Order, OrderAssignment, OrderEvent
