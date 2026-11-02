@@ -13,4 +13,10 @@
             {% translate "Builder levels" %}
         </a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active == 'stations' %}active{% endif %}"
+           href="{% url 'evebuilders:stations' %}">
+            {% translate "Stations" %}
+        </a>
+    </li>
 </ul>

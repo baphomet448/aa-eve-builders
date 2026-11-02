@@ -31,7 +31,7 @@ from evebuilders.catalog import (
     search_items,
     start_catalog_sync,
 )
-from evebuilders.contracts import CONTRACTS_SCOPE, connect_source
+from evebuilders.contracts import CONTRACTS_SCOPE, EsiError, connect_source
 from evebuilders.forms import OrderEditForm, OrderForm
 from evebuilders.levels import builder_users, level_rows, set_builder_level
 from evebuilders.manager_actions import (
@@ -47,7 +47,7 @@ from evebuilders.overview import (
     recent_events,
     waiting_contract_rows,
 )
-from evebuilders.models import CatalogSync, ContractSource, Order
+from evebuilders.models import CatalogSync, ContractSource, Destination, Order
 from evebuilders.orders import (
     create_order,
     discard_share,
@@ -57,6 +57,12 @@ from evebuilders.orders import (
     visible_orders,
 )
 from evebuilders.permissions import MANAGE_ACCESS, has_any_access
+from evebuilders.places import (
+    SEARCH_MIN_LENGTH,
+    add_destination,
+    search_systems,
+    system_stations,
+)
 from evebuilders.sync import next_sync_time, sync_now
 
 # The due date offered on a new order form
@@ -685,3 +691,103 @@ def management(request: WSGIRequest) -> HttpResponse:
     }
 
     return render(request, "evebuilders/management.html", context)
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+def stations_view(request: WSGIRequest) -> HttpResponse:
+    """
+    The places orders can be delivered to, and a search to add more (managers only)
+    :param request: GET parameter ``q`` (a part of a system name) or ``system``
+        (the ID of a system whose stations to show)
+    :return:
+    """
+
+    query = request.GET.get("q", "").strip()
+    system_id = request.GET.get("system", "")
+    context = {
+        "places": Destination.objects.all(),
+        "query": query,
+        "searched": False,
+        "too_short": 0 < len(query) < SEARCH_MIN_LENGTH and not system_id.isdigit(),
+        "systems": [],
+        "system": None,
+        "stations": [],
+    }
+
+    try:
+        if system_id.isdigit():
+            found = system_stations(int(system_id))
+            context.update(system=found["system"], stations=found["stations"])
+            context["searched"] = True
+        elif query:
+            systems = search_systems(query)
+            context["searched"] = True
+            if len(systems) == 1:
+                found = system_stations(systems[0]["id"])
+                context.update(system=found["system"], stations=found["stations"])
+            else:
+                context["systems"] = systems
+    except EsiError as ex:
+        messages.error(request, _("ESI could not be read: %(error)s") % {"error": ex})
+
+    return render(request, "evebuilders/stations.html", context)
+
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+@require_POST
+def add_station_view(request: WSGIRequest) -> HttpResponse:
+    """
+    Add a place to the list (managers only)
+    :param request: POST parameters ``system_id`` and, optionally, ``station_id``
+        and ``structure_name``
+    :return:
+    """
+
+    try:
+        system_id = int(request.POST.get("system_id", ""))
+        raw_station = request.POST.get("station_id", "").strip()
+        station_id = int(raw_station) if raw_station else None
+        place = add_destination(
+            actor=request.user,
+            system_id=system_id,
+            station_id=station_id,
+            structure_name=request.POST.get("structure_name", ""),
+        )
+    except ValueError:
+        messages.error(request, _("Please check the numbers."))
+    except ValidationError as ex:
+        for message in ex.messages:
+            messages.error(request, message)
+    except EsiError as ex:
+        messages.error(request, _("ESI could not be read: %(error)s") % {"error": ex})
+    else:
+        messages.success(
+            request, _("%(place)s was added.") % {"place": place.label}
+        )
+
+    return redirect("evebuilders:stations")
+
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+@require_POST
+def delete_station_view(request: WSGIRequest, place_id: int) -> HttpResponse:
+    """
+    Remove a place from the list (managers only). Orders that have it keep it.
+    :param request:
+    :param place_id: The place
+    :return:
+    """
+
+    place = get_object_or_404(Destination, pk=place_id)
+    label = place.label
+    place.delete()
+
+    messages.success(
+        request,
+        _("%(place)s was removed from the list. Orders that have it keep it.")
+        % {"place": label},
+    )
+
+    return redirect("evebuilders:stations")

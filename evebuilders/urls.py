@@ -29,6 +29,13 @@ urlpatterns = [
         views.set_level_view,
         name="set_level",
     ),
+    path("settings/stations/", views.stations_view, name="stations"),
+    path("settings/stations/add/", views.add_station_view, name="add_station"),
+    path(
+        "settings/stations/<int:place_id>/delete/",
+        views.delete_station_view,
+        name="delete_station",
+    ),
     path("settings/esi/connect/", views.connect_esi, name="connect_esi"),
     path("settings/sync-catalog/", views.start_sync, name="sync_catalog"),
     path("items/search/", views.item_search, name="item_search"),

@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 # AA EVE Builders
 from evebuilders.catalog import catalog_types
-from evebuilders.models import Order
+from evebuilders.models import Destination, Order
 
 
 class OrderForm(forms.Form):
@@ -54,8 +54,9 @@ class OrderForm(forms.Form):
         label=_("Note"), required=False, widget=forms.Textarea(attrs={"rows": 3})
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, current_destination: str = "", **kwargs):
         super().__init__(*args, **kwargs)
+        self._use_the_list_of_places(current_destination)
 
         for field in self.fields.values():
             if isinstance(field.widget, forms.HiddenInput):
@@ -65,6 +66,28 @@ class OrderForm(forms.Form):
             )
             field.widget.attrs["class"] = css_class
 
+    def _use_the_list_of_places(self, current_destination: str) -> None:
+        """
+        The destination is picked from the places a manager added in the
+        settings. While there are none, it stays a free text.
+
+        :param current_destination: The destination an order has already, it
+            stays a choice even when it is not in the list
+        """
+
+        labels = list(Destination.objects.values_list("label", flat=True))
+        if not labels:
+            return
+
+        if current_destination and current_destination not in labels:
+            labels.append(current_destination)
+
+        self.fields["destination"] = forms.ChoiceField(
+            label=_("Destination"),
+            required=False,
+            choices=[("", "---------")] + [(label, label) for label in labels],
+        )
+        
     def clean_due_date(self):
         due_date = self.cleaned_data["due_date"]
         if due_date < timezone.localdate():
@@ -93,7 +116,7 @@ class OrderEditForm(OrderForm):
     """
 
     def __init__(self, *args, order, item_locked: bool, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, current_destination=order.destination, **kwargs)
         self.order = order
         self.item_locked = item_locked
 

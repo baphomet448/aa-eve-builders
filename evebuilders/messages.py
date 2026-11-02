@@ -44,6 +44,7 @@ def new_order_payload(order: Order) -> dict:
         ("Приоритет", order.priority),
         ("Взять заказ:", _order_list_url()),
         ("Срок сдачи до", order.due_date.isoformat()),
+        ("Доставка", order.destination),
     ]
     if order.access_level != Order.AccessLevel.BASE:
         fields.append(("Уровень доступа", order.get_access_level_display()))
