@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load humanize %}
+{% load l10n %}
 
 {% block details %}
     <div class="card card-primary mb-3">
@@ -53,28 +54,29 @@
                 </p>
 
                 <div class="table-responsive">
-                    <table class="table table-sm table-hover align-middle">
+                    <table id="evebuilders-my-orders" class="table table-sm table-hover align-middle">
                         <thead>
                             <tr>
-                                <th>{% translate "Order" %}</th>
-                                <th>{% translate "Status" %}</th>
-                                <th>{% translate "Item" %}</th>
-                                <th class="text-end">{% translate "Price per unit" %}</th>
-                                <th class="text-end">{% translate "Total price" %}</th>
-                                <th class="text-end">{% translate "Taken" %}</th>
-                                <th class="text-end">{% translate "Ready" %}</th>
-                                <th class="text-end">{% translate "In contracts" %}</th>
-                                <th class="text-end">{% translate "Can be given back" %}</th>
-                                <th>{% translate "Due date" %}</th>
-                                <th>{% translate "Give back until" %}</th>
+                                <th data-sort="number">{% translate "Order" %}</th>
+                                <th data-sort="number">{% translate "Status" %}</th>
+                                <th data-sort="number">{% translate "Priority" %}</th>
+                                <th data-sort="text">{% translate "Item" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "Price per unit" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "Total price" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "Taken" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "Ready" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "In contracts" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "Can be given back" %}</th>
+                                <th data-sort="text">{% translate "Due date" %}</th>
+                                <th data-sort="text">{% translate "Give back until" %}</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for row in rows %}
                                 <tr>
-                                    <td class="text-nowrap">{{ row.order.number }}</td>
-                                    <td>
+                                    <td class="text-nowrap" data-value="{{ row.order.pk|unlocalize }}">{{ row.order.number }}</td>
+                                    <td data-value="{{ row.status_rank|unlocalize }}">
                                         {% if row.status == 'UNDER_REVIEW' %}
                                             <span class="badge bg-warning">{% translate "Under review" %}</span>
                                         {% elif row.status == 'DONE' %}
@@ -85,13 +87,21 @@
                                             <span class="badge bg-info">{% translate "In progress" %}</span>
                                         {% endif %}
                                     </td>
+                                    <td data-value="{{ row.priority_rank|unlocalize }}">
+                                        <span class="badge
+                                            {% if row.order.priority == 'HIGH' %}bg-danger
+                                            {% elif row.order.priority == 'MEDIUM' %}bg-warning
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ row.order.get_priority_display }}
+                                        </span>
+                                    </td>
                                     <td>{{ row.order.eve_type.name }}</td>
-                                    <td class="text-end">{{ row.order.unit_price|intcomma }}</td>
-                                    <td class="text-end">{{ row.total|intcomma }}</td>
-                                    <td class="text-end">{{ row.share.taken|intcomma }}</td>
-                                    <td class="text-end">{{ row.share.credited|intcomma }}</td>
-                                    <td class="text-end">{{ row.pending|intcomma }}</td>
-                                    <td class="text-end">{{ row.releasable|intcomma }}</td>
+                                    <td class="text-end" data-value="{{ row.order.unit_price|unlocalize }}">{{ row.order.unit_price|intcomma }}</td>
+                                    <td class="text-end" data-value="{{ row.total|unlocalize }}">{{ row.total|intcomma }}</td>
+                                    <td class="text-end" data-value="{{ row.share.taken|unlocalize }}">{{ row.share.taken|intcomma }}</td>
+                                    <td class="text-end" data-value="{{ row.share.credited|unlocalize }}">{{ row.share.credited|intcomma }}</td>
+                                    <td class="text-end" data-value="{{ row.pending|unlocalize }}">{{ row.pending|intcomma }}</td>
+                                    <td class="text-end" data-value="{{ row.releasable|unlocalize }}">{{ row.releasable|intcomma }}</td>
                                     <td class="text-nowrap">{{ row.order.due_date|date:"Y-m-d" }}</td>
                                     <td class="text-nowrap">{{ row.discard_deadline|date:"Y-m-d" }}</td>
                                     <td class="text-nowrap">
@@ -162,4 +172,8 @@
             </div>
         </div>
     {% endif %}
+{% endblock %}
+
+{% block extra_javascript %}
+    {% include 'evebuilders/sortable_table.html' with table_id='evebuilders-my-orders' %}
 {% endblock %}

@@ -1,0 +1,58 @@
+<style>
+    #{{ table_id }} th[data-sort] { cursor: pointer; user-select: none; }
+    #{{ table_id }} th.sorted-asc::after { content: " \25B2"; }
+    #{{ table_id }} th.sorted-desc::after { content: " \25BC"; }
+</style>
+<script>
+    // Click on a column header sorts the table by that column. The first order of
+    // the rows comes from the server. A cell sorts by its data-value, if it has one.
+    document.addEventListener("DOMContentLoaded", function () {
+        const table = document.getElementById("{{ table_id }}");
+        if (!table) {
+            return;
+        }
+
+        const body = table.tBodies[0];
+        const headers = table.querySelectorAll("thead th[data-sort]");
+
+        function valueOf(row, index, type) {
+            const cell = row.cells[index];
+            const raw = cell.dataset.value !== undefined ? cell.dataset.value : cell.textContent.trim();
+
+            return type === "number" ? parseFloat(raw) : raw.toLowerCase();
+        }
+
+        headers.forEach(function (header) {
+            header.addEventListener("click", function () {
+                const index = header.cellIndex;
+                const type = header.dataset.sort;
+                const direction = header.dataset.direction === "asc" ? "desc" : "asc";
+
+                headers.forEach(function (other) {
+                    delete other.dataset.direction;
+                    other.classList.remove("sorted-asc", "sorted-desc");
+                });
+                header.dataset.direction = direction;
+                header.classList.add("sorted-" + direction);
+
+                const rows = Array.from(body.rows);
+                rows.sort(function (a, b) {
+                    const x = valueOf(a, index, type);
+                    const y = valueOf(b, index, type);
+
+                    if (x < y) {
+                        return direction === "asc" ? -1 : 1;
+                    }
+                    if (x > y) {
+                        return direction === "asc" ? 1 : -1;
+                    }
+
+                    return 0;
+                });
+                rows.forEach(function (row) {
+                    body.appendChild(row);
+                });
+            });
+        });
+    });
+</script>

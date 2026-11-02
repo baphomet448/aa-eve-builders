@@ -429,6 +429,8 @@ def my_shares(user) -> list[dict]:
                 "order": share.order,
                 "pending": pending_quantity(share),
                 "status": share_status(share),
+                "status_rank": SHARE_STATUS_ORDER.index(share_status(share)),
+                "priority_rank": PRIORITY_ORDER.index(share.order.priority),
                 "total": share.order.unit_price * share.taken,
                 "releasable": releasable,
                 "discard_deadline": deadline,
@@ -439,6 +441,12 @@ def my_shares(user) -> list[dict]:
                 ),
             }
         )
+
+    # The same idea as the order list: what still has to be delivered first, the
+    # urgent ones first, newer orders first
+    rows.sort(
+        key=lambda row: (row["status_rank"], row["priority_rank"], -row["order"].pk)
+    )
 
     return rows
 
@@ -523,3 +531,7 @@ def _rank(field: str, values) -> Case:
         default=Value(len(values)),
         output_field=IntegerField(),
     )
+
+# The order of the shares on the "My orders" page: what is still to be delivered
+# first, finished and cancelled ones last
+SHARE_STATUS_ORDER = ("IN_PROGRESS", "UNDER_REVIEW", "DONE", "CANCELLED")
