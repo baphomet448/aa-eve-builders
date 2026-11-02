@@ -1,210 +1,313 @@
-# Example Plugin App for Alliance Auth (GitHub Version)<a name="example-plugin-app-for-alliance-auth-github-version"></a>
+# EVE Builders for Alliance Auth
 
-This is an example plugin app for [Alliance Auth](https://gitlab.com/allianceauth/allianceauth)
-(AA) that can be used as a starting point to develop custom plugins.
+[Русская версия](README.ru.md)
 
 ![License](https://img.shields.io/badge/license-GPLv3-green)
-![python](https://img.shields.io/badge/python-3.8-informational)
-![django](https://img.shields.io/badge/django-3.2-informational)
-![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)
+![python](https://img.shields.io/badge/python-3.10%2B-informational)
+![django](https://img.shields.io/badge/django-5.2-informational)
 
-_(These badges are examples, you can and should replace them with your own)_
+Corporate build orders for [Alliance Auth](https://gitlab.com/allianceauth/allianceauth)
+(AA). Managers post orders ("20 Punishers at 1.5M each, due on Friday"), builders
+take a part of an order, build it and deliver it with an ordinary in-game item
+exchange contract to the corporation. The plugin reads the corporation contracts,
+checks them against the order, and credits the builder when the contract is
+accepted. Everyone is kept informed through Discord.
 
-For the GitLab version of this example app, please have a look over here, Erik
-Kalkoken was so friendly to provide it » [Alliance Auth Example App (GitLab Version)](https://gitlab.com/ErikKalkoken/allianceauth-example-plugin)
+This plugin is a rewrite for Alliance Auth of the Java web application
+[eve-builders](https://github.com/AntonAzarenko/eve-builders) by AntonAzarenko. No
+code was copied; the idea and the workflow are his. Thank you!
 
 > [!IMPORTANT]
 >
-> **This app needs Alliance Auth v5!**
->
-> Please make sure to update your Alliance Auth instance **before** you install this
-> version, otherwise an update to Alliance Auth will be pulled in unsupervised.
+> **This app needs Alliance Auth v5**, a running Celery worker **and Celery beat**
+> (the contracts are checked by a scheduled task).
 
 ______________________________________________________________________
 
-<!-- mdformat-toc start --slug=github --maxlevel=6 --minlevel=1 -->
-
-- [Example Plugin App for Alliance Auth (GitHub Version)](#example-plugin-app-for-alliance-auth-github-version)
-  - [Features](#features)
-  - [How to Use It](#how-to-use-it)
-    - [Cloning From Repo](#cloning-from-repo)
-    - [Renaming the App](#renaming-the-app)
-  - [Clearing Migrations](#clearing-migrations)
-  - [Writing Unit Tests](#writing-unit-tests)
-  - [Installing Into Your Dev AA](#installing-into-your-dev-aa)
-  - [Installing Into Production AA](#installing-into-production-aa)
-  - [Contribute](#contribute)
-
-<!-- mdformat-toc end -->
+- [Features](#features)
+- [How it works](#how-it-works)
+- [Installation](#installation)
+  - [Requirements](#requirements)
+  - [Install the package](#install-the-package)
+  - [Scheduled tasks](#scheduled-tasks)
+  - [ESI scope](#esi-scope)
+  - [Permissions](#permissions)
+  - [First setup in the web interface](#first-setup-in-the-web-interface)
+- [Configuration](#configuration)
+- [Discord notifications](#discord-notifications)
+- [Contract rules](#contract-rules)
+- [Management commands](#management-commands)
+- [Updating](#updating)
+- [Known limitations](#known-limitations)
+- [Development](#development)
+- [Credits and license](#credits-and-license)
 
 ______________________________________________________________________
 
-## Features<a name="features"></a>
+## Features
 
-- The plugin can be installed, upgraded (and removed) into an existing AA
-  installation using PyInstaller.
-- It has its own menu item in the sidebar.
-- It has one view that shows a panel and some text
+- **Orders**: item from the EVE catalog, quantity, price per unit, priority, due
+  date, access level, delivery place and a note. Order numbers look like
+  `N20261101-1` (date and the number of the day).
+- **Builders** take any part of an order and can give it back until half of the time
+  between the creation and the due date has passed. After that only a manager can
+  take it back.
+- **Access levels** Base, Middle and Senior: a builder does not see orders above
+  his level.
+- **Delivery through contracts**: the builder creates an item exchange contract to
+  the corporation with the order number in the title. The plugin credits it when it
+  is accepted in the game. No manual book-keeping.
+- **My orders** page with what was taken, what waits for acceptance, what is done,
+  prices and the due dates, and the contracts that could not be counted and why.
+- **Manager tools**: order details with history, edit, delete (cancel), release a
+  share, credit by hand (also a contract without the order number), builder levels,
+  places to deliver to, and a Management page that shows what needs attention.
+- **Discord** notifications through webhooks.
+- **English and Russian** interface.
 
-## How to Use It<a name="how-to-use-it"></a>
+## How it works
 
-To use this example as a basis for your own development, just fork this repo and then
-clone it on your dev machine.
+1. A manager creates an order. Discord gets a message.
+1. A builder opens **Corporate orders** and takes a part of it.
+1. The builder builds the items and creates an **item exchange contract to the
+   corporation** (see [Contract rules](#contract-rules)): the order number in the
+   title, the price is the price per unit multiplied by the quantity.
+1. Within a few minutes the plugin sees the contract and the order shows the share as
+   **Under review**.
+1. When someone accepts the contract in the game, the plugin credits the items,
+   shows who accepted it, and reports it in Discord. When everything is credited, the
+   order is **Done**.
 
-You then should rename the app, and then you can install it into your AA dev
-installation.
+## Installation
 
-### Cloning From Repo<a name="cloning-from-repo"></a>
+### Requirements
 
-For this app, we're assuming that you have all your AA projects, your virtual
-environment, and your AA installation under one top folder (e.g. aa-dev).
+- Alliance Auth 5 (tested with 5.4), Python 3.10 or newer
+- [django-eveuniverse](https://pypi.org/project/django-eveuniverse/) 2.2 or newer
+  (the item catalog). If your Auth has it already, nothing to do.
+- Celery worker and **Celery beat** running
 
-This should look something like this:
+### Install the package
+
+There is no PyPI release yet, install from GitHub. Activate the virtual environment
+of your Auth first.
+
+```shell
+pip install git+https://github.com/baphomet448/aa-eve-builders@v0.1.0
+```
+
+Add the apps to `INSTALLED_APPS` in your `local.py` (`eveuniverse` only if it is not
+there yet):
+
+```python
+INSTALLED_APPS += [
+    "eveuniverse",
+    "evebuilders",
+]
+```
+
+Run the migrations and restart Auth:
+
+```shell
+python manage.py migrate
+python manage.py collectstatic --noinput
+```
+
+Then restart the services (for example `supervisorctl restart myauth:` on a
+standard installation). With
+[allianceauth-docker](https://gitlab.com/allianceauth/allianceauth-docker) add
+`git+https://github.com/baphomet448/aa-eve-builders@v0.1.0` to `conf/requirements.txt`,
+the `INSTALLED_APPS` lines to `conf/local.py`, rebuild the image and run the migrations
+in the container.
+
+### Scheduled tasks
+
+Add these two tasks to `CELERYBEAT_SCHEDULE` in `local.py` and restart Celery beat:
+
+```python
+CELERYBEAT_SCHEDULE["evebuilders_sync_catalog"] = {
+    "task": "evebuilders.tasks.sync_catalog",
+    "schedule": crontab(minute="30", hour="4"),
+}
+
+CELERYBEAT_SCHEDULE["evebuilders_sync_contracts"] = {
+    "task": "evebuilders.tasks.sync_contracts",
+    "schedule": crontab(minute="*"),
+}
+```
+
+- `sync_catalog` refreshes the item catalog once a day (04:30 UTC here).
+- `sync_contracts` runs **every minute**, but it reads ESI only when ESI has fresh data
+  (the contract list is cached by ESI for about five minutes) and not more often than
+  the minimum interval. Most runs do nothing and report `not_yet`: that is normal.
+
+### ESI scope
+
+The plugin reads the contracts of the corporation with the token of **one corporation
+member**; no in-game role is needed. The CCP application of your Auth
+(<https://developers.eveonline.com/>) must allow this scope:
 
 ```text
-aa-dev
-|- venv/
-|- myauth/
-|- aa-example-plugin
-|- (other AA projects ...)
+esi-contracts.read_corporation_contracts.v1
 ```
 
-Then just cd into the top folder (e.g. aa-dev) and clone the repo from your fork.
-You can give the repo a new name right away (e.g. `aa-your-app-name`). You also want
-to create a new git repo for it.
-Finally, enable [pre-commit](https://pre-commit.com) to enable automatic code style
-checking.
+Add it to the application if it is not there yet.
 
-```bash
-git clone https://github.com/YourName/aa-example-plugin.git aa-your-app-name
-cd aa-your-app-name
-rm -rf .git
-git init
-pre-commit install
+### Permissions
+
+Give these permissions in the Auth admin to groups or states. They appear as
+"EVE Builders ... | general | ...":
+
+| Permission | Who | What it allows |
+| --- | --- | --- |
+| `evebuilders.builder_access` | builders | View and take corporate build orders |
+| `evebuilders.manage_access` | managers | Manage orders and the plugin settings |
+
+Menu entries ("Corporate orders" and "My orders") are shown only to people with one of
+them. If you group the menu in folders (Auth admin, Menu), put them in a folder of
+your choice.
+
+### First setup in the web interface
+
+A manager does this once (the **Settings** button of the plugin):
+
+1. **ESI and catalog, ESI connection**: press **Connect** with a character that is in the
+   corporation. The corporation contracts are read with this token.
+1. **ESI and catalog, Item catalog**: press **Update catalog** and wait a few minutes for
+   the items to load (it also refreshes by itself every day).
+1. **Builder levels**: set the levels of the builders (Base by default).
+1. **Stations**: add the places orders are delivered to (search a system by a part of
+   its name, pick a station, or add a system with the name of a structure). While the
+   list is empty, the destination of an order is free text.
+
+Then try the **Create order** button.
+
+## Configuration
+
+All settings are optional. Put them in `local.py`.
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| `EVEBUILDERS_CATALOG_CATEGORY_IDS` | `[4, 6, 7, 8, 18, 22, 32, 65, 66, 87]` | EVE categories kept in the item catalog |
+| `EVEBUILDERS_CATALOG_GROUP_IDS` | `[]` | Extra single groups (for example `1136`, Fuel Block) |
+| `EVEBUILDERS_CATALOG_MIN_INTERVAL_MINUTES` | `15` | Shortest time between two catalog updates |
+| `EVEBUILDERS_SYNC_MIN_INTERVAL_SECONDS` | `60` | Shortest time between two contract syncs (button and schedule) |
+| `EVEBUILDERS_DISCORD_NEW_ORDER_WEBHOOK_URL` | empty | Webhook for new, changed and deleted orders |
+| `EVEBUILDERS_DISCORD_NEW_ORDER_THREAD_ID` | empty | Thread ID of that channel, if the webhook posts into a thread |
+| `EVEBUILDERS_DISCORD_COMPLETE_WEBHOOK_URL` | empty | Webhook for the reports about contracts and deliveries |
+| `EVEBUILDERS_DISCORD_COMPLETE_THREAD_ID` | empty | Thread ID of that channel |
+| `EVEBUILDERS_DISCORD_NOTIFY_TAKEN` | `True` | Announce that a builder took a part of an order |
+
+The default categories are Material, Ship, Module, Charge, Drone, Deployable,
+Subsystem, Structure, Structure Module and Fighter.
+
+## Discord notifications
+
+Create a webhook in each Discord channel (channel settings, Integrations) and put the
+URLs into `local.py`:
+
+```python
+EVEBUILDERS_DISCORD_NEW_ORDER_WEBHOOK_URL = "https://discord.com/api/webhooks/..."
+EVEBUILDERS_DISCORD_COMPLETE_WEBHOOK_URL = "https://discord.com/api/webhooks/..."
 ```
 
-### Renaming the App<a name="renaming-the-app"></a>
+The webhook URLs are secrets: do not publish them. An empty URL switches that channel
+off. Restart Auth and the Celery worker after the change. Check it with:
 
-Before installing this app into your dev AA you need to rename it to something
-suitable for your development project. Otherwise, you risk not being able to install
-additional apps that might also be called example.
-
-Here is an overview of the places that you need to edit to adopt the name.
-
-Easiest is to just find & replace `example` with your new app name in all files
-listed below.
-
-One small warning about picking names: Python is a bit particular about what special
-characters are allowed for names of modules and packages. To avoid any pitfalls, I
-would therefore recommend using only normal characters (a-z) in your app's name
-unless you know exactly what you're doing.
-
-| Location                                 | Description                                                                            |
-| ---------------------------------------- | -------------------------------------------------------------------------------------- |
-| `./example/`                             | Folder name                                                                            |
-| `./example/static/example/`              | Folder name                                                                            |
-| `./example/templates/example/`           | Folder name                                                                            |
-| `./pyproject.cfg`                        | Update module name for version import, update package name, update title, author, etc. |
-| `./example/apps.py`                      | App name                                                                               |
-| `./example/__init__.py`                  | App name                                                                               |
-| `./example/auth_hooks.py`                | Menu hook config incl. icon and label of your app's menu item appearing in the sidebar |
-| `./example/models.py`                    | App name                                                                               |
-| `./example/urls.py`                      | App name                                                                               |
-| `./example/views.py`                     | Permission name and template path                                                      |
-| `./example/templates/example/base.html`  | Title of your app to be shown in all views and as title in the browser tab             |
-| `./example/templates/example/index.html` | Template path                                                                          |
-| `./testauth/local.py`                    | App name in `PACKAGE` constant                                                         |
-| `./.coveragerc`                          | App name                                                                               |
-| `./MANIFEST.in`                          | App name                                                                               |
-| `./README.md`                            | Clear content                                                                          |
-| `./LICENSE`                              | Replace with your own license                                                          |
-| `./tox.ini`                              | App name                                                                               |
-| `./.isort.cfg`                           | App name for `import_heading_firstparty`                                               |
-| `./Makefile`                             | App name and package name                                                              |
-
-## Clearing Migrations<a name="clearing-migrations"></a>
-
-Instead of renaming your app in the migrations, it's easier to just recreate them
-later in the process. For this to work, you need to delete the old migration files in
-your `migrations` folder.
-
-```bash
-rm your-app-name/migrations/0001_initial.py
-rm -rf your-app-name/migrations/_pycache
+```shell
+python manage.py evebuilders_test_notification --help
 ```
 
-## Writing Unit Tests<a name="writing-unit-tests"></a>
+Messages are sent in the background with several retries when Discord is busy. They
+are written in **Russian**. Links in the messages use `SITE_URL` of your Auth.
 
-Write your unit tests in `your-app-name/tests/` and make sure that you use a "test\_"
-prefix for files with your unit tests.
+| Channel | What is sent |
+| --- | --- |
+| New order | an order was created, changed or deleted |
+| Complete | a builder took a part, gave it back, a manager released it; a contract waits for acceptance, was accepted and credited, or cannot be counted (with the reason); the ESI token stopped working |
 
-## Installing Into Your Dev AA<a name="installing-into-your-dev-aa"></a>
+## Contract rules
 
-Once you've cloned or copied all files into place and finished renaming the app,
-you're ready to install it to your dev AA instance.
+A contract is counted when **all** of this is true:
 
-Make sure you're in your venv. Then install it with pip in editable mode:
+- it is an **item exchange** contract **to the corporation** (not to a person);
+- the title contains the **order number**, for example `N20261101-1` (other text next to
+  it is fine; two different numbers are refused);
+- it was created by a character on the Auth account of a builder who **took** this
+  order;
+- it **includes** the item of the order (other items in the same contract are
+  ignored);
+- the **price** equals the price per unit multiplied by the quantity of that item (a
+  difference of 0.01 ISK is allowed);
+- the quantity is not more than what the builder still has to deliver.
 
-```bash
-pip install -e aa-your-app-name
+A valid contract is **Under review** until someone accepts it, then it is **credited**.
+A contract that does not fit is shown to the builder under "Contracts that could not be
+counted" with the reason, and to the managers on the Management page; a manager can
+credit it by hand after looking at it. A contract that is deleted or expires leaves the
+list by itself.
+
+> [!NOTE]
+>
+> ESI caches the corporation contract list for about five minutes. A new contract, or
+> one that was just accepted, shows up after ESI refreshes its answer. "My orders"
+> shows when the next automatic check is expected.
+
+## Management commands
+
+```shell
+python manage.py evebuilders_sync_catalog        # update the item catalog now
+python manage.py evebuilders_sync_contracts      # read and apply the contracts now
+python manage.py evebuilders_show_contracts      # show the corporation contracts as ESI gives them
+python manage.py evebuilders_load_systems        # (re)load the names of the solar systems
+python manage.py evebuilders_test_notification   # send a test message to Discord
 ```
 
-First add your app to the Django project by adding the name of your app to
-INSTALLED_APPS in `settings/local.py`.
+Every command has `--help`. The names of the solar systems (used to search a system by
+a part of its name) are loaded by themselves at the first search.
 
-Next, we will create new migrations for your app:
+## Updating
 
-```bash
-python manage.py makemigrations
-```
-
-Then run a check to see if everything is set up correctly.
-
-```bash
-python manage.py check
-```
-
-In case they're errors make sure to fix them before proceeding.
-
-Next, perform migrations to add your model to the database:
-
-```bash
+```shell
+pip install -U git+https://github.com/baphomet448/aa-eve-builders@<new version>
 python manage.py migrate
+python manage.py collectstatic --noinput
 ```
 
-Finally, restart your AA server and that's it.
+Restart the services afterwards. If an update changes the menu entries, Auth pages can
+show an error until `python manage.py migrate` has been run: run it and reload.
 
-## Installing Into Production AA<a name="installing-into-production-aa"></a>
+## Known limitations
 
-To install your plugin into a production AA, run this command within the virtual
-Python environment of your AA installation:
+- One corporation and one ESI token. The orders are corporate; personal orders are
+  planned.
+- The public ESI knows only NPC stations. For player structures (and wormholes) a
+  manager adds the system and types the structure name.
+- Discord messages are in Russian only.
+- Dates and deadlines are calculated in UTC.
+- Status, priority and access level names (Done, High, Senior ...) are kept in English
+  on purpose.
 
-```bash
-pip install git+https://github.com/YourName/aa-your-app-name
+## Development
+
+```shell
+python runtests.py evebuilders -v 2   # or: tox
 ```
 
-Alternatively, you can create a package file and manually upload it to your
-production AA:
+Translations (needs GNU gettext):
 
-```bash
-pip install build
-python -m build
+```shell
+cd evebuilders
+django-admin makemessages -l ru --no-obsolete --add-location=file -i "tests/*"
+django-admin compilemessages
 ```
 
-You'll find the package under `./dist/aa-your-app-name.tar.gz` after this.
+The compiled `django.mo` is kept in the repository, so a server does not need gettext.
+Issues and pull requests are welcome.
 
-Install your package directly from the package file:
+## Credits and license
 
-```bash
-pip install aa-your-app-name.tar.gz
-```
-
-Then add your app to `INSTALLED_APPS` in `settings/local.py`, run migrations and
-restart your allianceserver.
-
-## Contribute<a name="contribute"></a>
-
-If you've made a new app for AA, please consider sharing it with the rest of the
-community. For any questions on how to share your app, please contact the AA devs on
-their Discord. You find the current community creations
-[here](https://gitlab.com/allianceauth/community-creations).
+- The idea and the workflow come from the Java application
+  [eve-builders](https://github.com/AntonAzarenko/eve-builders) by AntonAzarenko.
+- The project was started from the Alliance Auth Example Plugin (GitHub version).
+- Licensed under the **GNU General Public License v3.0**, see [LICENSE](LICENSE).
