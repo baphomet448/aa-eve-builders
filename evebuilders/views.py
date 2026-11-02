@@ -42,6 +42,11 @@ from evebuilders.manager_actions import (
     update_order,
 )
 from evebuilders.order_detail import contract_rows, event_rows, share_rows
+from evebuilders.overview import (
+    problem_contract_rows,
+    recent_events,
+    waiting_contract_rows,
+)
 from evebuilders.models import CatalogSync, ContractSource, Order
 from evebuilders.orders import (
     create_order,
@@ -662,3 +667,21 @@ def delete_order(request: WSGIRequest, order_id: int) -> HttpResponse:
     )
 
     return redirect("evebuilders:orders")
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+def management(request: WSGIRequest) -> HttpResponse:
+    """
+    What needs a manager's attention: contracts that cannot be counted,
+    contracts that wait for acceptance, and the latest activity (managers only)
+    :param request:
+    :return:
+    """
+
+    context = {
+        "problems": problem_contract_rows(),
+        "waiting": waiting_contract_rows(),
+        "events": recent_events(),
+    }
+
+    return render(request, "evebuilders/management.html", context)

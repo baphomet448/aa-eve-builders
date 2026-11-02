@@ -1,0 +1,144 @@
+{% extends 'evebuilders/base.html' %}
+
+{% load i18n %}
+{% load humanize %}
+{% load l10n %}
+
+{% block details %}
+    <div class="card card-primary mb-3">
+        <div class="card-header">
+            <div class="card-title">{% translate "Contracts that need attention" %}</div>
+        </div>
+        <div class="card-body">
+            <p>
+                {% blocktranslate trimmed %}
+                    These contracts were found but cannot be credited (a missing order number, a
+                    wrong price, a cancelled order ...). Open the order and credit the contract by
+                    hand if it is fine. A contract that is deleted in the game disappears from
+                    this list.
+                {% endblocktranslate %}
+            </p>
+
+            {% if problems %}
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>{% translate "Issued" %}</th>
+                                <th>{% translate "Contract" %}</th>
+                                <th>{% translate "Title" %}</th>
+                                <th>{% translate "Made by" %}</th>
+                                <th>{% translate "Problem" %}</th>
+                                <th>{% translate "Orders" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in problems %}
+                                <tr>
+                                    <td class="text-nowrap">{{ row.record.issued_at|date:"Y-m-d H:i" }}</td>
+                                    <td class="text-nowrap">{{ row.record.contract_id|unlocalize }}</td>
+                                    <td>{{ row.record.title|default:"-" }}</td>
+                                    <td>{{ row.issuer }}</td>
+                                    <td class="text-danger">{{ row.record.reason }}</td>
+                                    <td>
+                                        {% for order in row.orders %}
+                                            <a href="{% url 'evebuilders:order_detail' order.pk %}">{{ order.number }}</a>{% if not forloop.last %}, {% endif %}
+                                        {% empty %}
+                                            -
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="mb-0">{% translate "Nothing needs attention." %}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card card-primary mb-3">
+        <div class="card-header">
+            <div class="card-title">{% translate "Waiting for acceptance" %}</div>
+        </div>
+        <div class="card-body">
+            {% if waiting %}
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>{% translate "Issued" %}</th>
+                                <th>{% translate "Contract" %}</th>
+                                <th>{% translate "Order" %}</th>
+                                <th>{% translate "Item" %}</th>
+                                <th>{% translate "Builder" %}</th>
+                                <th class="text-end">{% translate "Quantity" %}</th>
+                                <th class="text-end">{% translate "Price" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in waiting %}
+                                <tr>
+                                    <td class="text-nowrap">{{ row.record.issued_at|date:"Y-m-d H:i" }}</td>
+                                    <td class="text-nowrap">{{ row.record.contract_id|unlocalize }}</td>
+                                    <td>
+                                        {% if row.record.order %}
+                                            <a href="{% url 'evebuilders:order_detail' row.record.order.pk %}">{{ row.record.order.number }}</a>
+                                        {% else %}-{% endif %}
+                                    </td>
+                                    <td>{{ row.record.order.eve_type.name|default:"-" }}</td>
+                                    <td>{{ row.builder|default:"-" }}</td>
+                                    <td class="text-end">{{ row.record.quantity|intcomma }}</td>
+                                    <td class="text-end">{{ row.record.price|intcomma }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="mb-0">{% translate "No contracts are waiting for acceptance." %}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card card-primary">
+        <div class="card-header">
+            <div class="card-title">{% translate "Latest activity" %}</div>
+        </div>
+        <div class="card-body">
+            {% if events %}
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>{% translate "When" %}</th>
+                                <th>{% translate "Order" %}</th>
+                                <th>{% translate "Event" %}</th>
+                                <th>{% translate "By" %}</th>
+                                <th>{% translate "Details" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in events %}
+                                <tr>
+                                    <td class="text-nowrap">{{ row.event.created_at|date:"Y-m-d H:i" }}</td>
+                                    <td class="text-nowrap">
+                                        {% if row.event.order %}
+                                            <a href="{% url 'evebuilders:order_detail' row.event.order.pk %}">{{ row.event.order.number }}</a>
+                                        {% else %}-{% endif %}
+                                    </td>
+                                    <td>{{ row.event.get_kind_display }}</td>
+                                    <td>{{ row.actor|default:"-" }}</td>
+                                    <td>{{ row.event.description }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="mb-0">{% translate "Nothing has happened yet." %}</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
