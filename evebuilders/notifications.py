@@ -13,6 +13,7 @@ from django.db import transaction
 
 # AA EVE Builders
 from evebuilders import __version__, app_settings
+from evebuilders.models import DiscordConfig
 
 logger = logging.getLogger(__name__)
 
@@ -154,20 +155,47 @@ def build_payload(
 
 
 def _webhook(channel: str) -> tuple[str, str]:
-    """The webhook URL and the thread ID of a channel (empty if not set)"""
+    """
+    The webhook URL and the thread ID of a channel (empty if not set).
+
+    What an administrator saved in the Django admin wins. A channel that is empty
+    there uses the setting from local.py, together with that setting's thread ID.
+    """
+
+    config = DiscordConfig.objects.first()
 
     if channel == CHANNEL_NEW_ORDER:
+        if config is not None and config.new_order_webhook_url:
+            return config.new_order_webhook_url, config.new_order_thread_id
+
         return (
             app_settings.EVEBUILDERS_DISCORD_NEW_ORDER_WEBHOOK_URL,
             app_settings.EVEBUILDERS_DISCORD_NEW_ORDER_THREAD_ID,
         )
+
     if channel == CHANNEL_COMPLETE:
+        if config is not None and config.complete_webhook_url:
+            return config.complete_webhook_url, config.complete_thread_id
+
         return (
             app_settings.EVEBUILDERS_DISCORD_COMPLETE_WEBHOOK_URL,
             app_settings.EVEBUILDERS_DISCORD_COMPLETE_THREAD_ID,
         )
 
     raise ValueError(f"Unknown notification channel: {channel}")
+
+
+def notify_taken_enabled() -> bool:
+    """
+    Whether to announce that a builder took a part of an order: the choice made
+    in the Django admin, or the setting from local.py when nothing was chosen.
+    """
+
+    config = DiscordConfig.objects.first()
+    if config is not None and config.notify_taken is not None:
+        return config.notify_taken
+
+    return app_settings.EVEBUILDERS_DISCORD_NOTIFY_TAKEN
 
 
 def _retry_after(response) -> float | None:

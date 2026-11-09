@@ -212,7 +212,7 @@ class TestBuildPayload(SimpleTestCase):
         )
 
 
-class TestDeliver(SettingsMixin, SimpleTestCase):
+class TestDeliver(SettingsMixin, TestCase):
     """deliver"""
 
     PAYLOAD = {"content": "@everyone"}

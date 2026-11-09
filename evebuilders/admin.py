@@ -1,6 +1,7 @@
 """Admin models"""
 
 # Django
+from django import forms
 from django.contrib import admin
 
 # AA EVE Builders
@@ -9,6 +10,7 @@ from evebuilders.models import (
     CatalogSync,
     ContractRecord,
     ContractSource,
+    DiscordConfig,
     Order,
     OrderAssignment,
     OrderEvent,
@@ -141,3 +143,94 @@ class CatalogSyncAdmin(admin.ModelAdmin):
         """Only one row is allowed"""
 
         return not CatalogSync.objects.exists()
+
+
+class DiscordConfigForm(forms.ModelForm):
+    """The Discord settings: checks the shape of what is typed"""
+
+    class Meta:
+        model = DiscordConfig
+        fields = "__all__"
+
+    @staticmethod
+    def _check_url(url: str) -> str:
+        url = url.strip()
+        if url and not url.startswith("https://"):
+            raise forms.ValidationError("The webhook URL must start with https://")
+
+        return url
+
+    @staticmethod
+    def _check_thread(thread_id: str) -> str:
+        thread_id = thread_id.strip()
+        if thread_id and not thread_id.isdigit():
+            raise forms.ValidationError("A thread ID is a number")
+
+        return thread_id
+
+    def clean_new_order_webhook_url(self):
+        return self._check_url(self.cleaned_data["new_order_webhook_url"])
+
+    def clean_complete_webhook_url(self):
+        return self._check_url(self.cleaned_data["complete_webhook_url"])
+
+    def clean_new_order_thread_id(self):
+        return self._check_thread(self.cleaned_data["new_order_thread_id"])
+
+    def clean_complete_thread_id(self):
+        return self._check_thread(self.cleaned_data["complete_thread_id"])
+
+
+@admin.register(DiscordConfig)
+class DiscordConfigAdmin(admin.ModelAdmin):
+    """
+    The Discord webhooks. A webhook URL is a secret: whoever has it can write to
+    the channel, so it is edited here and not on the plugin pages.
+    """
+
+    form = DiscordConfigForm
+    list_display = (
+        "__str__",
+        "new_order_configured",
+        "complete_configured",
+        "updated_at",
+    )
+    readonly_fields = ("updated_at",)
+    fieldsets = (
+        (
+            "Channel for new orders",
+            {
+                "description": "New, changed and deleted orders.",
+                "fields": ("new_order_webhook_url", "new_order_thread_id"),
+            },
+        ),
+        (
+            "Channel for reports",
+            {
+                "description": (
+                    "Contracts waiting for acceptance, credited and invalid "
+                    "contracts, items taken and given back, ESI token problems."
+                ),
+                "fields": ("complete_webhook_url", "complete_thread_id"),
+            },
+        ),
+        ("Options", {"fields": ("notify_taken", "updated_at")}),
+    )
+
+    def has_add_permission(self, request):
+        """Only one row is allowed"""
+
+        return not DiscordConfig.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        """The row stays; to switch a channel off, empty its fields"""
+
+        return False
+
+    @admin.display(boolean=True, description="Channel for new orders")
+    def new_order_configured(self, obj):
+        return bool(obj.new_order_webhook_url)
+
+    @admin.display(boolean=True, description="Channel for reports")
+    def complete_configured(self, obj):
+        return bool(obj.complete_webhook_url)

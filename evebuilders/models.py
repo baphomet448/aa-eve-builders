@@ -484,3 +484,54 @@ class SolarSystem(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class DiscordConfig(models.Model):
+    """
+    The Discord webhooks, set by an administrator in the Django admin.
+
+    A value that is set here wins over the same setting in local.py; a value
+    that is left empty falls back to the setting. There is one row.
+    """
+
+    new_order_webhook_url = models.URLField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="Webhook of the channel for new, changed and deleted orders.",
+    )
+    new_order_thread_id = models.CharField(
+        max_length=32,
+        blank=True,
+        default="",
+        help_text="Thread ID, only if the webhook above posts into a thread.",
+    )
+    complete_webhook_url = models.URLField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="Webhook of the channel for the reports about contracts and deliveries.",
+    )
+    complete_thread_id = models.CharField(
+        max_length=32,
+        blank=True,
+        default="",
+        help_text="Thread ID, only if the webhook above posts into a thread.",
+    )
+    notify_taken = models.BooleanField(
+        null=True,
+        blank=True,
+        default=None,
+        help_text=(
+            "Announce that a builder took a part of an order. "
+            "Unknown means: use the setting from local.py (default: yes)."
+        ),
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Discord settings"
+        verbose_name_plural = "Discord settings"
+
+    def __str__(self) -> str:
+        return "Discord settings"

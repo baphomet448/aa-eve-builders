@@ -29,7 +29,6 @@ from django.utils.translation import gettext as _
 from allianceauth.authentication.models import CharacterOwnership
 
 # AA EVE Builders
-from evebuilders import app_settings
 from evebuilders.messages import discard_payload, new_order_payload, taken_payload
 from evebuilders.models import (
     BuilderProfile,
@@ -40,7 +39,12 @@ from evebuilders.models import (
     OrderEvent,
     OrderSequence,
 )
-from evebuilders.notifications import CHANNEL_COMPLETE, CHANNEL_NEW_ORDER, notify
+from evebuilders.notifications import (
+    CHANNEL_COMPLETE,
+    CHANNEL_NEW_ORDER,
+    notify,
+    notify_taken_enabled,
+)
 from evebuilders.permissions import MANAGE_ACCESS, has_any_access
 
 # Orders a builder can still see: not finished and not cancelled
@@ -290,7 +294,7 @@ def take_order(*, user, order_id: int, quantity: int) -> OrderAssignment:
         )
         recalculate_status(order)
 
-        if app_settings.EVEBUILDERS_DISCORD_NOTIFY_TAKEN:
+        if notify_taken_enabled():
             notify(
                 CHANNEL_COMPLETE,
                 taken_payload(
