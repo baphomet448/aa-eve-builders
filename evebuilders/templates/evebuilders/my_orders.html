@@ -63,6 +63,7 @@
                                 <th data-sort="number">{% translate "Order" %}</th>
                                 <th data-sort="number">{% translate "Status" %}</th>
                                 <th data-sort="number">{% translate "Priority" %}</th>
+                                <th data-sort="text">{% translate "Item" %}</th>
                                 <th data-sort="text">{% translate "To" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Price per unit" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Total price" %}</th>
@@ -70,7 +71,8 @@
                                 <th class="text-end" data-sort="number">{% translate "Ready" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "In contracts" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Left to deliver" %}</th>
-                                <th class="text-end" data-sort="number">{% translate "Total left" %}</th>                                <th data-sort="text">{% translate "Due date" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "Total left" %}</th>
+                                <th data-sort="text">{% translate "Due date" %}</th>
                                 <th data-sort="text">{% translate "Give back until" %}</th>
                                 <th></th>
                             </tr>
@@ -99,7 +101,7 @@
                                         </span>
                                     </td>
                                     <td class="text-nowrap">{% include 'evebuilders/item_icon.html' with type_id=row.order.eve_type_id %}{{ row.order.eve_type.name }}</td>
-                                    <td class="text-nowrap">{{ row.recipient|default:"-" }}{% if row.recipient %}{% include 'evebuilders/copy_button.html' with text=row.recipient %}{% endif %}</td>                                    
+                                    <td class="text-nowrap">{{ row.recipient|default:"-" }}{% if row.recipient %}{% include 'evebuilders/copy_button.html' with text=row.recipient %}{% endif %}</td>
                                     <td class="text-end text-nowrap" data-value="{{ row.order.unit_price|unlocalize }}">{{ row.order.unit_price|intcomma }}{% include 'evebuilders/copy_button.html' with text=row.order.unit_price|plain_isk %}</td>
                                     <td class="text-end text-nowrap" data-value="{{ row.total|unlocalize }}">{{ row.total|intcomma }}{% include 'evebuilders/copy_button.html' with text=row.total|plain_isk %}</td>
                                     <td class="text-end" data-value="{{ row.share.taken|unlocalize }}">{{ row.share.taken|intcomma }}</td>

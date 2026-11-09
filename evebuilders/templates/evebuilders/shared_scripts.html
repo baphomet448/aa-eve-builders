@@ -37,3 +37,76 @@
         }
     });
 </script>
+
+<script>
+    // The search box and the filters above a table. The controls sit in an element
+    // with data-filter-for="<table id>". A row has data-search (the text to search)
+    // and the data-* values that the filters compare:
+    //   data-filter-text                 the search box
+    //   data-filter-eq="status"          a select: the row's data-status must be equal
+    //   data-filter-positive="free"      a checkbox: the row's data-free must be above 0
+    //   data-filter-reset, data-filter-count
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("[data-filter-for]").forEach(function (bar) {
+            const table = document.getElementById(bar.dataset.filterFor);
+            if (!table) {
+                return;
+            }
+
+            const rows = Array.from(table.tBodies[0].rows);
+            const text = bar.querySelector("[data-filter-text]");
+            const equals = bar.querySelectorAll("[data-filter-eq]");
+            const positives = bar.querySelectorAll("[data-filter-positive]");
+            const count = bar.querySelector("[data-filter-count]");
+            const reset = bar.querySelector("[data-filter-reset]");
+
+            function apply() {
+                const needle = text ? text.value.trim().toLowerCase() : "";
+                let shown = 0;
+
+                rows.forEach(function (row) {
+                    let visible = !needle || (row.dataset.search || "").toLowerCase().includes(needle);
+
+                    equals.forEach(function (select) {
+                        if (select.value && row.dataset[select.dataset.filterEq] !== select.value) {
+                            visible = false;
+                        }
+                    });
+                    positives.forEach(function (box) {
+                        if (box.checked && !(Number(row.dataset[box.dataset.filterPositive]) > 0)) {
+                            visible = false;
+                        }
+                    });
+
+                    row.hidden = !visible;
+                    if (visible) {
+                        shown += 1;
+                    }
+                });
+
+                if (count) {
+                    count.textContent = shown + " / " + rows.length;
+                }
+            }
+
+            bar.addEventListener("input", apply);
+            bar.addEventListener("change", apply);
+            if (reset) {
+                reset.addEventListener("click", function () {
+                    if (text) {
+                        text.value = "";
+                    }
+                    equals.forEach(function (select) {
+                        select.value = "";
+                    });
+                    positives.forEach(function (box) {
+                        box.checked = false;
+                    });
+                    apply();
+                });
+            }
+
+            apply();
+        });
+    });
+</script>

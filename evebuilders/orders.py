@@ -552,6 +552,7 @@ def _rank(field: str, values) -> Case:
 # first, finished and cancelled ones last
 SHARE_STATUS_ORDER = ("IN_PROGRESS", "UNDER_REVIEW", "DONE", "CANCELLED")
 
+
 def recipient_name(order: Order, source) -> str:
     """
     Who the items of an order are delivered to: the corporation of the ESI

@@ -18,6 +18,51 @@
 
         <div class="card-body">
             {% if orders %}
+                <div class="row g-2 mb-2 align-items-center" data-filter-for="evebuilders-orders">
+                    <div class="col-12 col-md-4">
+                        <input type="search" class="form-control form-control-sm" data-filter-text
+                               placeholder="{% translate 'Order number, item or destination' %}">
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <select class="form-select form-select-sm" data-filter-eq="status">
+                            <option value="">{% translate "All statuses" %}</option>
+                            <option value="NEW">New</option>
+                            <option value="IN_PROGRESS">In progress</option>
+                            <option value="DISTRIBUTED">Distributed</option>
+                            <option value="COMPLETED">Done</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <select class="form-select form-select-sm" data-filter-eq="priority">
+                            <option value="">{% translate "All priorities" %}</option>
+                            <option value="HIGH">High</option>
+                            <option value="MEDIUM">Medium</option>
+                            <option value="LOW">Low</option>
+                        </select>
+                    </div>
+                    {% if perms.evebuilders.manage_access %}
+                        <div class="col-6 col-md-2">
+                            <select class="form-select form-select-sm" data-filter-eq="level">
+                                <option value="">{% translate "All levels" %}</option>
+                                <option value="1">Base</option>
+                                <option value="2">Middle</option>
+                                <option value="3">Senior</option>
+                            </select>
+                        </div>
+                    {% endif %}
+                    <div class="col-auto">
+                        <div class="form-check mb-0">
+                            <input class="form-check-input" type="checkbox" id="evebuilders-only-free" data-filter-positive="free">
+                            <label class="form-check-label" for="evebuilders-only-free">{% translate "Only with free items" %}</label>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-filter-reset>{% translate "Reset" %}</button>
+                        <span class="text-muted small ms-2">{% translate "Shown" %}: <span data-filter-count></span></span>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table id="evebuilders-orders" class="table table-sm table-hover align-middle">
                         <thead>
@@ -42,7 +87,11 @@
                         </thead>
                         <tbody>
                             {% for order in orders %}
-                                <tr>
+                                <tr data-search="{{ order.number }} {{ order.eve_type.name }} {{ order.destination }}"
+                                    data-status="{{ order.status }}"
+                                    data-priority="{{ order.priority }}"
+                                    data-level="{{ order.access_level|unlocalize }}"
+                                    data-free="{{ order.free|unlocalize }}">
                                     <td class="text-nowrap" data-value="{{ order.pk|unlocalize }}">
                                         {% if perms.evebuilders.manage_access %}
                                             <a href="{% url 'evebuilders:order_detail' order.pk %}">{{ order.number }}</a>

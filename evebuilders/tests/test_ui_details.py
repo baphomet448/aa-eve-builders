@@ -99,3 +99,10 @@ class TestDetailsOnThePages(ViewsTestCase):
         response = self._get(self.manager, "management")
 
         self.assertContains(response, self._icon())
+
+    def test_every_column_of_the_order_list_has_a_header(self):
+        content = self._get(self.manager, "orders").content.decode()
+
+        head = content.split("<thead>")[1].split("</thead>")[0]
+        row = content.split("<tbody>")[1].split("</tr>")[0]
+        self.assertEqual(head.count("<th"), row.count("<td"))

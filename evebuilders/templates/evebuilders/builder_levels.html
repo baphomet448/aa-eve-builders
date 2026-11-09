@@ -1,6 +1,7 @@
 {% extends 'evebuilders/base.html' %}
 
 {% load i18n %}
+{% load l10n %}
 
 {% block details %}
     {% include 'evebuilders/settings_tabs.html' with active='builders' %}
@@ -21,19 +22,38 @@
             </p>
 
             {% if rows %}
+                                <div class="row g-2 mb-2 align-items-center" data-filter-for="evebuilders-builders">
+                    <div class="col-12 col-md-4">
+                        <input type="search" class="form-control form-control-sm" data-filter-text
+                               placeholder="{% translate 'Name or corporation' %}">
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <select class="form-select form-select-sm" data-filter-eq="level">
+                            <option value="">{% translate "All levels" %}</option>
+                            <option value="1">Base</option>
+                            <option value="2">Middle</option>
+                            <option value="3">Senior</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-filter-reset>{% translate "Reset" %}</button>
+                        <span class="text-muted small ms-2">{% translate "Shown" %}: <span data-filter-count></span></span>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
-                    <table class="table table-sm align-middle">
-                        <thead>
+                    <table id="evebuilders-builders" class="table table-sm align-middle">                        <thead>
                             <tr>
-                                <th>{% translate "Name" %}</th>
-                                <th>{% translate "Corporation" %}</th>
-                                <th>{% translate "Access" %}</th>
-                                <th>{% translate "Level" %}</th>
+                                <th data-sort="text">{% translate "Name" %}</th>
+                                <th data-sort="text">{% translate "Corporation" %}</th>
+                                <th data-sort="text">{% translate "Access" %}</th>
+                                <th data-sort="number">{% translate "Level" %}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for row in rows %}
-                                <tr>
+                                <tr data-search="{{ row.name }} {{ row.corporation }}"
+                                    data-level="{{ row.level|unlocalize }}">
                                     <td>{{ row.name }}</td>
                                     <td>{{ row.corporation|default:"-" }}</td>
                                     <td>
@@ -70,4 +90,8 @@
             {% endif %}
         </div>
     </div>
+{% endblock %}
+
+{% block extra_javascript %}
+    {% include 'evebuilders/sortable_table.html' with table_id='evebuilders-builders' %}
 {% endblock %}

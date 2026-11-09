@@ -1216,3 +1216,27 @@ msgstr "Впишите номер заказа в название контра�
 
 msgid "Create the contract. The plugin finds it by itself within a few minutes."
 msgstr "Создайте контракт. Плагин найдёт его сам в течение нескольких минут."
+
+msgid "Order number, item or destination"
+msgstr "Номер заказа, предмет или место"
+
+msgid "All statuses"
+msgstr "Все статусы"
+
+msgid "All priorities"
+msgstr "Все приоритеты"
+
+msgid "All levels"
+msgstr "Все уровни"
+
+msgid "Only with free items"
+msgstr "Только со свободными"
+
+msgid "Reset"
+msgstr "Сбросить"
+
+msgid "Shown"
+msgstr "Показано"
+
+msgid "Name or corporation"
+msgstr "Имя или корпорация"

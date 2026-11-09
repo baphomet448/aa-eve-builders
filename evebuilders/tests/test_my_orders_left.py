@@ -105,3 +105,12 @@ class TestMyOrdersPage(LeftTestCase):
 
         self.assertContains(response, "Discard (400)")
         self.assertNotContains(response, "Can be given back")
+
+    def test_every_column_has_a_header(self):
+        self._take(self.builder, 400)
+
+        content = self._page().content.decode()
+
+        head = content.split("<thead>")[1].split("</thead>")[0]
+        row = content.split("<tbody>")[1].split("</tr>")[0]
+        self.assertEqual(head.count("<th"), row.count("<td"))
