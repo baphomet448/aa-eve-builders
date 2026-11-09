@@ -22,7 +22,7 @@ from evebuilders.forms import OrderEditForm
 from evebuilders.manager_actions import item_is_locked, update_order
 from evebuilders.messages import display_name, show_value
 from evebuilders.models import ContractRecord, Order, OrderEvent
-from evebuilders.notifications import CHANNEL_NEW_ORDER
+from evebuilders.notifications import CHANNEL_NEW_ORDER, EMOJI_CHANGED
 from evebuilders.tests.test_messages import fields_of
 from evebuilders.tests.test_notifications import SettingsMixin
 from evebuilders.tests.test_take_discard_views import ViewsTestCase
@@ -194,7 +194,8 @@ class TestUpdateOrder(EditTestCase):
         lines = payload["embeds"][0]["description"].splitlines()
         self.assertEqual(
             lines[0],
-            f"Заказ {self.order.number} был изменен {display_name(self.manager)}",
+            f"{EMOJI_CHANGED} Заказ {self.order.number} был изменен "
+            f"{display_name(self.manager)}",
         )
         fields = fields_of(payload)
         self.assertEqual(fields["Количество"], "1000 -> 1200")

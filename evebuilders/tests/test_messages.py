@@ -6,6 +6,7 @@ from django.test import override_settings
 
 # AA EVE Builders
 from evebuilders.messages import discard_payload, display_name, new_order_payload
+from evebuilders.notifications import EMOJI_GIVEN_BACK
 from evebuilders.tests.test_take_discard_views import ViewsTestCase
 
 User = get_user_model()
@@ -61,7 +62,7 @@ class TestDiscardPayload(ViewsTestCase):
         self.assertEqual(
             payload["embeds"][0]["description"].splitlines(),
             [
-                f"Отчет от - {name}",
+                f"{EMOJI_GIVEN_BACK} Отчет от - {name}",
                 "Отказ от 5 позиций",
                 "Сумма 5 000 000 ISK 5 миллионов",
                 "ОТМЕНА",

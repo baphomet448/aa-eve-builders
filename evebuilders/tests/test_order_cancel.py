@@ -16,7 +16,7 @@ from django.utils import timezone
 from evebuilders.manager_actions import can_delete_order, cancel_order
 from evebuilders.messages import display_name
 from evebuilders.models import ContractRecord, Order, OrderEvent
-from evebuilders.notifications import CHANNEL_NEW_ORDER
+from evebuilders.notifications import CHANNEL_NEW_ORDER, EMOJI_DELETED
 from evebuilders.orders import create_order, my_shares, share_status, take_order
 from evebuilders.tests.test_messages import fields_of
 from evebuilders.tests.test_notifications import SettingsMixin
@@ -167,7 +167,8 @@ class TestCancelOrder(CancelTestCase):
         self.assertEqual(channel, CHANNEL_NEW_ORDER)
         self.assertEqual(
             payload["embeds"][0]["description"],
-            f"Заказ {self.order.number} был удален {display_name(self.manager)}",
+            f"{EMOJI_DELETED} Заказ {self.order.number} был удален "
+            f"{display_name(self.manager)}",
         )
         fields = fields_of(payload)
         self.assertEqual(fields["Количество"], "1000")

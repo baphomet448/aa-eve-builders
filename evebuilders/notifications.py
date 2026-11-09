@@ -1,6 +1,7 @@
 """Discord notifications: message formatting and delivery through webhooks"""
 
 # Standard Library
+import functools
 import logging
 from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal
 from math import ceil
@@ -309,3 +310,47 @@ def positions_of(count: int) -> str:
     """After the preposition "от": 1 позиции, 2 позиций, 5 позиций"""
 
     return f"{count} {_count_form(count, 'позиции', 'позиций', 'позиций')}"
+
+
+# The emoji at the start of a message: what kind of event it is, at a glance
+EMOJI_NEW = "\U0001f195"  # new order
+EMOJI_CHANGED = "\u270f\ufe0f"  # order changed
+EMOJI_DELETED = "\U0001f5d1\ufe0f"  # order deleted
+EMOJI_TAKEN = "\U0001f4e6"  # a builder took a part
+EMOJI_GIVEN_BACK = "\u21a9\ufe0f"  # a part was given back or released
+EMOJI_WAITING = "\u23f3"  # a contract waits for acceptance
+EMOJI_CREDITED = "\u2705"  # a contract was accepted and credited
+EMOJI_CREDITED_BY_HAND = "\u2611\ufe0f"  # credited by a manager
+EMOJI_INVALID = "\u274c"  # a contract cannot be counted
+EMOJI_WARNING = "\u26a0\ufe0f"  # the ESI token stopped working
+
+
+def add_emoji(payload: dict, emoji: str) -> dict:
+    """
+    Put an emoji before the first line of the message (before the title when
+    the message has no text).
+
+    :param payload: The body made by build_payload
+    :return: The same payload
+    """
+
+    embed = payload["embeds"][0]
+    if "description" in embed:
+        embed["description"] = f"{emoji} {embed['description']}"
+    else:
+        embed["title"] = f"{emoji} {embed['title']}"
+
+    return payload
+
+
+def with_emoji(emoji: str):
+    """A decorator for the functions that make a message: the message gets the emoji"""
+
+    def decorator(function):
+        @functools.wraps(function)
+        def wrapper(*args, **kwargs):
+            return add_emoji(function(*args, **kwargs), emoji)
+
+        return wrapper
+
+    return decorator

@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 # AA EVE Builders
 from evebuilders import app_settings
 from evebuilders.messages import display_name
-from evebuilders.notifications import CHANNEL_COMPLETE
+from evebuilders.notifications import CHANNEL_COMPLETE, EMOJI_TAKEN
 from evebuilders.tests.test_messages import fields_of
 from evebuilders.tests.test_notifications import SettingsMixin
 from evebuilders.tests.test_take_discard_views import ViewsTestCase
@@ -34,7 +34,8 @@ class TestTakenNotification(SettingsMixin, ViewsTestCase):
         self.assertEqual(channel, CHANNEL_COMPLETE)
         self.assertEqual(
             payload["embeds"][0]["description"],
-            f"Заказ {self.order.number} отдан в работу - {display_name(self.builder)}",
+            f"{EMOJI_TAKEN} Заказ {self.order.number} отдан в работу - "
+            f"{display_name(self.builder)}",
         )
         fields = fields_of(payload)
         self.assertEqual(fields["Количество"], "300")

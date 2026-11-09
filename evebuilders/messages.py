@@ -7,11 +7,22 @@ from django.urls import reverse
 # AA EVE Builders
 from evebuilders.models import Order
 from evebuilders.notifications import (
+    EMOJI_CHANGED,
+    EMOJI_CREDITED,
+    EMOJI_CREDITED_BY_HAND,
+    EMOJI_DELETED,
+    EMOJI_GIVEN_BACK,
+    EMOJI_INVALID,
+    EMOJI_NEW,
+    EMOJI_TAKEN,
+    EMOJI_WAITING,
+    EMOJI_WARNING,
     build_payload,
     format_isk,
     isk_in_words,
     positions_for,
     positions_of,
+    with_emoji,
 )
 
 
@@ -33,6 +44,7 @@ def _order_list_url() -> str:
     return f"{site_url}{reverse('evebuilders:orders')}"
 
 
+@with_emoji(EMOJI_NEW)
 def new_order_payload(order: Order) -> dict:
     """The message about a new order"""
 
@@ -52,6 +64,7 @@ def new_order_payload(order: Order) -> dict:
     return build_payload(fields=fields)
 
 
+@with_emoji(EMOJI_GIVEN_BACK)
 def discard_payload(*, user, order: Order, quantity: int, free: int) -> dict:
     """
     The message about a builder giving items back.
@@ -97,6 +110,7 @@ def _contract_lines(builder: str, quantity: int, price) -> list[str]:
     ]
 
 
+@with_emoji(EMOJI_WAITING)
 def contract_waiting_payload(
     *, builder: str, order: Order, quantity: int, price
 ) -> dict:
@@ -112,6 +126,7 @@ def contract_waiting_payload(
     )
 
 
+@with_emoji(EMOJI_CREDITED)
 def contract_credited_payload(
     *, builder: str, order: Order, quantity: int, price, acceptor: str, remaining: int
 ) -> dict:
@@ -133,6 +148,7 @@ def contract_credited_payload(
     )
 
 
+@with_emoji(EMOJI_INVALID)
 def contract_invalid_payload(
     *, reporter: str, order: Order | None, quantity: int, price, reason: str
 ) -> dict:
@@ -155,6 +171,7 @@ def contract_invalid_payload(
     return build_payload(lines, fields)
 
 
+@with_emoji(EMOJI_WARNING)
 def token_failure_payload(*, corporation: str, error: str) -> dict:
     """The ESI token stopped working"""
 
@@ -172,6 +189,7 @@ def token_failure_payload(*, corporation: str, error: str) -> dict:
     )
 
 
+@with_emoji(EMOJI_TAKEN)
 def taken_payload(*, user, order: Order, quantity: int, free: int) -> dict:
     """
     A builder took (a part of) an order.
@@ -198,6 +216,7 @@ def taken_payload(*, user, order: Order, quantity: int, free: int) -> dict:
     )
 
 
+@with_emoji(EMOJI_GIVEN_BACK)
 def released_payload(
     *, manager, builder, order: Order, quantity: int, free: int
 ) -> dict:
@@ -225,6 +244,7 @@ def released_payload(
     )
 
 
+@with_emoji(EMOJI_CREDITED_BY_HAND)
 def manual_credit_payload(
     *,
     manager,
@@ -288,6 +308,7 @@ def show_value(field: str, value, empty: str = "<пусто>") -> str:
     return str(value)
 
 
+@with_emoji(EMOJI_CHANGED)
 def order_changed_payload(*, manager, order: Order, changes) -> dict:
     """
     The message about a changed order.
@@ -311,6 +332,7 @@ def order_changed_payload(*, manager, order: Order, changes) -> dict:
     )
 
 
+@with_emoji(EMOJI_DELETED)
 def order_cancelled_payload(
     *, manager, order: Order, taken: int, reason: str = ""
 ) -> dict:

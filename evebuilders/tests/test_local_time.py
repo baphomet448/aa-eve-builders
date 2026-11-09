@@ -38,9 +38,7 @@ class TestLocalTimeFilter(SimpleTestCase):
         self.assertIn(">10:05 UTC</time>", html)
 
     def test_another_zone_is_turned_into_utc(self):
-        moment = datetime(
-            2026, 11, 9, 12, 0, tzinfo=dt_timezone(timedelta(hours=2))
-        )
+        moment = datetime(2026, 11, 9, 12, 0, tzinfo=dt_timezone(timedelta(hours=2)))
 
         self.assertIn(">2026-11-09 10:00 UTC</time>", local_time(moment))
 
