@@ -39,6 +39,8 @@ ______________________________________________________________________
   что требует внимания.
 - **Уведомления в Discord** через вебхуки.
 - Интерфейс на английском и русском.
+- **Удобства**: поиск и фильтры над списком заказов, иконки предметов, кнопки копирования
+  номера заказа и цены, даты в часовом поясе вашего браузера.
 
 ## Как это работает
 
@@ -63,11 +65,11 @@ ______________________________________________________________________
 
 ### Установка пакета
 
-Пакета в PyPI пока нет, ставим из GitHub. Сначала активируйте виртуальное окружение
-вашего Auth.
+Пакета в PyPI нет: ставим колесо со страницы релиза. Сначала активируйте виртуальное
+окружение вашего Auth.
 
 ```shell
-pip install git+https://github.com/baphomet448/aa-eve-builders@v0.1.0
+pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.0/aa_eve_builders-0.2.0-py3-none-any.whl
 ```
 
 В `local.py` добавьте приложения в `INSTALLED_APPS` (`eveuniverse` только если его там
@@ -80,7 +82,7 @@ INSTALLED_APPS += [
 ]
 ```
 
-Выполните миграции:
+Выполните миграции и перезапустите Auth:
 
 ```shell
 python manage.py migrate
@@ -88,10 +90,28 @@ python manage.py collectstatic --noinput
 ```
 
 И перезапустите сервисы (например, `supervisorctl restart myauth:` на стандартной
-установке). Для [allianceauth-docker](https://gitlab.com/allianceauth/allianceauth-docker)
-добавьте `git+https://github.com/baphomet448/aa-eve-builders@v0.1.0` в
-`conf/requirements.txt`, строки `INSTALLED_APPS` в `conf/local.py`, пересоберите образ и
-выполните миграции в контейнере.
+установке).
+
+#### Docker (allianceauth-docker)
+
+В образе Auth нет `git`, поэтому тоже ставим колесо. Добавьте строку в
+`conf/requirements.txt`:
+
+```text
+aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.0/aa_eve_builders-0.2.0-py3-none-any.whl
+```
+
+Строки `INSTALLED_APPS` и задачи по расписанию добавьте в `conf/local.py`. Затем пересоберите
+образ и **пересоздайте** контейнеры (`docker compose restart` недостаточно: он не меняет
+образ и не перечитывает `.env`), и выполните миграции в контейнере:
+
+```shell
+docker compose build
+docker compose --env-file=.env up -d --force-recreate
+docker compose exec allianceauth_gunicorn bash
+auth migrate
+auth collectstatic --noinput
+```
 
 ### Задачи по расписанию
 
@@ -173,23 +193,26 @@ esi-contracts.read_corporation_contracts.v1
 
 ## Уведомления в Discord
 
-Создайте вебхук в каждом канале Discord (настройки канала, Интеграции) и впишите
-адреса в `local.py`:
+Создайте вебхук в каждом канале Discord (настройки канала, Интеграции). Затем передайте
+плагину два адреса в админке Django: **EVE BUILDERS, Discord settings**. Изменение
+действует сразу, перезапуск не нужен. Адрес вебхука секретный (кто его знает, может
+писать в канал), поэтому он правится в админке, а не на страницах плагина.
 
-```python
-EVEBUILDERS_DISCORD_NEW_ORDER_WEBHOOK_URL = "https://discord.com/api/webhooks/..."
-EVEBUILDERS_DISCORD_COMPLETE_WEBHOOK_URL = "https://discord.com/api/webhooks/..."
-```
+Пустой канал в админке берёт значение из `local.py` (`EVEBUILDERS_DISCORD_*`, см.
+«Настройки»), так что старая настройка продолжает работать. В Docker то, что лежит в
+`.env`, доходит до воркера только после пересоздания контейнеров.
 
-Адреса вебхуков секретные: не публикуйте их. Пустой адрес отключает этот канал. После
-изменения перезапустите Auth и воркер Celery. Проверка:
+ID ветки необязателен. Он нужен, только если вебхук должен писать в ветку (для
+форум-канала он обязателен). Включите в Discord режим разработчика и скопируйте ID
+ветки. Вебхук создавайте в родительском канале этой ветки.
+
+Сообщения отправляются в фоне, при занятости Discord делается несколько повторов. Тексты
+на русском, и каждое сообщение начинается с эмодзи, показывающего вид события. Проверить
+каналы можно командой ниже (она отправляет тестовое сообщение с @everyone):
 
 ```shell
-python manage.py evebuilders_test_notification --help
+python manage.py evebuilders_test_notification
 ```
-
-Сообщения отправляются в фоне, при занятости Discord делается несколько повторов.
-Тексты сообщений на русском. Ссылки в сообщениях строятся из `SITE_URL` вашего Auth.
 
 | Канал        | Что приходит                                                                                                                                                      |
 | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -238,14 +261,18 @@ python manage.py evebuilders_test_notification   # отправить тесто
 ## Обновление
 
 ```shell
-pip install -U git+https://github.com/baphomet448/aa-eve-builders@<новая версия>
+pip install -U https://github.com/baphomet448/aa-eve-builders/releases/download/<версия>/aa_eve_builders-<версия>-py3-none-any.whl
 python manage.py migrate
 python manage.py collectstatic --noinput
 ```
 
-После этого перезапустите сервисы. Если обновление меняет пункты меню, страницы Auth
-могут показывать ошибку, пока не выполнена `python manage.py migrate`: выполните её и
+После этого перезапустите сервисы. Если обновление меняет пункты меню, страницы Auth могут
+показывать ошибку, пока не выполнена `python manage.py migrate`: выполните её и
 перезагрузите страницу.
+
+В Docker поменяйте версию в строке `conf/requirements.txt` (тег и имя файла), затем
+выполните `docker compose build`, `docker compose --env-file=.env up -d --force-recreate`,
+а в контейнере `auth migrate` и `auth collectstatic --noinput`.
 
 ## Известные ограничения
 

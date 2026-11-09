@@ -64,6 +64,8 @@ ______________________________________________________________________
   places to deliver to, and a Management page that shows what needs attention.
 - **Discord** notifications through webhooks.
 - **English and Russian** interface.
+- **Convenience**: search and filters above the order list, item icons, buttons that copy
+  an order number or a price, and dates in the time zone of your browser.
 
 ## How it works
 
@@ -89,11 +91,11 @@ ______________________________________________________________________
 
 ### Install the package
 
-There is no PyPI release yet, install from GitHub. Activate the virtual environment
-of your Auth first.
+There is no PyPI release: install the wheel from the release page. Activate the virtual
+environment of your Auth first.
 
 ```shell
-pip install git+https://github.com/baphomet448/aa-eve-builders@v0.1.0
+pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.0/aa_eve_builders-0.2.0-py3-none-any.whl
 ```
 
 Add the apps to `INSTALLED_APPS` in your `local.py` (`eveuniverse` only if it is not
@@ -113,12 +115,30 @@ python manage.py migrate
 python manage.py collectstatic --noinput
 ```
 
-Then restart the services (for example `supervisorctl restart myauth:` on a
-standard installation). With
-[allianceauth-docker](https://gitlab.com/allianceauth/allianceauth-docker) add
-`git+https://github.com/baphomet448/aa-eve-builders@v0.1.0` to `conf/requirements.txt`,
-the `INSTALLED_APPS` lines to `conf/local.py`, rebuild the image and run the migrations
-in the container.
+Then restart the services (for example `supervisorctl restart myauth:` on a standard
+installation).
+
+#### Docker (allianceauth-docker)
+
+The image of Auth has no `git`, so use the wheel too. Add this line to
+`conf/requirements.txt`:
+
+```text
+aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.0/aa_eve_builders-0.2.0-py3-none-any.whl
+```
+
+Add the `INSTALLED_APPS` lines and the scheduled tasks to `conf/local.py`. Then rebuild
+the image and **recreate** the containers (`docker compose restart` is not enough: it
+neither changes the image nor reads `.env` again), and run the migrations in the
+container:
+
+```shell
+docker compose build
+docker compose --env-file=.env up -d --force-recreate
+docker compose exec allianceauth_gunicorn bash
+auth migrate
+auth collectstatic --noinput
+```
 
 ### Scheduled tasks
 
@@ -203,23 +223,28 @@ Subsystem, Structure, Structure Module and Fighter.
 
 ## Discord notifications
 
-Create a webhook in each Discord channel (channel settings, Integrations) and put the
-URLs into `local.py`:
+Create a webhook in each Discord channel (channel settings, Integrations). Then give the
+two addresses to the plugin in the Django admin: **EVE BUILDERS, Discord settings**. A
+change applies at once, no restart is needed. The address of a webhook is a secret
+(whoever has it can write to the channel), so it is edited in the admin and not on the
+pages of the plugin.
 
-```python
-EVEBUILDERS_DISCORD_NEW_ORDER_WEBHOOK_URL = "https://discord.com/api/webhooks/..."
-EVEBUILDERS_DISCORD_COMPLETE_WEBHOOK_URL = "https://discord.com/api/webhooks/..."
-```
+An empty channel in the admin falls back to the setting of `local.py`
+(`EVEBUILDERS_DISCORD_*`, see Configuration), so an older setup keeps working. In Docker,
+what you put into `.env` reaches the worker only after the containers are recreated.
 
-The webhook URLs are secrets: do not publish them. An empty URL switches that channel
-off. Restart Auth and the Celery worker after the change. Check it with:
+The thread ID is optional. It is needed only when the webhook has to post into a thread
+(a forum channel needs it). Switch on the developer mode in Discord, then copy the ID of
+the thread. Create the webhook in the parent channel of the thread.
+
+Messages are sent in the background with several retries when Discord is busy. They are
+written in **Russian**, and each starts with an emoji that tells the kind of event.
+Check the channels with the command below. It posts a test message that mentions
+@everyone:
 
 ```shell
-python manage.py evebuilders_test_notification --help
+python manage.py evebuilders_test_notification
 ```
-
-Messages are sent in the background with several retries when Discord is busy. They
-are written in **Russian**. Links in the messages use `SITE_URL` of your Auth.
 
 | Channel   | What is sent                                                                                                                                                                                  |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -269,13 +294,18 @@ a part of its name) are loaded by themselves at the first search.
 ## Updating
 
 ```shell
-pip install -U git+https://github.com/baphomet448/aa-eve-builders@<new version>
+pip install -U https://github.com/baphomet448/aa-eve-builders/releases/download/<version>/aa_eve_builders-<version>-py3-none-any.whl
 python manage.py migrate
 python manage.py collectstatic --noinput
 ```
 
-Restart the services afterwards. If an update changes the menu entries, Auth pages can
+Restart the services afterwards. If an update changes the menu entries, pages of Auth can
 show an error until `python manage.py migrate` has been run: run it and reload.
+
+With Docker change the version in the line of `conf/requirements.txt` (the tag and the
+name of the file), then run `docker compose build`,
+`docker compose --env-file=.env up -d --force-recreate`, and `auth migrate` and
+`auth collectstatic --noinput` in the container.
 
 ## Known limitations
 
