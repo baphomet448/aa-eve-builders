@@ -1,5 +1,8 @@
 """Why a contract cannot be counted: codes with parameters, translated when shown"""
 
+# Standard Library
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
+
 # Django
 from django.utils import translation
 from django.utils.translation import gettext as _
@@ -15,6 +18,15 @@ WRONG_PRICE = "wrong_price"
 TOO_MANY = "too_many"
 NOT_AVAILABLE = "not_available"
 ORDER_CANCELLED = "order_cancelled"
+
+
+def _whole(value) -> str:
+    """An amount of ISK without cents (older records keep them: 500.00)"""
+
+    try:
+        return str(Decimal(str(value)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+    except InvalidOperation:
+        return str(value)
 
 
 def reason_text(code: str, data: dict | None = None) -> str:
@@ -55,7 +67,7 @@ def reason_text(code: str, data: dict | None = None) -> str:
 
     if code == WRONG_PRICE:
         return _("The price must be %(expected)s ISK for %(quantity)s items.") % {
-            "expected": data.get("expected", ""),
+            "expected": _whole(data.get("expected", "")),
             "quantity": data.get("quantity", ""),
         }
 

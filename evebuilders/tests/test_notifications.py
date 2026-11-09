@@ -60,15 +60,15 @@ class SettingsMixin:
 class TestFormatIsk(SimpleTestCase):
     """format_isk"""
 
-    def test_groups_with_spaces_and_a_decimal_comma(self):
-        self.assertEqual(format_isk(Decimal("1000000")), "1 000 000,00 ISK")
-        self.assertEqual(format_isk(Decimal("100")), "100,00 ISK")
-        self.assertEqual(format_isk(Decimal("0.5")), "0,50 ISK")
-        self.assertEqual(format_isk(Decimal("1234.567")), "1 234,57 ISK")
+    def test_groups_with_spaces_and_no_decimals(self):
+        self.assertEqual(format_isk(Decimal("1000000")), "1 000 000 ISK")
+        self.assertEqual(format_isk(Decimal("100")), "100 ISK")
+        self.assertEqual(format_isk(Decimal("0.5")), "1 ISK")
+        self.assertEqual(format_isk(Decimal("1234.567")), "1 235 ISK")
 
     def test_accepts_numbers_that_are_not_decimals(self):
-        self.assertEqual(format_isk(250), "250,00 ISK")
-        self.assertEqual(format_isk(100.0), "100,00 ISK")
+        self.assertEqual(format_isk(250), "250 ISK")
+        self.assertEqual(format_isk(100.0), "100 ISK")
 
     def test_nothing_gives_an_empty_text(self):
         self.assertEqual(format_isk(None), "")

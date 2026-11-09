@@ -115,7 +115,7 @@
                                     <td class="text-end" data-value="{{ order.free|unlocalize }}">{{ order.free|intcomma }}</td>
                                     <td class="text-end" data-value="{{ order.credited|unlocalize }}">{{ order.credited|intcomma }}</td>
                                     <td class="text-end" data-value="{{ order.pending|unlocalize }}">{{ order.pending|intcomma }}</td>
-                                    <td class="text-end text-nowrap" data-value="{{ order.unit_price|unlocalize }}">{{ order.unit_price|intcomma }}{% include 'evebuilders/copy_button.html' with text=order.unit_price|plain_isk %}</td>                                    <td data-value="{{ order.priority_rank|unlocalize }}">
+                                    <td class="text-end text-nowrap" data-value="{{ order.unit_price|unlocalize }}">{{ order.unit_price|isk }}{% include 'evebuilders/copy_button.html' with text=order.unit_price|plain_isk %}</td>                                    <td data-value="{{ order.priority_rank|unlocalize }}">
                                         <span class="badge
                                             {% if order.priority == 'HIGH' %}bg-danger
                                             {% elif order.priority == 'MEDIUM' %}bg-warning

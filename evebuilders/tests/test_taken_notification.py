@@ -39,8 +39,8 @@ class TestTakenNotification(SettingsMixin, ViewsTestCase):
         fields = fields_of(payload)
         self.assertEqual(fields["Количество"], "300")
         self.assertEqual(fields["Остаток свободных позиций в заказе"], "700")
-        self.assertEqual(fields["Цена за единицу"], "1 000 000,00 ISK 1 миллион")
-        self.assertEqual(fields["Цена за все"], "300 000 000,00 ISK 300 миллионов")
+        self.assertEqual(fields["Цена за единицу"], "1 000 000 ISK 1 миллион")
+        self.assertEqual(fields["Цена за все"], "300 000 000 ISK 300 миллионов")
 
     def test_it_can_be_switched_off(self):
         with patch.object(app_settings, "EVEBUILDERS_DISCORD_NOTIFY_TAKEN", False):

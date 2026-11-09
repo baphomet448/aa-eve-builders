@@ -102,13 +102,13 @@
                                     </td>
                                     <td class="text-nowrap">{% include 'evebuilders/item_icon.html' with type_id=row.order.eve_type_id %}{{ row.order.eve_type.name }}</td>
                                     <td class="text-nowrap">{{ row.recipient|default:"-" }}{% if row.recipient %}{% include 'evebuilders/copy_button.html' with text=row.recipient %}{% endif %}</td>
-                                    <td class="text-end text-nowrap" data-value="{{ row.order.unit_price|unlocalize }}">{{ row.order.unit_price|intcomma }}{% include 'evebuilders/copy_button.html' with text=row.order.unit_price|plain_isk %}</td>
-                                    <td class="text-end text-nowrap" data-value="{{ row.total|unlocalize }}">{{ row.total|intcomma }}{% include 'evebuilders/copy_button.html' with text=row.total|plain_isk %}</td>
+                                    <td class="text-end text-nowrap" data-value="{{ row.order.unit_price|unlocalize }}">{{ row.order.unit_price|isk }}{% include 'evebuilders/copy_button.html' with text=row.order.unit_price|plain_isk %}</td>
+                                    <td class="text-end text-nowrap" data-value="{{ row.total|unlocalize }}">{{ row.total|isk }}{% include 'evebuilders/copy_button.html' with text=row.total|plain_isk %}</td>
                                     <td class="text-end" data-value="{{ row.share.taken|unlocalize }}">{{ row.share.taken|intcomma }}</td>
                                     <td class="text-end" data-value="{{ row.share.credited|unlocalize }}">{{ row.share.credited|intcomma }}</td>
                                     <td class="text-end" data-value="{{ row.pending|unlocalize }}">{{ row.pending|intcomma }}</td>
                                     <td class="text-end" data-value="{{ row.left|unlocalize }}">{{ row.left|intcomma }}</td>
-                                    <td class="text-end text-nowrap" data-value="{{ row.left_total|unlocalize }}">{{ row.left_total|intcomma }}{% include 'evebuilders/copy_button.html' with text=row.left_total|plain_isk %}</td>                                    <td class="text-nowrap">{{ row.order.due_date|date:"Y-m-d" }}</td>
+                                    <td class="text-end text-nowrap" data-value="{{ row.left_total|unlocalize }}">{{ row.left_total|isk }}{% include 'evebuilders/copy_button.html' with text=row.left_total|plain_isk %}</td>                                    <td class="text-nowrap">{{ row.order.due_date|date:"Y-m-d" }}</td>
                                     <td class="text-nowrap">{{ row.discard_deadline|date:"Y-m-d" }}</td>
                                     <td class="text-nowrap">
                                         {% if row.can_discard %}
@@ -168,7 +168,7 @@
                                     <td>{{ contract.title|default:"-" }}</td>
                                     <td class="text-nowrap">{{ contract.order.number|default:"-" }}</td>
                                     <td class="text-end">{{ contract.quantity|intcomma }}</td>
-                                    <td class="text-end">{{ contract.price|intcomma }}</td>
+                                    <td class="text-end">{{ contract.price|isk }}</td>
                                     <td class="text-danger">{{ contract.reason_text }}</td>
                                 </tr>
                             {% endfor %}

@@ -31,7 +31,11 @@ class OrderForm(forms.Form):
     )
     quantity = forms.IntegerField(label=_("Quantity"), min_value=1)
     unit_price = forms.DecimalField(
-        label=_("Price per unit (ISK)"), min_value=0, max_digits=20, decimal_places=2
+        label=_("Price per unit (ISK)"),
+        min_value=0,
+        max_digits=20,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={"step": "1"}),
     )
     priority = forms.ChoiceField(
         label=_("Priority"),
@@ -91,6 +95,13 @@ class OrderForm(forms.Form):
             required=False,
             choices=[("", "---------")] + [(label, label) for label in labels],
         )
+
+    def clean_unit_price(self):
+        unit_price = self.cleaned_data["unit_price"]
+        if unit_price != unit_price.to_integral_value():
+            raise forms.ValidationError(_("The price must be a whole number of ISK."))
+
+        return unit_price
 
     def clean_due_date(self):
         due_date = self.cleaned_data["due_date"]

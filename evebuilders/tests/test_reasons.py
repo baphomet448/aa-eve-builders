@@ -12,7 +12,7 @@ from evebuilders.reasons import english, reason_fields, reason_text
 from evebuilders.tests.test_matching import MatchingTestCase
 from evebuilders.tests.test_sync import SyncTestCase
 
-PRICE = "The price must be 500.00 ISK for 5 items."
+PRICE = "The price must be 500 ISK for 5 items."
 
 
 class TestReasonText(SimpleTestCase):

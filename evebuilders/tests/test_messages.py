@@ -28,7 +28,7 @@ class TestNewOrderPayload(ViewsTestCase):
         self.assertEqual(fields["Заказ"], self.order.number)
         self.assertEqual(fields["Наименование"], "Punisher")
         self.assertEqual(fields["Количество"], "1000")
-        self.assertEqual(fields["Цена за единицу"], "1 000 000,00 ISK")
+        self.assertEqual(fields["Цена за единицу"], "1 000 000 ISK")
         self.assertEqual(fields["Приоритет"], "MEDIUM")
         self.assertEqual(
             fields["Взять заказ:"], "https://auth.example.com/evebuilders/orders/"
@@ -63,7 +63,7 @@ class TestDiscardPayload(ViewsTestCase):
             [
                 f"Отчет от - {name}",
                 "Отказ от 5 позиций",
-                "Сумма 5 000 000,00 ISK 5 миллионов",
+                "Сумма 5 000 000 ISK 5 миллионов",
                 "ОТМЕНА",
             ],
         )

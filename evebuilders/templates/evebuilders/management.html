@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load humanize %}
 {% load l10n %}
+{% load evebuilders_extras %}
 
 {% block details %}
     <div class="card card-primary mb-3">
@@ -89,7 +90,7 @@
                                     </td>
                                     <td class="text-nowrap">{% if row.record.order %}{% include 'evebuilders/item_icon.html' with type_id=row.record.order.eve_type_id %}{{ row.record.order.eve_type.name }}{% else %}-{% endif %}</td>                                    <td>{{ row.builder|default:"-" }}</td>
                                     <td class="text-end">{{ row.record.quantity|intcomma }}</td>
-                                    <td class="text-end">{{ row.record.price|intcomma }}</td>
+                                    <td class="text-end">{{ row.record.price|isk }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

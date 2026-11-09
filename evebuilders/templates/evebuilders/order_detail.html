@@ -44,7 +44,7 @@
                 </dd>
 
                 <dt class="col-sm-3">{% translate "Price per unit" %}</dt>
-                <dd class="col-sm-9">{{ order.unit_price|intcomma }}{% include 'evebuilders/copy_button.html' with text=order.unit_price|plain_isk %}</dd>
+                <dd class="col-sm-9">{{ order.unit_price|isk }}{% include 'evebuilders/copy_button.html' with text=order.unit_price|plain_isk %}</dd>
                 <dt class="col-sm-3">{% translate "Priority" %}</dt>
                 <dd class="col-sm-9">{{ order.get_priority_display }}</dd>
 
@@ -195,7 +195,7 @@
                                     <td>{{ row.record.title|default:"-" }}</td>
                                     <td>{{ row.builder }}</td>
                                     <td class="text-end">{{ row.record.quantity|intcomma }}</td>
-                                    <td class="text-end">{{ row.record.price|intcomma }}</td>
+                                    <td class="text-end">{{ row.record.price|isk }}</td>
                                     <td>{{ row.acceptor|default:"-" }}</td>
                                     <td class="text-nowrap">{{ row.record.issued_at|date:"Y-m-d H:i" }}</td>
                                     <td class="text-danger">{{ row.record.reason_text }}</td>

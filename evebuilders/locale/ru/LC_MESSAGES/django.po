@@ -1240,3 +1240,7 @@ msgstr "Показано"
 
 msgid "Name or corporation"
 msgstr "Имя или корпорация"
+
+
+msgid "The price must be a whole number of ISK."
+msgstr "Цена должна быть целым числом ISK."

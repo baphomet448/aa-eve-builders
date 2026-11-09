@@ -32,5 +32,5 @@ class TestMyOrdersPrices(ViewsTestCase):
 
         self.assertContains(response, "Price per unit")
         self.assertContains(response, "Total price")
-        self.assertContains(response, "1,000,000.00")
-        self.assertContains(response, "300,000,000.00")
+        self.assertContains(response, "1,000,000")
+        self.assertContains(response, "300,000,000")

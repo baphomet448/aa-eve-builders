@@ -2,7 +2,7 @@
 
 # Standard Library
 import logging
-from decimal import ROUND_DOWN, ROUND_HALF_EVEN, Decimal
+from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal
 from math import ceil
 
 # Third Party
@@ -51,14 +51,14 @@ class DiscordRetry(Exception):
 
 
 def format_isk(value) -> str:
-    """An amount as in the live system: 1 000 000,00 ISK"""
+    """An amount in whole ISK: 1 000 000 ISK"""
 
     if value is None:
         return ""
 
-    amount = Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN)
+    amount = Decimal(str(value)).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
 
-    return f"{amount:,.2f}".replace(",", " ").replace(".", ",") + " ISK"
+    return f"{amount:,.0f}".replace(",", " ") + " ISK"
 
 
 def _number_text(amount: Decimal) -> str:

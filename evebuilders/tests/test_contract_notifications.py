@@ -52,7 +52,7 @@ class TestContractNotifications(SettingsMixin, SyncTestCase):
         channel, payload = first[0]
         self.assertEqual(channel, CHANNEL_COMPLETE)
         self.assertIn("Контракт на 5 позиций", self._description(first[0]))
-        self.assertIn("Контракт 500,00 ISK", self._description(first[0]))
+        self.assertIn("Контракт 500 ISK", self._description(first[0]))
         self.assertEqual(fields_of(payload)["СТАТУС"], WAITING)
         self.assertEqual(fields_of(payload)["Заказ"], self.order.number)
         self.assertEqual(again, [])
