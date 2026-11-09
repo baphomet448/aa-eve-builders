@@ -45,14 +45,16 @@
             </div>
 
             {% if rows %}
-                <p>
-                    {% blocktranslate trimmed %}
-                        When your items are ready, create an item exchange contract to the
-                        corporation. Put the order number into the contract title and set the
-                        price to the price per unit multiplied by the quantity. Then press
-                        "Sync contracts".
-                    {% endblocktranslate %}
-                </p>
+                <div class="alert alert-info">
+                    <strong>{% translate "How to deliver" %}</strong>
+                    <ol class="mb-0">
+                        <li>{% translate "In the game, open Contracts and create an Item Exchange contract." %}</li>
+                        <li>{% translate 'Assign it to the recipient from the "To" column.' %}</li>
+                        <li>{% translate "Put the items you built into the contract. You can deliver in parts." %}</li>
+                        <li>{% translate 'Set the price to the price per unit multiplied by the quantity in the contract. The price for everything you still have to deliver is in the column "Total left".' %}</li>
+                        <li>{% translate "Write the order number into the contract title, for example N20261109-1." %}</li>
+                        <li>{% translate "Create the contract. The plugin finds it by itself within a few minutes." %}</li>                    </ol>
+                </div>
 
                 <div class="table-responsive">
                     <table id="evebuilders-my-orders" class="table table-sm table-hover align-middle">
@@ -61,14 +63,14 @@
                                 <th data-sort="number">{% translate "Order" %}</th>
                                 <th data-sort="number">{% translate "Status" %}</th>
                                 <th data-sort="number">{% translate "Priority" %}</th>
-                                <th data-sort="text">{% translate "Item" %}</th>
+                                <th data-sort="text">{% translate "To" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Price per unit" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Total price" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Taken" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Ready" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "In contracts" %}</th>
-                                <th class="text-end" data-sort="number">{% translate "Can be given back" %}</th>
-                                <th data-sort="text">{% translate "Due date" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "Left to deliver" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "Total left" %}</th>                                <th data-sort="text">{% translate "Due date" %}</th>
                                 <th data-sort="text">{% translate "Give back until" %}</th>
                                 <th></th>
                             </tr>
@@ -97,13 +99,14 @@
                                         </span>
                                     </td>
                                     <td class="text-nowrap">{% include 'evebuilders/item_icon.html' with type_id=row.order.eve_type_id %}{{ row.order.eve_type.name }}</td>
+                                    <td class="text-nowrap">{{ row.recipient|default:"-" }}{% if row.recipient %}{% include 'evebuilders/copy_button.html' with text=row.recipient %}{% endif %}</td>                                    
                                     <td class="text-end text-nowrap" data-value="{{ row.order.unit_price|unlocalize }}">{{ row.order.unit_price|intcomma }}{% include 'evebuilders/copy_button.html' with text=row.order.unit_price|plain_isk %}</td>
                                     <td class="text-end text-nowrap" data-value="{{ row.total|unlocalize }}">{{ row.total|intcomma }}{% include 'evebuilders/copy_button.html' with text=row.total|plain_isk %}</td>
                                     <td class="text-end" data-value="{{ row.share.taken|unlocalize }}">{{ row.share.taken|intcomma }}</td>
                                     <td class="text-end" data-value="{{ row.share.credited|unlocalize }}">{{ row.share.credited|intcomma }}</td>
                                     <td class="text-end" data-value="{{ row.pending|unlocalize }}">{{ row.pending|intcomma }}</td>
-                                    <td class="text-end" data-value="{{ row.releasable|unlocalize }}">{{ row.releasable|intcomma }}</td>
-                                    <td class="text-nowrap">{{ row.order.due_date|date:"Y-m-d" }}</td>
+                                    <td class="text-end" data-value="{{ row.left|unlocalize }}">{{ row.left|intcomma }}</td>
+                                    <td class="text-end text-nowrap" data-value="{{ row.left_total|unlocalize }}">{{ row.left_total|intcomma }}{% include 'evebuilders/copy_button.html' with text=row.left_total|plain_isk %}</td>                                    <td class="text-nowrap">{{ row.order.due_date|date:"Y-m-d" }}</td>
                                     <td class="text-nowrap">{{ row.discard_deadline|date:"Y-m-d" }}</td>
                                     <td class="text-nowrap">
                                         {% if row.can_discard %}
@@ -112,7 +115,7 @@
                                                   onsubmit="return confirm('{{ confirm_text|escapejs }}');">
                                                 {% csrf_token %}
                                                 <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                    {% translate "Discard" %}
+                                                    {% translate "Discard" %} ({{ row.releasable|intcomma }})
                                                 </button>
                                             </form>
                                         {% endif %}

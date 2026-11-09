@@ -49,6 +49,7 @@ from evebuilders.orders import (
     discard_share,
     my_shares,
     problem_contracts,
+    recipient_name,
     take_order,
     visible_orders,
 )
@@ -300,8 +301,12 @@ def my_orders(request: WSGIRequest) -> HttpResponse:
     """
 
     source = ContractSource.get_solo()
+    rows = my_shares(request.user)
+    for row in rows:
+        row["recipient"] = recipient_name(row["order"], source)
+
     context = {
-        "rows": my_shares(request.user),
+        "rows": rows,
         "problems": problem_contracts(request.user),
         "source": source,
         "next_check": next_sync_time(source) if source else None,

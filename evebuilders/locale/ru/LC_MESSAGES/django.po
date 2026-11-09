@@ -1185,3 +1185,34 @@ msgstr ""
 "%(place)s убрано из списка. У заказов, где оно указано, оно сохраняется."
 msgid "Copy"
 msgstr "Копировать"
+
+
+msgid "To"
+msgstr "Кому"
+
+msgid "Left to deliver"
+msgstr "Ещё сдать"
+
+msgid "Total left"
+msgstr "Сумма несданного"
+
+msgid "How to deliver"
+msgstr "Как сдавать"
+
+msgid "In the game, open Contracts and create an Item Exchange contract."
+msgstr "В игре откройте «Контракты» и создайте контракт «Обмен предметами»."
+
+msgid "Assign it to the recipient from the \"To\" column."
+msgstr "Назначьте его получателю из колонки «Кому»."
+
+msgid "Put the items you built into the contract. You can deliver in parts."
+msgstr "Положите в контракт предметы, которые вы сделали. Можно сдавать частями."
+
+msgid "Set the price to the price per unit multiplied by the quantity in the contract. The price for everything you still have to deliver is in the column \"Total left\"."
+msgstr "Поставьте цену, равную цене за единицу, умноженной на количество в контракте. Цена за всё, что осталось сдать, указана в колонке «Сумма несданного»."
+
+msgid "Write the order number into the contract title, for example N20261109-1."
+msgstr "Впишите номер заказа в название контракта, например N20261109-1."
+
+msgid "Create the contract. The plugin finds it by itself within a few minutes."
+msgstr "Создайте контракт. Плагин найдёт его сам в течение нескольких минут."

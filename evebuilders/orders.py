@@ -29,7 +29,12 @@ from django.utils.translation import gettext as _
 from allianceauth.authentication.models import CharacterOwnership
 
 # AA EVE Builders
-from evebuilders.messages import discard_payload, new_order_payload, taken_payload
+from evebuilders.messages import (
+    discard_payload,
+    display_name,
+    new_order_payload,
+    taken_payload,
+)
 from evebuilders.models import (
     BuilderProfile,
     ContractRecord,
@@ -440,6 +445,8 @@ def my_shares(user) -> list[dict]:
                 "status_rank": SHARE_STATUS_ORDER.index(share_status(share)),
                 "priority_rank": PRIORITY_ORDER.index(share.order.priority),
                 "total": share.order.unit_price * share.taken,
+                "left": share.taken - share.credited,
+                "left_total": share.order.unit_price * (share.taken - share.credited),
                 "releasable": releasable,
                 "discard_deadline": deadline,
                 "can_discard": (
@@ -544,3 +551,17 @@ def _rank(field: str, values) -> Case:
 # The order of the shares on the "My orders" page: what is still to be delivered
 # first, finished and cancelled ones last
 SHARE_STATUS_ORDER = ("IN_PROGRESS", "UNDER_REVIEW", "DONE", "CANCELLED")
+
+def recipient_name(order: Order, source) -> str:
+    """
+    Who the items of an order are delivered to: the corporation of the ESI
+    connection for a corporate order, the customer for a private one.
+
+    :param source: The connected ContractSource, or None
+    :return: The name, empty if it is not known
+    """
+
+    if order.kind == Order.Kind.PRIVATE:
+        return display_name(order.created_by) if order.created_by else ""
+
+    return source.corporation_name if source else ""
