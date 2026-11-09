@@ -686,8 +686,8 @@ msgid "Builders"
 msgstr "Строители"
 
 #: templates/evebuilders/order_detail.html
-msgid "Open"
-msgstr "Осталось"
+msgid "Not in a contract yet"
+msgstr "Ещё не в контракте"
 
 #: templates/evebuilders/order_detail.html
 msgid "Actions"
@@ -698,7 +698,7 @@ msgid "all"
 msgstr "все"
 
 #: templates/evebuilders/order_detail.html
-msgid "Release"
+msgid "Release share"
 msgstr "Освободить"
 
 #: templates/evebuilders/order_detail.html
