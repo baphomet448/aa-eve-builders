@@ -36,7 +36,7 @@ class Command(BaseCommand):
         for channel, label in CHANNELS:
             payload = build_payload(
                 [
-                    "Это тестовое сообщение плагина EVE Builders. "
+                    "Это тестовое сообщение плагина PROB Builders. "
                     "Если вы его видите, вебхук настроен правильно."
                 ],
                 [("Канал", label)],

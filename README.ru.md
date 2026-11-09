@@ -69,7 +69,7 @@ ______________________________________________________________________
 окружение вашего Auth.
 
 ```shell
-pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.0/aa_eve_builders-0.2.0-py3-none-any.whl
+pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.1/aa_eve_builders-0.2.1-py3-none-any.whl
 ```
 
 В `local.py` добавьте приложения в `INSTALLED_APPS` (`eveuniverse` только если его там
@@ -98,7 +98,7 @@ python manage.py collectstatic --noinput
 `conf/requirements.txt`:
 
 ```text
-aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.0/aa_eve_builders-0.2.0-py3-none-any.whl
+aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.1/aa_eve_builders-0.2.1-py3-none-any.whl
 ```
 
 Строки `INSTALLED_APPS` и задачи по расписанию добавьте в `conf/local.py`. Затем пересоберите

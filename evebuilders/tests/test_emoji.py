@@ -45,7 +45,7 @@ class TestAddEmoji(SimpleTestCase):
     def test_without_a_text_it_goes_before_the_title(self):
         payload = add_emoji(build_payload(), "X")
 
-        self.assertEqual(payload["embeds"][0]["title"], "X EVE Builders Notification")
+        self.assertEqual(payload["embeds"][0]["title"], "X PROB Builders Notification")
 
     def test_the_decorator_keeps_the_function_and_adds_the_emoji(self):
         @with_emoji("X")

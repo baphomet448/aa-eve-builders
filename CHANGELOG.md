@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [In Development] - Unreleased
 
+## [0.2.1] - 2026-11-09
+
+### Changed
+
+- The name in the top bar of Auth and in the title of the browser tab is now "PROB Builders".
+
 ## [0.2.0] - 2026-11-09
 
 ### Fixed

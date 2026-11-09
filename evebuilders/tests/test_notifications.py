@@ -161,7 +161,7 @@ class TestBuildPayload(SimpleTestCase):
         self.assertEqual(payload["content"], "@everyone")
         self.assertEqual(payload["allowed_mentions"], {"parse": ["everyone"]})
         embed = payload["embeds"][0]
-        self.assertEqual(embed["title"], "EVE Builders Notification")
+        self.assertEqual(embed["title"], "PROB Builders Notification")
         self.assertEqual(embed["color"], 0x2B6CB0)
         self.assertEqual(embed["description"], "Отчет от - Ivan")
         self.assertEqual(

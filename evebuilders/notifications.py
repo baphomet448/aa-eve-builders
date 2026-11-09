@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 CHANNEL_NEW_ORDER = "new_order"  # industry-new-order-ping
 CHANNEL_COMPLETE = "complete"  # industry-complete-ping
 
-EMBED_TITLE = "EVE Builders Notification"
+EMBED_TITLE = "PROB Builders Notification"
 EMBED_COLOR = 0x2B6CB0
 EVERYONE_MENTION = "@everyone"
 
