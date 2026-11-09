@@ -51,9 +51,7 @@ class TestWhichContractsMatter(MatchingTestCase):
         self.assertEqual(verdict.outcome, Outcome.PENDING)
 
     def test_an_old_contract_without_a_number_is_ignored(self):
-        verdict, _loader = self._classify(
-            self._contract(title="", date_issued=BEFORE)
-        )
+        verdict, _loader = self._classify(self._contract(title="", date_issued=BEFORE))
 
         self.assertEqual(verdict.outcome, Outcome.IGNORE)
 

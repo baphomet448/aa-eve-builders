@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load humanize %}
 {% load l10n %}
+{% load evebuilders_extras %}
 
 {% block details %}
     <div class="card card-primary">
@@ -48,6 +49,7 @@
                                         {% else %}
                                             {{ order.number }}
                                         {% endif %}
+                                        {% include 'evebuilders/copy_button.html' with text=order.number %}
                                     </td>
                                     <td data-value="{{ order.status_rank|unlocalize }}">
                                         <span class="badge
@@ -59,14 +61,12 @@
                                             {{ order.get_status_display }}
                                         </span>
                                     </td>
-                                    <td>{{ order.eve_type.name }}</td>
-                                    <td class="text-end" data-value="{{ order.quantity|unlocalize }}">{{ order.quantity|intcomma }}</td>
+                                    <td class="text-nowrap">{% include 'evebuilders/item_icon.html' with type_id=order.eve_type_id %}{{ order.eve_type.name }}</td>                                    <td class="text-end" data-value="{{ order.quantity|unlocalize }}">{{ order.quantity|intcomma }}</td>
                                     <td class="text-end" data-value="{{ order.taken|unlocalize }}">{{ order.taken|intcomma }}</td>
                                     <td class="text-end" data-value="{{ order.free|unlocalize }}">{{ order.free|intcomma }}</td>
                                     <td class="text-end" data-value="{{ order.credited|unlocalize }}">{{ order.credited|intcomma }}</td>
                                     <td class="text-end" data-value="{{ order.pending|unlocalize }}">{{ order.pending|intcomma }}</td>
-                                    <td class="text-end" data-value="{{ order.unit_price|unlocalize }}">{{ order.unit_price|intcomma }}</td>
-                                    <td data-value="{{ order.priority_rank|unlocalize }}">
+                                    <td class="text-end text-nowrap" data-value="{{ order.unit_price|unlocalize }}">{{ order.unit_price|intcomma }}{% include 'evebuilders/copy_button.html' with text=order.unit_price|plain_isk %}</td>                                    <td data-value="{{ order.priority_rank|unlocalize }}">
                                         <span class="badge
                                             {% if order.priority == 'HIGH' %}bg-danger
                                             {% elif order.priority == 'MEDIUM' %}bg-warning
@@ -76,8 +76,7 @@
                                     </td>
                                     <td class="text-nowrap">{{ order.due_date|date:"Y-m-d" }}</td>
                                     {% if perms.evebuilders.manage_access %}
-                                        <td data-value="{{ order.access_level|unlocalize }}">{{ order.get_access_level_display }}</td>
-                                    {% endif %}
+                                        <td data-value="{{ order.access_level|unlocalize }}">{% include 'evebuilders/level_badge.html' with level=order.access_level label=order.get_access_level_display %}</td>                                    {% endif %}
                                     <td>{{ order.destination }}</td>
                                     <td class="text-nowrap">
                                         {% if order.free > 0 and order.status != 'CANCELLED' %}

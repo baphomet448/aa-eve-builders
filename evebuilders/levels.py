@@ -58,6 +58,9 @@ def level_rows() -> list[dict]:
                     main_character.corporation_name if main_character else ""
                 ),
                 "level": levels.get(user.pk, Order.AccessLevel.BASE),
+                "level_label": Order.AccessLevel(
+                    levels.get(user.pk, Order.AccessLevel.BASE)
+                ).label,
                 "is_manager": user.has_perm(MANAGE_ACCESS),
             }
         )

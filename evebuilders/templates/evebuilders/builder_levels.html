@@ -44,6 +44,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
+                                        <div class="mb-1">{% include 'evebuilders/level_badge.html' with level=row.level label=row.level_label %}</div>
                                         <form method="post" action="{% url 'evebuilders:set_level' row.user.pk %}"
                                               class="d-flex gap-2">
                                             {% csrf_token %}

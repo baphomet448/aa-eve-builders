@@ -87,8 +87,7 @@
                                             <a href="{% url 'evebuilders:order_detail' row.record.order.pk %}">{{ row.record.order.number }}</a>
                                         {% else %}-{% endif %}
                                     </td>
-                                    <td>{{ row.record.order.eve_type.name|default:"-" }}</td>
-                                    <td>{{ row.builder|default:"-" }}</td>
+                                    <td class="text-nowrap">{% if row.record.order %}{% include 'evebuilders/item_icon.html' with type_id=row.record.order.eve_type_id %}{{ row.record.order.eve_type.name }}{% else %}-{% endif %}</td>                                    <td>{{ row.builder|default:"-" }}</td>
                                     <td class="text-end">{{ row.record.quantity|intcomma }}</td>
                                     <td class="text-end">{{ row.record.price|intcomma }}</td>
                                 </tr>

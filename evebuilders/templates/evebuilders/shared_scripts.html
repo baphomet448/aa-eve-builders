@@ -1,0 +1,39 @@
+<script>
+    // A button with the class evb-copy copies the text of its data-copy attribute
+    document.addEventListener("click", function (event) {
+        const button = event.target.closest(".evb-copy");
+        if (!button) {
+            return;
+        }
+
+        const text = button.dataset.copy;
+        const done = function () {
+            const icon = button.querySelector("i");
+            if (!icon) {
+                return;
+            }
+            icon.classList.replace("fa-copy", "fa-check");
+            window.setTimeout(function () {
+                icon.classList.replace("fa-check", "fa-copy");
+            }, 1500);
+        };
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(done);
+        } else {
+            // Without HTTPS the clipboard API is not available
+            const area = document.createElement("textarea");
+            area.value = text;
+            area.style.position = "fixed";
+            area.style.opacity = "0";
+            document.body.appendChild(area);
+            area.select();
+            try {
+                document.execCommand("copy");
+                done();
+            } finally {
+                document.body.removeChild(area);
+            }
+        }
+    });
+</script>

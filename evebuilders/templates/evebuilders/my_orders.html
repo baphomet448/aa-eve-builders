@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load humanize %}
 {% load l10n %}
+{% load evebuilders_extras %}
 
 {% block details %}
     <div class="card card-primary mb-3">
@@ -75,7 +76,7 @@
                         <tbody>
                             {% for row in rows %}
                                 <tr>
-                                    <td class="text-nowrap" data-value="{{ row.order.pk|unlocalize }}">{{ row.order.number }}</td>
+                                    <td class="text-nowrap" data-value="{{ row.order.pk|unlocalize }}">{{ row.order.number }}{% include 'evebuilders/copy_button.html' with text=row.order.number %}</td>
                                     <td data-value="{{ row.status_rank|unlocalize }}">
                                         {% if row.status == 'UNDER_REVIEW' %}
                                             <span class="badge bg-warning">{% translate "Under review" %}</span>
@@ -95,9 +96,9 @@
                                             {{ row.order.get_priority_display }}
                                         </span>
                                     </td>
-                                    <td>{{ row.order.eve_type.name }}</td>
-                                    <td class="text-end" data-value="{{ row.order.unit_price|unlocalize }}">{{ row.order.unit_price|intcomma }}</td>
-                                    <td class="text-end" data-value="{{ row.total|unlocalize }}">{{ row.total|intcomma }}</td>
+                                    <td class="text-nowrap">{% include 'evebuilders/item_icon.html' with type_id=row.order.eve_type_id %}{{ row.order.eve_type.name }}</td>
+                                    <td class="text-end text-nowrap" data-value="{{ row.order.unit_price|unlocalize }}">{{ row.order.unit_price|intcomma }}{% include 'evebuilders/copy_button.html' with text=row.order.unit_price|plain_isk %}</td>
+                                    <td class="text-end text-nowrap" data-value="{{ row.total|unlocalize }}">{{ row.total|intcomma }}{% include 'evebuilders/copy_button.html' with text=row.total|plain_isk %}</td>
                                     <td class="text-end" data-value="{{ row.share.taken|unlocalize }}">{{ row.share.taken|intcomma }}</td>
                                     <td class="text-end" data-value="{{ row.share.credited|unlocalize }}">{{ row.share.credited|intcomma }}</td>
                                     <td class="text-end" data-value="{{ row.pending|unlocalize }}">{{ row.pending|intcomma }}</td>
