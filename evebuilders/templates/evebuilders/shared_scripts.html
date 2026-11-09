@@ -110,3 +110,26 @@
         });
     });
 </script>
+
+<script>
+    // Moments are stored and sent in UTC. Show them in the time zone of the browser,
+    // the UTC text stays as the hint.
+    document.addEventListener("DOMContentLoaded", function () {
+        const pad = function (number) {
+            return String(number).padStart(2, "0");
+        };
+
+        document.querySelectorAll("time.evb-local").forEach(function (element) {
+            const moment = new Date(element.getAttribute("datetime"));
+            if (isNaN(moment.getTime())) {
+                return;
+            }
+
+            const time = pad(moment.getHours()) + ":" + pad(moment.getMinutes());
+            const date = moment.getFullYear() + "-" + pad(moment.getMonth() + 1) + "-" + pad(moment.getDate());
+
+            element.title = element.textContent;
+            element.textContent = element.dataset.kind === "time" ? time : date + " " + time;
+        });
+    });
+</script>

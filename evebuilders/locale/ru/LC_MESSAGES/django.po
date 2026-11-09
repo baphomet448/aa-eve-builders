@@ -564,14 +564,8 @@ msgstr "Контракты проверялись %(when)s."
 
 #: templates/evebuilders/my_orders.html
 #, python-format
-msgid ""
-"The next automatic check is around %(when)s (server time), right after ESI "
-"refreshes its data. A contract that you create, or that is accepted in the "
-"game, shows up after that."
-msgstr ""
-"Следующая автоматическая проверка примерно в %(when)s (время сервера), сразу "
-"после обновления данных ESI. Контракт, который вы создали или который "
-"приняли в игре, появится после этого."
+msgid "The next automatic check is around %(when)s, right after ESI refreshes its data. A contract that you create, or that is accepted in the game, shows up after that."
+msgstr "Следующая автоматическая проверка примерно в %(when)s, сразу после обновления данных ESI. Контракт, который вы создали или который приняли в игре, появится после этого."
 
 #: templates/evebuilders/my_orders.html
 msgid "The last contract check failed:"
@@ -1106,14 +1100,8 @@ msgstr "несколько минут"
 
 #: views.py
 #, python-format
-msgid ""
-"Right now %(waiting)s contract(s) wait for acceptance (%(items)s items) and "
-"%(problems)s cannot be counted. ESI keeps this answer until %(until)s. The "
-"plugin checks again automatically right after that."
-msgstr ""
-"Сейчас ожидают принятия контрактов: %(waiting)s (%(items)s шт.), не удаётся "
-"засчитать: %(problems)s. ESI хранит этот ответ до %(until)s. Плагин проверит "
-"снова автоматически сразу после этого."
+msgid "Right now %(waiting)s contract(s) wait for acceptance (%(items)s items) and %(problems)s cannot be counted. The plugin checks again automatically when ESI refreshes its data."
+msgstr "Сейчас ожидают принятия контрактов: %(waiting)s (%(items)s шт.), не удаётся засчитать: %(problems)s. Плагин проверит снова автоматически, когда ESI обновит данные."
 
 #: views.py
 #, python-format

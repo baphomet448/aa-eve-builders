@@ -61,7 +61,7 @@
 
                 <dt class="col-sm-3">{% translate "Created" %}</dt>
                 <dd class="col-sm-9">
-                    {{ order.created_at|date:"Y-m-d H:i" }}
+                    {{ order.created_at|local_time }}
                     {% if order.created_by %}({{ order.created_by }}){% endif %}
                 </dd>
             </dl>
@@ -197,7 +197,7 @@
                                     <td class="text-end">{{ row.record.quantity|intcomma }}</td>
                                     <td class="text-end">{{ row.record.price|isk }}</td>
                                     <td>{{ row.acceptor|default:"-" }}</td>
-                                    <td class="text-nowrap">{{ row.record.issued_at|date:"Y-m-d H:i" }}</td>
+                                    <td class="text-nowrap">{{ row.record.issued_at|local_time }}</td>
                                     <td class="text-danger">{{ row.record.reason_text }}</td>
                                 </tr>
                             {% endfor %}
@@ -229,7 +229,7 @@
                         <tbody>
                             {% for row in events %}
                                 <tr>
-                                    <td class="text-nowrap">{{ row.event.created_at|date:"Y-m-d H:i" }}</td>
+                                    <td class="text-nowrap">{{ row.event.created_at|local_time }}</td>
                                     <td>{{ row.event.get_kind_display }}</td>
                                     <td>{{ row.actor|default:"-" }}</td>
                                     <td>{{ row.event.description }}</td>

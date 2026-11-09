@@ -2,7 +2,6 @@
 
 # Standard Library
 from datetime import timedelta
-from datetime import timezone as dt_timezone
 
 # Django
 from django.contrib import messages
@@ -381,23 +380,17 @@ def _report_messages(request: WSGIRequest, report) -> None:
 
     messages.add_message(request, level, " ".join(changes))
 
-    if report.expires is None:
-        until = _("a few minutes")
-    else:
-        until = report.expires.astimezone(dt_timezone.utc).strftime("%H:%M UTC")
-
     messages.info(
         request,
         _(
             "Right now %(waiting)s contract(s) wait for acceptance (%(items)s items) "
-            "and %(problems)s cannot be counted. ESI keeps this answer until "
-            "%(until)s. The plugin checks again automatically right after that."
+            "and %(problems)s cannot be counted. The plugin checks again "
+            "automatically when ESI refreshes its data."
         )
         % {
             "waiting": report.waiting_contracts,
             "items": report.waiting_items,
             "problems": report.problem_contracts,
-            "until": until,
         },
     )
 

@@ -19,9 +19,9 @@
                             Contracts were last checked {{ when }}.
                         {% endblocktranslate %}
                         {% if next_check %}
-                            {% blocktranslate trimmed with when=next_check|date:"H:i" %}
-                                The next automatic check is around {{ when }} (server time), right
-                                after ESI refreshes its data. A contract that you create, or that is
+                            {% blocktranslate trimmed with when=next_check|local_time:"time" %}
+                                The next automatic check is around {{ when }}, right after ESI
+                                refreshes its data. A contract that you create, or that is
                                 accepted in the game, shows up after that.
                             {% endblocktranslate %}
                         {% endif %}
@@ -164,7 +164,7 @@
                         <tbody>
                             {% for contract in problems %}
                                 <tr>
-                                    <td class="text-nowrap">{{ contract.issued_at|date:"Y-m-d H:i" }}</td>
+                                    <td class="text-nowrap">{{ contract.issued_at|local_time }}</td>
                                     <td>{{ contract.title|default:"-" }}</td>
                                     <td class="text-nowrap">{{ contract.order.number|default:"-" }}</td>
                                     <td class="text-end">{{ contract.quantity|intcomma }}</td>

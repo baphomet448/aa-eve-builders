@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load humanize %}
+{% load evebuilders_extras %}
 
 {% block details %}
     {% include 'evebuilders/settings_tabs.html' with active='general' %}
@@ -27,7 +28,7 @@
                     <dt class="col-sm-3">{% translate "Connected by" %}</dt>
                     <dd class="col-sm-9">
                         {{ source.connected_by }}{% if source.token %} ({{ source.token.character_name }}){% endif %},
-                        {{ source.connected_at|date:"Y-m-d H:i" }}
+                        {{ source.connected_at|local_time }}
                     </dd>
 
                     <dt class="col-sm-3">{% translate "Token" %}</dt>
@@ -59,7 +60,7 @@
                     <dt class="col-sm-3">{% translate "ESI answer valid until" %}</dt>
                     <dd class="col-sm-9">
                         {% if source.esi_expires_at %}
-                            {{ source.esi_expires_at|date:"Y-m-d H:i" }}
+                            {{ source.esi_expires_at|local_time }}
                         {% else %}
                             -
                         {% endif %}
@@ -99,7 +100,7 @@
                 <dt class="col-sm-3">{% translate "Last started" %}</dt>
                 <dd class="col-sm-9">
                     {% if sync.started_at %}
-                        {{ sync.started_at|date:"Y-m-d H:i" }} ({{ sync.started_at|naturaltime }})
+                        {{ sync.started_at|local_time }} ({{ sync.started_at|naturaltime }})
                         {% if sync.started_by %}&ndash; {{ sync.started_by }}{% endif %}
                     {% else %}
                         {% translate "Never" %}

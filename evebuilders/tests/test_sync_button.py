@@ -168,7 +168,8 @@ class TestSyncContractsView(TestCase):
         self.assertIn("1 contract(s) credited (1 items)", changes[1])
         self.assertEqual(state[0], constants.INFO)
         self.assertIn("2 contract(s) wait for acceptance (7 items)", state[1])
-        self.assertIn("17:55 UTC", state[1])
+        self.assertNotIn("UTC", state[1])
+        self.assertIn("when ESI refreshes its data", state[1])
 
     def test_nothing_changed(self):
         response, _mock = self._post(SyncAttempt(report=SyncReport(seen=3)))

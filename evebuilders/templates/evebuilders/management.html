@@ -36,7 +36,7 @@
                         <tbody>
                             {% for row in problems %}
                                 <tr>
-                                    <td class="text-nowrap">{{ row.record.issued_at|date:"Y-m-d H:i" }}</td>
+                                    <td class="text-nowrap">{{ row.record.issued_at|local_time }}</td>
                                     <td class="text-nowrap">{{ row.record.contract_id|unlocalize }}</td>
                                     <td>{{ row.record.title|default:"-" }}</td>
                                     <td>{{ row.issuer }}</td>
@@ -81,7 +81,7 @@
                         <tbody>
                             {% for row in waiting %}
                                 <tr>
-                                    <td class="text-nowrap">{{ row.record.issued_at|date:"Y-m-d H:i" }}</td>
+                                    <td class="text-nowrap">{{ row.record.issued_at|local_time }}</td>
                                     <td class="text-nowrap">{{ row.record.contract_id|unlocalize }}</td>
                                     <td>
                                         {% if row.record.order %}
@@ -122,7 +122,7 @@
                         <tbody>
                             {% for row in events %}
                                 <tr>
-                                    <td class="text-nowrap">{{ row.event.created_at|date:"Y-m-d H:i" }}</td>
+                                    <td class="text-nowrap">{{ row.event.created_at|local_time }}</td>
                                     <td class="text-nowrap">
                                         {% if row.event.order %}
                                             <a href="{% url 'evebuilders:order_detail' row.event.order.pk %}">{{ row.event.order.number }}</a>
