@@ -342,6 +342,10 @@ def process_contracts(
     Contracts are processed from the oldest to the newest, so when a builder
     has more contracts than items left, the older ones win.
 
+    A contract that the plugin now has nothing to say about (for example it
+    turned out to be older than the order it was thought to be for) leaves the
+    list of problem contracts.
+
     :param contracts: The ESI list of corporation contracts
     :param corporation_id: The corporation the orders are for
     :param items_loader: Returns the ESI items of a contract
@@ -352,6 +356,7 @@ def process_contracts(
 
     now = now or timezone.now()
     report = SyncReport()
+    ignored_ids: list[int] = []
 
     ordered = sorted(
         contracts,
@@ -388,6 +393,14 @@ def process_contracts(
             report.closed += _apply_closed(contract, verdict)
         elif verdict.outcome is Outcome.INVALID:
             report.invalid += _apply_invalid(contract, verdict)
+        else:
+            ignored_ids.append(contract["contract_id"])
+
+    if ignored_ids:
+        # Only problems are forgotten: credited and waiting records stay
+        ContractRecord.objects.filter(
+            contract_id__in=ignored_ids, state=ContractRecord.State.INVALID
+        ).delete()
 
     return report
 

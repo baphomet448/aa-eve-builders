@@ -1,7 +1,8 @@
 """Contract classification tests (ESI is not involved)"""
 
 # Standard Library
-from datetime import timedelta
+from datetime import datetime, timedelta
+from datetime import timezone as dt_timezone
 from decimal import Decimal
 from unittest.mock import MagicMock
 
@@ -73,6 +74,11 @@ class MatchingTestCase(TestCase):
         )
         take_order(user=cls.builder, order_id=cls.order.pk, quantity=5)
         cls.share = OrderAssignment.objects.get(order=cls.order, builder=cls.builder)
+        # The builder took the order well before the dates of the test contracts
+        OrderAssignment.objects.filter(pk=cls.share.pk).update(
+            created_at=datetime(2026, 10, 1, tzinfo=dt_timezone.utc)
+        )
+        cls.share.refresh_from_db()
         cls.issuer_id = cls.builder.profile.main_character.character_id
 
     def _contract(self, **overrides):

@@ -3,12 +3,17 @@ Deciding what a corporation contract means for the orders.
 
 Nothing is changed here: classify_contract only returns a verdict. Applying the
 verdicts (records, crediting) is done separately.
+
+A builder's contracts are looked at only from the moment he took his order: an
+old contract to the corporation, made before that, is none of the plugin's
+business, and so is a contract of somebody who has nothing left to deliver.
 """
 
 # Standard Library
 import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 
@@ -81,14 +86,36 @@ def user_of_character(character_id):
     return ownership.user if ownership else None
 
 
-def _has_open_share(user) -> bool:
-    """Whether the user still has something to deliver on an open order"""
+def _watch_start(user) -> datetime | None:
+    """
+    From when the contracts of a user matter: the moment he took the oldest of
+    the orders he still has something to deliver on. None when there is
+    nothing left to deliver, then no contract of his matters.
+    """
 
     shares = OrderAssignment.objects.filter(
         builder=user, taken__gt=0, order__status__in=OPEN_STATUSES
     )
+    starts = [share.created_at for share in shares if releasable_quantity(share) > 0]
 
-    return any(releasable_quantity(share) > 0 for share in shares)
+    return min(starts) if starts else None
+
+
+def _is_a_builders_new_contract(issuer, issued_at: datetime | None) -> bool:
+    """
+    Whether a contract that does not point to an order the maker has taken is
+    the plugin's business: its maker is a builder with something left to
+    deliver, and he made the contract after he took that order.
+    """
+
+    if issuer is None:
+        return False
+
+    start = _watch_start(issuer)
+    if start is None:
+        return False
+
+    return issued_at is None or issued_at >= start
 
 
 def _is_expired(contract: dict, now) -> bool:
@@ -157,30 +184,32 @@ def classify_contract(
         )
 
     issuer = user_of_character(contract.get("issuer_id"))
+    issued_at = parse_datetime(contract.get("date_issued") or "")
     numbers = find_order_numbers(contract.get("title") or "")
 
     if not numbers:
-        # Foreign contracts are none of our business; but a builder who still
-        # has something to deliver should hear that the number is missing
-        if issuer is not None and _has_open_share(issuer):
+        if _is_a_builders_new_contract(issuer, issued_at):
             return Verdict(Outcome.INVALID, reason_code=reasons.NO_NUMBER)
 
         return Verdict(Outcome.IGNORE)
 
     if len(numbers) > 1:
-        return Verdict(Outcome.INVALID, reason_code=reasons.MANY_NUMBERS)
+        if _is_a_builders_new_contract(issuer, issued_at):
+            return Verdict(Outcome.INVALID, reason_code=reasons.MANY_NUMBERS)
+
+        return Verdict(Outcome.IGNORE)
 
     number = next(iter(numbers))
     order = Order.objects.filter(number=number, kind=Order.Kind.CORPORATE).first()
     if order is None:
-        if issuer is None:
-            return Verdict(Outcome.IGNORE)
+        if _is_a_builders_new_contract(issuer, issued_at):
+            return Verdict(
+                Outcome.INVALID,
+                reason_code=reasons.UNKNOWN_ORDER,
+                reason_data={"number": number},
+            )
 
-        return Verdict(
-            Outcome.INVALID,
-            reason_code=reasons.UNKNOWN_ORDER,
-            reason_data={"number": number},
-        )
+        return Verdict(Outcome.IGNORE)
 
     if issuer is None:
         return Verdict(Outcome.INVALID, reason_code=reasons.NOT_ON_ACCOUNT, order=order)
@@ -188,6 +217,11 @@ def classify_contract(
     share = OrderAssignment.objects.filter(order=order, builder=issuer).first()
     if share is None or share.taken < 1:
         return Verdict(Outcome.INVALID, reason_code=reasons.NOT_TAKEN, order=order)
+
+    if issued_at is not None and issued_at < share.created_at:
+        # Made before the builder took the order: an older contract, not his
+        # delivery
+        return Verdict(Outcome.IGNORE)
 
     if order.status == Order.Status.CANCELLED:
         return Verdict(

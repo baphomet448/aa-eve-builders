@@ -59,6 +59,11 @@ class SyncTestCase(TestCase):
         )
         take_order(user=cls.builder, order_id=cls.order.pk, quantity=5)
         cls.share = OrderAssignment.objects.get(order=cls.order, builder=cls.builder)
+        # The builder took the order well before the dates of the test contracts
+        OrderAssignment.objects.filter(pk=cls.share.pk).update(
+            created_at=datetime(2026, 10, 1, tzinfo=timezone.utc)
+        )
+        cls.share.refresh_from_db()
         cls.issuer_id = cls.builder.profile.main_character.character_id
         cls.acceptor_id = cls.acceptor.profile.main_character.character_id
 
@@ -182,7 +187,9 @@ class TestProcessContracts(SyncTestCase):
         )
         take_order(user=self.builder, order_id=order.pk, quantity=5)
 
-        self._process([self._finished(title=order.number)])
+        self._process(
+            [self._finished(title=order.number, date_issued="2099-01-01T00:00:00Z")]
+        )
 
         order.refresh_from_db()
         self.assertEqual(order.status, Order.Status.COMPLETED)

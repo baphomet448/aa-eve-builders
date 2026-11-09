@@ -78,7 +78,9 @@ class TestContractNotifications(SettingsMixin, SyncTestCase):
         take_order(user=self.builder, order_id=order.pk, quantity=5)
 
         sent = self._announced(
-            lambda: self._process([self._finished(title=order.number)])
+            lambda: self._process(
+                [self._finished(title=order.number, date_issued="2099-01-01T00:00:00Z")]
+            )
         )
 
         description = self._description(sent[0])

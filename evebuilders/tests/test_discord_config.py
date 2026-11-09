@@ -179,7 +179,9 @@ class TestDiscordConfigAdmin(TestCase):
         self.assertIs(config.notify_taken, False)
 
     def test_a_url_must_be_https(self):
-        response = self._add(new_order_webhook_url="http://discord.com/api/webhooks/1/a")
+        response = self._add(
+            new_order_webhook_url="http://discord.com/api/webhooks/1/a"
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "must start with https://")
