@@ -68,18 +68,18 @@
                         <thead>
                             <tr>
                                 <th data-sort="number">{% translate "Order" %}</th>
-                                <th data-sort="number">{% translate "Status" %}</th>
+                                <th class="text-center" data-sort="number">{% translate "Status" %}</th>
                                 <th data-sort="text">{% translate "Item" %}</th>
-                                <th class="text-end" data-sort="number">{% translate "Quantity" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "Available" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Taken" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Free" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Ready" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "On review" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Price per unit" %}</th>
-                                <th data-sort="number">{% translate "Priority" %}</th>
+                                <th class="text-center" data-sort="number">{% translate "Priority" %}</th>
                                 <th data-sort="text">{% translate "Due date" %}</th>
                                 {% if perms.evebuilders.manage_access %}
-                                    <th data-sort="number">{% translate "Access level" %}</th>
+                                    <th class="text-center" data-sort="number">{% translate "Access" %}</th>
                                 {% endif %}
                                 <th data-sort="text">{% translate "Destination" %}</th>
                                 <th></th>
@@ -100,7 +100,7 @@
                                         {% endif %}
                                         {% include 'evebuilders/copy_button.html' with text=order.number %}
                                     </td>
-                                    <td data-value="{{ order.status_rank|unlocalize }}">
+                                    <td class="text-center" data-value="{{ order.status_rank|unlocalize }}">
                                         <span class="badge
                                             {% if order.status == 'NEW' %}bg-primary
                                             {% elif order.status == 'IN_PROGRESS' %}bg-info
@@ -115,7 +115,7 @@
                                     <td class="text-end" data-value="{{ order.free|unlocalize }}">{{ order.free|intcomma }}</td>
                                     <td class="text-end" data-value="{{ order.credited|unlocalize }}">{{ order.credited|intcomma }}</td>
                                     <td class="text-end" data-value="{{ order.pending|unlocalize }}">{{ order.pending|intcomma }}</td>
-                                    <td class="text-end text-nowrap" data-value="{{ order.unit_price|unlocalize }}">{{ order.unit_price|isk }}{% include 'evebuilders/copy_button.html' with text=order.unit_price|plain_isk %}</td>                                    <td data-value="{{ order.priority_rank|unlocalize }}">
+                                    <td class="text-end text-nowrap" data-value="{{ order.unit_price|unlocalize }}">{{ order.unit_price|isk }}{% include 'evebuilders/copy_button.html' with text=order.unit_price|plain_isk %}</td>                                    <td class="text-center" data-value="{{ order.priority_rank|unlocalize }}">
                                         <span class="badge
                                             {% if order.priority == 'HIGH' %}bg-danger
                                             {% elif order.priority == 'MEDIUM' %}bg-warning
@@ -125,7 +125,7 @@
                                     </td>
                                     <td class="text-nowrap">{{ order.due_date|date:"Y-m-d" }}</td>
                                     {% if perms.evebuilders.manage_access %}
-                                        <td data-value="{{ order.access_level|unlocalize }}">{% include 'evebuilders/level_badge.html' with level=order.access_level label=order.get_access_level_display %}</td>                                    {% endif %}
+                                        <td class="text-center" data-value="{{ order.access_level|unlocalize }}">{% include 'evebuilders/level_badge.html' with level=order.access_level label=order.get_access_level_display %}</td>                                    {% endif %}
                                     <td>{{ order.destination }}</td>
                                     <td class="text-nowrap">
                                         {% if order.free > 0 and order.status != 'CANCELLED' %}

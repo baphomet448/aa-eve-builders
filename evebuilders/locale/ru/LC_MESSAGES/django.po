@@ -623,7 +623,7 @@ msgstr "Можно вернуть"
 
 #: templates/evebuilders/my_orders.html
 msgid "Give back until"
-msgstr "Вернуть до"
+msgstr "Можно отменить до"
 
 #: templates/evebuilders/my_orders.html templates/evebuilders/order_detail.html
 msgid "Under review"
@@ -671,7 +671,7 @@ msgstr "зачтено"
 
 #: templates/evebuilders/order_detail.html
 msgid "on review"
-msgstr ""
+msgstr "На проверке"
 
 #: templates/evebuilders/order_detail.html
 msgid "free"
@@ -1174,12 +1174,8 @@ msgstr ""
 msgid "Copy"
 msgstr "Копировать"
 
-
-msgid "To"
-msgstr "Кому"
-
 msgid "Left to deliver"
-msgstr "Ещё сдать"
+msgstr "Осталось сдать"
 
 msgid "Total left"
 msgstr "Сумма несданного"
@@ -1189,9 +1185,6 @@ msgstr "Как сдавать"
 
 msgid "In the game, open Contracts and create an Item Exchange contract."
 msgstr "В игре откройте «Контракты» и создайте контракт «Обмен предметами»."
-
-msgid "Assign it to the recipient from the \"To\" column."
-msgstr "Назначьте его получателю из колонки «Кому»."
 
 msgid "Put the items you built into the contract. You can deliver in parts."
 msgstr "Положите в контракт предметы, которые вы сделали. Можно сдавать частями."
@@ -1232,3 +1225,16 @@ msgstr "Имя или корпорация"
 
 msgid "The price must be a whole number of ISK."
 msgstr "Цена должна быть целым числом ISK."
+
+
+msgid "Available"
+msgstr "Доступно"
+
+msgid "Receiver"
+msgstr "Приемщик"
+
+msgid "Assign it to the receiver from the \"Receiver\" column."
+msgstr "Назначьте его приемщику из колонки «Приемщик»."
+
+msgid "Watch the status: look at this page from time to time. If a contract cannot be counted, it appears in the list below with the reason."
+msgstr "Следите за статусом: время от времени заглядывайте на эту страницу. Если контракт не удаётся засчитать, он появится в списке ниже с причиной."

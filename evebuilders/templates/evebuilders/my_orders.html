@@ -49,11 +49,12 @@
                     <strong>{% translate "How to deliver" %}</strong>
                     <ol class="mb-0">
                         <li>{% translate "In the game, open Contracts and create an Item Exchange contract." %}</li>
-                        <li>{% translate 'Assign it to the recipient from the "To" column.' %}</li>
+                        <li>{% translate 'Assign it to the receiver from the "Receiver" column.' %}</li>
                         <li>{% translate "Put the items you built into the contract. You can deliver in parts." %}</li>
                         <li>{% translate 'Set the price to the price per unit multiplied by the quantity in the contract. The price for everything you still have to deliver is in the column "Total left".' %}</li>
                         <li>{% translate "Write the order number into the contract title, for example N20261109-1." %}</li>
-                        <li>{% translate "Create the contract. The plugin finds it by itself within a few minutes." %}</li>                    </ol>
+                        <li>{% translate "Create the contract. The plugin finds it by itself within a few minutes." %}</li>
+                        <li>{% translate "Watch the status: look at this page from time to time. If a contract cannot be counted, it appears in the list below with the reason." %}</li>                    </ol>
                 </div>
 
                 <div class="table-responsive">
@@ -61,15 +62,15 @@
                         <thead>
                             <tr>
                                 <th data-sort="number">{% translate "Order" %}</th>
-                                <th data-sort="number">{% translate "Status" %}</th>
-                                <th data-sort="number">{% translate "Priority" %}</th>
+                                <th class="text-center" data-sort="number">{% translate "Status" %}</th>
+                                <th class="text-center" data-sort="number">{% translate "Priority" %}</th>
                                 <th data-sort="text">{% translate "Item" %}</th>
-                                <th data-sort="text">{% translate "To" %}</th>
+                                <th data-sort="text">{% translate "Receiver" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Price per unit" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Total price" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Taken" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Ready" %}</th>
-                                <th class="text-end" data-sort="number">{% translate "In contracts" %}</th>
+                                <th class="text-end" data-sort="number">{% translate "On review" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Left to deliver" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Total left" %}</th>
                                 <th data-sort="text">{% translate "Due date" %}</th>
@@ -81,7 +82,7 @@
                             {% for row in rows %}
                                 <tr>
                                     <td class="text-nowrap" data-value="{{ row.order.pk|unlocalize }}">{{ row.order.number }}{% include 'evebuilders/copy_button.html' with text=row.order.number %}</td>
-                                    <td data-value="{{ row.status_rank|unlocalize }}">
+                                    <td class="text-center" data-value="{{ row.status_rank|unlocalize }}">
                                         {% if row.status == 'UNDER_REVIEW' %}
                                             <span class="badge bg-warning">{% translate "Under review" %}</span>
                                         {% elif row.status == 'DONE' %}
@@ -92,7 +93,7 @@
                                             <span class="badge bg-info">{% translate "In progress" %}</span>
                                         {% endif %}
                                     </td>
-                                    <td data-value="{{ row.priority_rank|unlocalize }}">
+                                    <td class="text-center" data-value="{{ row.priority_rank|unlocalize }}">
                                         <span class="badge
                                             {% if row.order.priority == 'HIGH' %}bg-danger
                                             {% elif row.order.priority == 'MEDIUM' %}bg-warning

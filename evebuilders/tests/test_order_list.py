@@ -143,7 +143,7 @@ class TestOrderListPage(OrderListTestCase):
 
         for order in (self.base, self.middle, self.senior):
             self.assertContains(response, order.number)
-        self.assertContains(response, "Access level")
+        self.assertContains(response, ">Access</th>")
 
     def test_builder_does_not_see_the_level_column(self):
         self.client.force_login(self.builder)
