@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [In Development] - Unreleased
 
+## [0.2.2] - 2026-11-09
+
+### Changed
+
+- The columns of the order tables have clearer names: "Available", "Access", "On review"
+  (in both tables), "Receiver", "Left to deliver", "Give back until"; the columns Status,
+  Priority and Access are centred, and the font of the tables is a little bigger.
+- "My orders": the status and the priority share one cell (two lines), and so do the due
+  date and the date to give back until, so the table is narrower. A click on one of the
+  two lines of such a header sorts by that line only.
+- The sorting of every table has three states: upwards, downwards, and back to the
+  order of the server.
+
+### Added
+
+- A step "Watch the status" in the instruction on how to deliver.
+
+### Fixed
+
+- The Russian title of the column "On review" was shown in English.
+
 ## [0.2.1] - 2026-11-09
 
 ### Changed
