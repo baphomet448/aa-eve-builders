@@ -69,7 +69,7 @@ ______________________________________________________________________
 окружение вашего Auth.
 
 ```shell
-pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.2/aa_eve_builders-0.2.2-py3-none-any.whl
+pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.3/aa_eve_builders-0.2.3-py3-none-any.
 ```
 
 В `local.py` добавьте приложения в `INSTALLED_APPS` (`eveuniverse` только если его там
@@ -98,7 +98,7 @@ python manage.py collectstatic --noinput
 `conf/requirements.txt`:
 
 ```text
-aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.2/aa_eve_builders-0.2.2-py3-none-any.whl
+aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.3/aa_eve_builders-0.2.3-py3-none-any.
 ```
 
 Строки `INSTALLED_APPS` и задачи по расписанию добавьте в `conf/local.py`. Затем пересоберите
@@ -289,4 +289,4 @@ python manage.py collectstatic --noinput
 - Идея и процесс взяты из Java-приложения
   [eve-builders](https://github.com/AntonAzarenko/eve-builders) автора AntonAzarenko.
 - Проект начат на основе Alliance Auth Example Plugin (версия для GitHub).
-- Лицензия **GNU General Public License v3.0**, см. [LICENSE](LICENSE).
+- Лицензия **GNU General Public License v3.0 или более поздняя** (GPL-3.0-or-later), см. [LICENSE](LICENSE).

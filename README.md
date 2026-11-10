@@ -95,7 +95,7 @@ There is no PyPI release: install the wheel from the release page. Activate the 
 environment of your Auth first.
 
 ```shell
-pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.2/aa_eve_builders-0.2.2-py3-none-any.whl
+pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.3/aa_eve_builders-0.2.3-py3-none-any.whl
 ```
 
 Add the apps to `INSTALLED_APPS` in your `local.py` (`eveuniverse` only if it is not
@@ -124,7 +124,7 @@ The image of Auth has no `git`, so use the wheel too. Add this line to
 `conf/requirements.txt`:
 
 ```text
-aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.2/aa_eve_builders-0.2.2-py3-none-any.whl
+aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.3/aa_eve_builders-0.2.3-py3-none-any.whl
 ```
 
 Add the `INSTALLED_APPS` lines and the scheduled tasks to `conf/local.py`. Then rebuild
@@ -340,4 +340,4 @@ Issues and pull requests are welcome.
 - The idea and the workflow come from the Java application
   [eve-builders](https://github.com/AntonAzarenko/eve-builders) by AntonAzarenko.
 - The project was started from the Alliance Auth Example Plugin (GitHub version).
-- Licensed under the **GNU General Public License v3.0**, see [LICENSE](LICENSE).
+- Licensed under the **GNU General Public License v3.0 or later** (GPL-3.0-or-later), see [LICENSE](LICENSE).

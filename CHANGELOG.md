@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [In Development] - Unreleased
 
+## [0.2.3] - 2026-11-10
+
+### Changed
+
+- The license is declared as GPL-3.0-or-later (the license text is the same GPLv3). The
+  package metadata now carries the identifier instead of the whole text of the license.
+- Russian: the column "Ready" is called "Сдано", and so is the message about items that a
+  manager credited by hand.
+
 ## [0.2.2] - 2026-11-09
 
 ### Changed
