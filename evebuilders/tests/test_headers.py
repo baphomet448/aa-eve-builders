@@ -49,10 +49,21 @@ class TestOrderTables(ViewsTestCase):
         self.assertContains(response, "Watch the status")
         self.assertContains(response, 'from the "Receiver" column')
 
-    def test_my_orders_centres_status_and_priority(self):
+    def test_my_orders_has_two_line_cells_for_status_and_dates(self):
         self._take(self.builder, 5)
 
         response = self._page(self.builder, "my_orders")
+        head = self._head(response)
 
-        self.assertContains(response, 'class="text-center" data-sort="number"', count=2)
-        self.assertContains(response, '<td class="text-center" data-value="')
+        # Status above priority, the due date above the date to give back until:
+        # each line is its own title that sorts by its own value
+        self.assertIn("Priority", head)
+        self.assertIn("Give back until", head)
+        self.assertEqual(head.count('data-sort-field="value2"'), 2)
+        self.assertContains(response, 'data-value2="', count=2)
+
+    def test_the_sorting_has_three_states(self):
+        response = self._page(self.manager, "orders")
+
+        # The third click brings back the order from the server
+        self.assertContains(response, "positions.get(a) - positions.get(b)")

@@ -115,4 +115,4 @@ class TestMyOrdersPage(SortingTestCase):
         response = self.client.get(reverse("evebuilders:orders"))
 
         self.assertContains(response, 'id="evebuilders-orders"')
-        self.assertContains(response, "th.sorted-asc")
+        self.assertContains(response, ".sorted-asc::after")

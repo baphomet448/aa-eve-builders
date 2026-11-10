@@ -1,7 +1,8 @@
 <style>
-    #{{ table_id }} th[data-sort] { cursor: pointer; user-select: none; }
-    #{{ table_id }} th.sorted-asc::after { content: " \25B2"; }
-    #{{ table_id }} th.sorted-desc::after { content: " \25BC"; }
+    #{{ table_id }} [data-sort] { cursor: pointer; user-select: none; }
+    #{{ table_id }} [data-sort]:hover { text-decoration: underline; }
+    #{{ table_id }} .sorted-asc::after { content: " \25B2"; }
+    #{{ table_id }} .sorted-desc::after { content: " \25BC"; }
 
     /* A compact table: the page has many columns */
     #{{ table_id }} { font-size: 0.9rem; }
@@ -13,8 +14,12 @@
     #{{ table_id }} .badge { font-size: 0.75rem; }
 </style>
 <script>
-    // Click on a column header sorts the table by that column. The first order of
-    // the rows comes from the server. A cell sorts by its data-value, if it has one.
+    // Click on a title in the header sorts the table by that column: the first click
+    // upwards, the second downwards, the third one brings back the order from the server.
+    // A title is a header cell or a span inside one (a header of two lines has two
+    // titles, each sorts by its own value). A cell is sorted by its data-value, or by
+    // data-value2 for a title with data-sort-field="value2". Equal values keep the
+    // order from the server.
     document.addEventListener("DOMContentLoaded", function () {
         const table = document.getElementById("{{ table_id }}");
         if (!table) {
@@ -22,45 +27,69 @@
         }
 
         const body = table.tBodies[0];
-        const headers = table.querySelectorAll("thead th[data-sort]");
+        const titles = table.querySelectorAll("thead [data-sort]");
+        const positions = new Map(
+            Array.from(body.rows).map(function (row, position) {
+                return [row, position];
+            })
+        );
 
-        function valueOf(row, index, type) {
+        function valueOf(row, index, type, field) {
             const cell = row.cells[index];
-            const raw = cell.dataset.value !== undefined ? cell.dataset.value : cell.textContent.trim();
+            const raw = cell.dataset[field] !== undefined ? cell.dataset[field] : cell.textContent.trim();
 
             return type === "number" ? parseFloat(raw) : raw.toLowerCase();
         }
 
-        headers.forEach(function (header) {
-            header.addEventListener("click", function () {
-                const index = header.cellIndex;
-                const type = header.dataset.sort;
-                const direction = header.dataset.direction === "asc" ? "desc" : "asc";
+        function show(rows) {
+            rows.forEach(function (row) {
+                body.appendChild(row);
+            });
+        }
 
-                headers.forEach(function (other) {
+        titles.forEach(function (title) {
+            title.addEventListener("click", function () {
+                const index = title.closest("th").cellIndex;
+                const type = title.dataset.sort;
+                const field = title.dataset.sortField || "value";
+                const before = title.dataset.direction;
+
+                titles.forEach(function (other) {
                     delete other.dataset.direction;
                     other.classList.remove("sorted-asc", "sorted-desc");
                 });
-                header.dataset.direction = direction;
-                header.classList.add("sorted-" + direction);
 
                 const rows = Array.from(body.rows);
+
+                if (before === "desc") {
+                    // The third click: back to the order from the server
+                    rows.sort(function (a, b) {
+                        return positions.get(a) - positions.get(b);
+                    });
+                    show(rows);
+
+                    return;
+                }
+
+                const direction = before === "asc" ? "desc" : "asc";
+                const sign = direction === "asc" ? 1 : -1;
+                title.dataset.direction = direction;
+                title.classList.add("sorted-" + direction);
+
                 rows.sort(function (a, b) {
-                    const x = valueOf(a, index, type);
-                    const y = valueOf(b, index, type);
+                    const x = valueOf(a, index, type, field);
+                    const y = valueOf(b, index, type, field);
 
                     if (x < y) {
-                        return direction === "asc" ? -1 : 1;
+                        return -sign;
                     }
                     if (x > y) {
-                        return direction === "asc" ? 1 : -1;
+                        return sign;
                     }
 
-                    return 0;
+                    return positions.get(a) - positions.get(b);
                 });
-                rows.forEach(function (row) {
-                    body.appendChild(row);
-                });
+                show(rows);
             });
         });
     });

@@ -54,7 +54,8 @@
                         <li>{% translate 'Set the price to the price per unit multiplied by the quantity in the contract. The price for everything you still have to deliver is in the column "Total left".' %}</li>
                         <li>{% translate "Write the order number into the contract title, for example N20261109-1." %}</li>
                         <li>{% translate "Create the contract. The plugin finds it by itself within a few minutes." %}</li>
-                        <li>{% translate "Watch the status: look at this page from time to time. If a contract cannot be counted, it appears in the list below with the reason." %}</li>                    </ol>
+                        <li>{% translate "Watch the status: look at this page from time to time. If a contract cannot be counted, it appears in the list below with the reason." %}</li>
+                    </ol>
                 </div>
 
                 <div class="table-responsive">
@@ -62,8 +63,7 @@
                         <thead>
                             <tr>
                                 <th data-sort="number">{% translate "Order" %}</th>
-                                <th class="text-center" data-sort="number">{% translate "Status" %}</th>
-                                <th class="text-center" data-sort="number">{% translate "Priority" %}</th>
+                                <th class="text-center"><span data-sort="number">{% translate "Status" %}</span><br><span class="fw-normal text-muted" data-sort="number" data-sort-field="value2">{% translate "Priority" %}</span></th>
                                 <th data-sort="text">{% translate "Item" %}</th>
                                 <th data-sort="text">{% translate "Receiver" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Price per unit" %}</th>
@@ -73,8 +73,7 @@
                                 <th class="text-end" data-sort="number">{% translate "On review" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Left to deliver" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Total left" %}</th>
-                                <th data-sort="text">{% translate "Due date" %}</th>
-                                <th data-sort="text">{% translate "Give back until" %}</th>
+                                <th><span data-sort="text">{% translate "Due date" %}</span><br><span class="fw-normal text-muted" data-sort="text" data-sort-field="value2">{% translate "Give back until" %}</span></th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -82,24 +81,26 @@
                             {% for row in rows %}
                                 <tr>
                                     <td class="text-nowrap" data-value="{{ row.order.pk|unlocalize }}">{{ row.order.number }}{% include 'evebuilders/copy_button.html' with text=row.order.number %}</td>
-                                    <td class="text-center" data-value="{{ row.status_rank|unlocalize }}">
-                                        {% if row.status == 'UNDER_REVIEW' %}
-                                            <span class="badge bg-warning">{% translate "Under review" %}</span>
-                                        {% elif row.status == 'DONE' %}
-                                            <span class="badge bg-success">{% translate "Done" %}</span>
-                                        {% elif row.status == 'CANCELLED' %}
-                                            <span class="badge bg-secondary">{% translate "Cancelled" %}</span>
-                                        {% else %}
-                                            <span class="badge bg-info">{% translate "In progress" %}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="text-center" data-value="{{ row.priority_rank|unlocalize }}">
-                                        <span class="badge
-                                            {% if row.order.priority == 'HIGH' %}bg-danger
-                                            {% elif row.order.priority == 'MEDIUM' %}bg-warning
-                                            {% else %}bg-secondary{% endif %}">
-                                            {{ row.order.get_priority_display }}
-                                        </span>
+                                    <td class="text-center" data-value="{{ row.status_rank|unlocalize }}" data-value2="{{ row.priority_rank|unlocalize }}">
+                                        <div>
+                                            {% if row.status == 'UNDER_REVIEW' %}
+                                                <span class="badge bg-warning">Under review</span>
+                                            {% elif row.status == 'DONE' %}
+                                                <span class="badge bg-success">Done</span>
+                                            {% elif row.status == 'CANCELLED' %}
+                                                <span class="badge bg-secondary">Cancelled</span>
+                                            {% else %}
+                                                <span class="badge bg-info">In progress</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="mt-1">
+                                            <span class="badge
+                                                {% if row.order.priority == 'HIGH' %}bg-danger
+                                                {% elif row.order.priority == 'MEDIUM' %}bg-warning
+                                                {% else %}bg-secondary{% endif %}">
+                                                {{ row.order.get_priority_display }}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td class="text-nowrap">{% include 'evebuilders/item_icon.html' with type_id=row.order.eve_type_id %}{{ row.order.eve_type.name }}</td>
                                     <td class="text-nowrap">{{ row.recipient|default:"-" }}{% if row.recipient %}{% include 'evebuilders/copy_button.html' with text=row.recipient %}{% endif %}</td>
@@ -109,8 +110,11 @@
                                     <td class="text-end" data-value="{{ row.share.credited|unlocalize }}">{{ row.share.credited|intcomma }}</td>
                                     <td class="text-end" data-value="{{ row.pending|unlocalize }}">{{ row.pending|intcomma }}</td>
                                     <td class="text-end" data-value="{{ row.left|unlocalize }}">{{ row.left|intcomma }}</td>
-                                    <td class="text-end text-nowrap" data-value="{{ row.left_total|unlocalize }}">{{ row.left_total|isk }}{% include 'evebuilders/copy_button.html' with text=row.left_total|plain_isk %}</td>                                    <td class="text-nowrap">{{ row.order.due_date|date:"Y-m-d" }}</td>
-                                    <td class="text-nowrap">{{ row.discard_deadline|date:"Y-m-d" }}</td>
+                                    <td class="text-end text-nowrap" data-value="{{ row.left_total|unlocalize }}">{{ row.left_total|isk }}{% include 'evebuilders/copy_button.html' with text=row.left_total|plain_isk %}</td>
+                                    <td class="text-nowrap" data-value="{{ row.order.due_date|date:'Y-m-d' }}" data-value2="{{ row.discard_deadline|date:'Y-m-d' }}">
+                                        <div>{{ row.order.due_date|date:"Y-m-d" }}</div>
+                                        <div class="text-muted small">{{ row.discard_deadline|date:"Y-m-d" }}</div>
+                                    </td>
                                     <td class="text-nowrap">
                                         {% if row.can_discard %}
                                             {% translate "Give back the items that are not delivered yet?" as confirm_text %}
