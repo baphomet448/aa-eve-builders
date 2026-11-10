@@ -792,7 +792,7 @@ msgstr "Свободно"
 
 #: templates/evebuilders/order_list.html
 msgid "On review"
-msgstr ""
+msgstr "На проверке"
 
 #: templates/evebuilders/order_list.html
 msgid "Take"
