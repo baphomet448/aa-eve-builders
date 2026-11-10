@@ -611,7 +611,7 @@ msgstr "Общая цена"
 #: templates/evebuilders/my_orders.html templates/evebuilders/order_detail.html
 #: templates/evebuilders/order_list.html
 msgid "Ready"
-msgstr "Зачтено"
+msgstr "Сдано"
 
 #: templates/evebuilders/my_orders.html templates/evebuilders/order_detail.html
 msgid "In contracts"
@@ -1140,7 +1140,7 @@ msgstr "%(quantity)s шт. из заказа %(number)s снова свобод�
 #: views.py
 #, python-format
 msgid "%(quantity)s items of order %(number)s were credited."
-msgstr "Зачтено %(quantity)s шт. из заказа %(number)s."
+msgstr "Сдано %(quantity)s шт. из заказа %(number)s."
 
 #: views.py
 #, python-format
