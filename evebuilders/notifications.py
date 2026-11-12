@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 # The two channels (webhooks), named after the channels of the live system
 CHANNEL_NEW_ORDER = "new_order"  # industry-new-order-ping
 CHANNEL_COMPLETE = "complete"  # industry-complete-ping
+CHANNEL_PROBLEMS = "problems"
 
 EMBED_TITLE = "PROB Builders Notification"
 EMBED_COLOR = 0x2B6CB0
@@ -121,6 +122,7 @@ def _trim(value: str, limit: int) -> str:
 def build_payload(
     description: list[str] | None = None,
     fields: list[tuple[str, str]] | None = None,
+    mention: bool = True,
 ) -> dict:
     """
     The body of a webhook request: one embed with the usual title and colour,
@@ -128,6 +130,7 @@ def build_payload(
 
     :param description: Lines of text under the title
     :param fields: (name, value) pairs; pairs with an empty value are left out
+    :param mention: False for a message without the mention of everyone
     """
 
     embed: dict = {"title": _trim(EMBED_TITLE, TITLE_LIMIT), "color": EMBED_COLOR}
@@ -148,19 +151,21 @@ def build_payload(
     if shown:
         embed["fields"] = shown
 
-    return {
-        "content": EVERYONE_MENTION,
-        "allowed_mentions": {"parse": ["everyone"]},
-        "embeds": [embed],
-    }
+    payload: dict = {"embeds": [embed]}
+    if mention:
+        payload["content"] = EVERYONE_MENTION
+        payload["allowed_mentions"] = {"parse": ["everyone"]}
+
+    return payload
 
 
 def _webhook(channel: str) -> tuple[str, str]:
     """
     The webhook URL and the thread ID of a channel (empty if not set).
 
-    What an administrator saved in the Django admin wins. A channel that is empty
-    there uses the setting from local.py, together with that setting's thread ID.
+    What is saved in the settings of the plugin (or in the Django admin) wins. A
+    channel that is empty there uses the setting from local.py, together with that
+    setting's thread ID. The third channel has no setting in local.py.
     """
 
     config = DiscordConfig.objects.first()
@@ -182,6 +187,12 @@ def _webhook(channel: str) -> tuple[str, str]:
             app_settings.EVEBUILDERS_DISCORD_COMPLETE_WEBHOOK_URL,
             app_settings.EVEBUILDERS_DISCORD_COMPLETE_THREAD_ID,
         )
+
+    if channel == CHANNEL_PROBLEMS:
+        if config is not None:
+            return config.problems_webhook_url, config.problems_thread_id
+
+        return "", ""
 
     raise ValueError(f"Unknown notification channel: {channel}")
 
@@ -233,7 +244,7 @@ def deliver(channel: str, payload: dict) -> str:
     :return: "skipped" (no webhook set), "sent" or "rejected" (Discord refused
         the message for good, e.g. a wrong URL; logged)
     """
-
+    payload = {key: value for key, value in payload.items() if key != KIND_KEY}
     url, thread_id = _webhook(channel)
     if not url:
         return "skipped"
@@ -273,7 +284,22 @@ def notify(channel: str, payload: dict) -> None:
     Queue a notification. It is sent only after the current database
     transaction has been committed, so a rolled-back operation sends nothing.
     Nothing is queued when the channel has no webhook.
+
+    A message made by the functions of messages.py knows its kind. Then the
+    channel and the mention of everyone come from the routing set in the settings
+    of the plugin (route_of), and the channel given here is not used. A message
+    without a kind goes to the channel given.
     """
+
+    kind = payload.get(KIND_KEY)
+    if kind is not None:
+        channel, everyone = route_of(kind)
+        payload = {key: value for key, value in payload.items() if key != KIND_KEY}
+        if not everyone:
+            payload = without_everyone(payload)
+
+    if not channel:
+        return  # this kind of message is switched off
 
     url, _thread_id = _webhook(channel)
     if not url:
@@ -350,6 +376,93 @@ def with_emoji(emoji: str):
         @functools.wraps(function)
         def wrapper(*args, **kwargs):
             return add_emoji(function(*args, **kwargs), emoji)
+
+        return wrapper
+
+    return decorator
+
+
+# The kinds of messages. The settings of the plugin say, for each kind, to which
+# channel it goes and whether it mentions everyone.
+KIND_KEY = "_kind"  # where a message keeps its kind, never sent to Discord
+KIND_NEW_ORDER = "new_order"
+KIND_ORDER_CHANGED = "order_changed"
+KIND_ORDER_CANCELLED = "order_cancelled"
+KIND_TAKEN = "taken"
+KIND_GIVEN_BACK = "given_back"
+KIND_RELEASED = "released"
+KIND_CONTRACT_WAITING = "contract_waiting"
+KIND_CONTRACT_CREDITED = "contract_credited"
+KIND_MANUAL_CREDIT = "manual_credit"
+KIND_CONTRACT_INVALID = "contract_invalid"
+KIND_TOKEN_FAILURE = "token_failure"
+
+# The channel of each kind when nothing is set: how it was before the routing could
+# be set. The kinds are in the order they are shown.
+DEFAULT_CHANNELS = {
+    KIND_NEW_ORDER: CHANNEL_NEW_ORDER,
+    KIND_ORDER_CHANGED: CHANNEL_NEW_ORDER,
+    KIND_ORDER_CANCELLED: CHANNEL_NEW_ORDER,
+    KIND_TAKEN: CHANNEL_COMPLETE,
+    KIND_GIVEN_BACK: CHANNEL_COMPLETE,
+    KIND_RELEASED: CHANNEL_COMPLETE,
+    KIND_CONTRACT_WAITING: CHANNEL_COMPLETE,
+    KIND_CONTRACT_CREDITED: CHANNEL_COMPLETE,
+    KIND_MANUAL_CREDIT: CHANNEL_COMPLETE,
+    KIND_CONTRACT_INVALID: CHANNEL_COMPLETE,
+    KIND_TOKEN_FAILURE: CHANNEL_COMPLETE,
+}
+CHANNELS = (CHANNEL_NEW_ORDER, CHANNEL_COMPLETE, CHANNEL_PROBLEMS)
+OFF = ""  # the "channel" of a kind that is switched off
+
+
+def route_of(kind: str) -> tuple[str, bool]:
+    """
+    Where a kind of message goes.
+
+    :return: The channel ("" means nowhere: the kind is switched off) and whether
+        the message mentions everyone
+    """
+
+    channel = DEFAULT_CHANNELS.get(kind, CHANNEL_COMPLETE)
+    everyone = True
+
+    config = DiscordConfig.objects.first()
+    saved = config.routes.get(kind) if config is not None else None
+
+    if saved:
+        if saved.get("channel") in (*CHANNELS, OFF):
+            channel = saved["channel"]
+        everyone = bool(saved.get("everyone", True))
+    elif kind == KIND_TAKEN and not notify_taken_enabled():
+        channel = OFF  # the older switch "announce that a builder took a part"
+
+    return channel, everyone
+
+
+def without_everyone(payload: dict) -> dict:
+    """The same message without the mention of everyone"""
+
+    return {
+        key: value
+        for key, value in payload.items()
+        if key not in ("content", "allowed_mentions")
+    }
+
+
+def message_of(kind: str, emoji: str):
+    """
+    A decorator for the functions that make a message: the message gets the emoji,
+    and it knows its kind, so that the routing decides where it goes.
+    """
+
+    def decorator(function):
+        @functools.wraps(function)
+        def wrapper(*args, **kwargs):
+            payload = add_emoji(function(*args, **kwargs), emoji)
+            payload[KIND_KEY] = kind
+
+            return payload
 
         return wrapper
 

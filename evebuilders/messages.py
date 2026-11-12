@@ -17,12 +17,23 @@ from evebuilders.notifications import (
     EMOJI_TAKEN,
     EMOJI_WAITING,
     EMOJI_WARNING,
+    KIND_CONTRACT_CREDITED,
+    KIND_CONTRACT_INVALID,
+    KIND_CONTRACT_WAITING,
+    KIND_GIVEN_BACK,
+    KIND_MANUAL_CREDIT,
+    KIND_NEW_ORDER,
+    KIND_ORDER_CANCELLED,
+    KIND_ORDER_CHANGED,
+    KIND_RELEASED,
+    KIND_TAKEN,
+    KIND_TOKEN_FAILURE,
     build_payload,
     format_isk,
     isk_in_words,
+    message_of,
     positions_for,
     positions_of,
-    with_emoji,
 )
 
 
@@ -44,7 +55,7 @@ def _order_list_url() -> str:
     return f"{site_url}{reverse('evebuilders:orders')}"
 
 
-@with_emoji(EMOJI_NEW)
+@message_of(KIND_NEW_ORDER, EMOJI_NEW)
 def new_order_payload(order: Order) -> dict:
     """The message about a new order"""
 
@@ -64,7 +75,7 @@ def new_order_payload(order: Order) -> dict:
     return build_payload(fields=fields)
 
 
-@with_emoji(EMOJI_GIVEN_BACK)
+@message_of(KIND_GIVEN_BACK, EMOJI_GIVEN_BACK)
 def discard_payload(*, user, order: Order, quantity: int, free: int) -> dict:
     """
     The message about a builder giving items back.
@@ -110,7 +121,7 @@ def _contract_lines(builder: str, quantity: int, price) -> list[str]:
     ]
 
 
-@with_emoji(EMOJI_WAITING)
+@message_of(KIND_CONTRACT_WAITING, EMOJI_WAITING)
 def contract_waiting_payload(
     *, builder: str, order: Order, quantity: int, price
 ) -> dict:
@@ -126,7 +137,7 @@ def contract_waiting_payload(
     )
 
 
-@with_emoji(EMOJI_CREDITED)
+@message_of(KIND_CONTRACT_CREDITED, EMOJI_CREDITED)
 def contract_credited_payload(
     *, builder: str, order: Order, quantity: int, price, acceptor: str, remaining: int
 ) -> dict:
@@ -148,7 +159,7 @@ def contract_credited_payload(
     )
 
 
-@with_emoji(EMOJI_INVALID)
+@message_of(KIND_CONTRACT_INVALID, EMOJI_INVALID)
 def contract_invalid_payload(
     *, reporter: str, order: Order | None, quantity: int, price, reason: str
 ) -> dict:
@@ -171,7 +182,7 @@ def contract_invalid_payload(
     return build_payload(lines, fields)
 
 
-@with_emoji(EMOJI_WARNING)
+@message_of(KIND_TOKEN_FAILURE, EMOJI_WARNING)
 def token_failure_payload(*, corporation: str, error: str) -> dict:
     """The ESI token stopped working"""
 
@@ -189,7 +200,7 @@ def token_failure_payload(*, corporation: str, error: str) -> dict:
     )
 
 
-@with_emoji(EMOJI_TAKEN)
+@message_of(KIND_TAKEN, EMOJI_TAKEN)
 def taken_payload(*, user, order: Order, quantity: int, free: int) -> dict:
     """
     A builder took (a part of) an order.
@@ -216,7 +227,7 @@ def taken_payload(*, user, order: Order, quantity: int, free: int) -> dict:
     )
 
 
-@with_emoji(EMOJI_GIVEN_BACK)
+@message_of(KIND_RELEASED, EMOJI_GIVEN_BACK)
 def released_payload(
     *, manager, builder, order: Order, quantity: int, free: int
 ) -> dict:
@@ -244,7 +255,7 @@ def released_payload(
     )
 
 
-@with_emoji(EMOJI_CREDITED_BY_HAND)
+@message_of(KIND_MANUAL_CREDIT, EMOJI_CREDITED_BY_HAND)
 def manual_credit_payload(
     *,
     manager,
@@ -308,7 +319,7 @@ def show_value(field: str, value, empty: str = "<пусто>") -> str:
     return str(value)
 
 
-@with_emoji(EMOJI_CHANGED)
+@message_of(KIND_ORDER_CHANGED, EMOJI_CHANGED)
 def order_changed_payload(*, manager, order: Order, changes) -> dict:
     """
     The message about a changed order.
@@ -332,7 +343,7 @@ def order_changed_payload(*, manager, order: Order, changes) -> dict:
     )
 
 
-@with_emoji(EMOJI_DELETED)
+@message_of(KIND_ORDER_CANCELLED, EMOJI_DELETED)
 def order_cancelled_payload(
     *, manager, order: Order, taken: int, reason: str = ""
 ) -> dict:

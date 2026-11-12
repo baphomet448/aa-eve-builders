@@ -518,6 +518,26 @@ class DiscordConfig(models.Model):
         default="",
         help_text="Thread ID, only if the webhook above posts into a thread.",
     )
+    problems_webhook_url = models.URLField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="Webhook of the third channel, for problems (optional).",
+    )
+    problems_thread_id = models.CharField(
+        max_length=32,
+        blank=True,
+        default="",
+        help_text="Thread ID, only if the webhook above posts into a thread.",
+    )
+    routes = models.JSONField(
+        blank=True,
+        default=dict,
+        help_text=(
+            "Which kind of message goes to which channel, and whether it mentions "
+            "everyone. Set in the settings of the plugin."
+        ),
+    )
     notify_taken = models.BooleanField(
         null=True,
         blank=True,
