@@ -10,9 +10,10 @@
         <a href="{% url 'evebuilders:orders' %}">&larr; {% translate "Corporate orders" %}</a>
     </p>
 
-    <div class="card card-primary mb-3">
+    <div id="evebuilders-order-card" class="card card-primary mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <div class="card-title mb-0">{% translate "Order" %} {{ order.number }}{% include 'evebuilders/copy_button.html' with text=order.number %}</div>            {% if order.status != 'COMPLETED' and order.status != 'CANCELLED' %}
+            <div class="card-title mb-0">{% translate "Order" %} {{ order.number }}{% include 'evebuilders/copy_button.html' with text=order.number %}</div>
+            {% if order.status != 'COMPLETED' and order.status != 'CANCELLED' %}
                 <a href="{% url 'evebuilders:edit_order' order.pk %}" class="btn btn-sm btn-primary">
                     {% translate "Edit order" %}
                 </a>
@@ -32,27 +33,39 @@
                     </span>
                 </dd>
 
+                <dt class="col-sm-3">{% translate "Access level" %}</dt>
+                <dd class="col-sm-9">{% include 'evebuilders/level_badge.html' with level=order.access_level label=order.get_access_level_display %}</dd>
+
                 <dt class="col-sm-3">{% translate "Item" %}</dt>
                 <dd class="col-sm-9">{% include 'evebuilders/item_icon.html' with type_id=order.eve_type_id %}{{ order.eve_type.name }}</dd>
-                <dt class="col-sm-3">{% translate "Quantity" %}</dt>
-                <dd class="col-sm-9">
-                    {{ order.quantity|intcomma }}:
-                    {% translate "taken" %} {{ order.taken|intcomma }},
-                    {% translate "ready" %} {{ order.credited|intcomma }},
-                    {% translate "on review" %} {{ order.pending|intcomma }},
-                    {% translate "free" %} {{ order.free|intcomma }}
-                </dd>
 
                 <dt class="col-sm-3">{% translate "Price per unit" %}</dt>
-                <dd class="col-sm-9">{{ order.unit_price|isk }}{% include 'evebuilders/copy_button.html' with text=order.unit_price|plain_isk %}</dd>
+                <dd class="col-sm-9">{{ order.unit_price|isk }} ISK{% include 'evebuilders/copy_button.html' with text=order.unit_price|plain_isk %}</dd>
+
                 <dt class="col-sm-3">{% translate "Priority" %}</dt>
-                <dd class="col-sm-9">{{ order.get_priority_display }}</dd>
+                <dd class="col-sm-9">
+                    <span class="badge
+                        {% if order.priority == 'HIGH' %}bg-danger
+                        {% elif order.priority == 'MEDIUM' %}bg-warning
+                        {% else %}bg-secondary{% endif %}">
+                        {{ order.get_priority_display }}
+                    </span>
+                </dd>
 
                 <dt class="col-sm-3">{% translate "Due date" %}</dt>
                 <dd class="col-sm-9">{{ order.due_date|date:"Y-m-d" }}</dd>
 
-                <dt class="col-sm-3">{% translate "Access level" %}</dt>
-                <dd class="col-sm-9">{% include 'evebuilders/level_badge.html' with level=order.access_level label=order.get_access_level_display %}</dd>
+                <dt class="col-sm-3">{% translate "Quantity" %}</dt>
+                <dd class="col-sm-9">
+                    <ul class="list-unstyled mb-0">
+                        <li>{% translate "Available" %}: {{ order.quantity|intcomma }}</li>
+                        <li>{% translate "Taken" %}: {{ order.taken|intcomma }}</li>
+                        <li>{% translate "Ready" %}: {{ order.credited|intcomma }}</li>
+                        <li>{% translate "On review" %}: {{ order.pending|intcomma }}</li>
+                        <li>{% translate "Free" %}: {{ order.free|intcomma }}</li>
+                    </ul>
+                </dd>
+
                 <dt class="col-sm-3">{% translate "Destination" %}</dt>
                 <dd class="col-sm-9">{{ order.destination|default:"-" }}</dd>
 
@@ -68,7 +81,7 @@
         </div>
     </div>
 
-    <div class="card card-primary mb-3">
+    <div id="evebuilders-order-builders" class="card card-primary mb-3">
         <div class="card-header">
             <div class="card-title">{% translate "Builders" %}</div>
         </div>
@@ -97,13 +110,13 @@
                                     <td class="text-end">{{ row.open|intcomma }}</td>
                                     <td>
                                         {% if row.status == 'UNDER_REVIEW' %}
-                                            <span class="badge bg-warning">{% translate "Under review" %}</span>
+                                            <span class="badge bg-warning">Under review</span>
                                         {% elif row.status == 'DONE' %}
-                                            <span class="badge bg-success">{% translate "Done" %}</span>
+                                            <span class="badge bg-success">Done</span>
                                         {% elif row.status == 'CANCELLED' %}
-                                            <span class="badge bg-secondary">{% translate "Cancelled" %}</span>
+                                            <span class="badge bg-secondary">Cancelled</span>
                                         {% else %}
-                                            <span class="badge bg-info">{% translate "In progress" %}</span>
+                                            <span class="badge bg-info">In progress</span>
                                         {% endif %}
                                     </td>
                                     <td>

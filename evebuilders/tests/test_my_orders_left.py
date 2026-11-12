@@ -93,10 +93,9 @@ class TestMyOrdersPage(LeftTestCase):
         response = self._page()
 
         self.assertContains(response, "Left to deliver")
-        self.assertContains(response, "Total left")
         self.assertContains(response, "How to deliver")
         self.assertContains(response, 'data-copy="Test Corp"')
-        self.assertContains(response, 'data-copy="400000000"')
+        self.assertNotContains(response, "Total left")
 
     def test_the_discard_button_says_how_many_can_be_given_back(self):
         self._take(self.builder, 400)

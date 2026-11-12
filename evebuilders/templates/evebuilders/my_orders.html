@@ -51,7 +51,7 @@
                         <li>{% translate "In the game, open Contracts and create an Item Exchange contract." %}</li>
                         <li>{% translate 'Assign it to the receiver from the "Receiver" column.' %}</li>
                         <li>{% translate "Put the items you built into the contract. You can deliver in parts." %}</li>
-                        <li>{% translate 'Set the price to the price per unit multiplied by the quantity in the contract. The price for everything you still have to deliver is in the column "Total left".' %}</li>
+                        <li>{% translate "Set the price to the price per unit multiplied by the quantity in the contract." %}</li>
                         <li>{% translate "Write the order number into the contract title, for example N20261109-1." %}</li>
                         <li>{% translate "Create the contract. The plugin finds it by itself within a few minutes." %}</li>
                         <li>{% translate "Watch the status: look at this page from time to time. If a contract cannot be counted, it appears in the list below with the reason." %}</li>
@@ -72,7 +72,6 @@
                                 <th class="text-end" data-sort="number">{% translate "Ready" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "On review" %}</th>
                                 <th class="text-end" data-sort="number">{% translate "Left to deliver" %}</th>
-                                <th class="text-end" data-sort="number">{% translate "Total left" %}</th>
                                 <th><span data-sort="text">{% translate "Due date" %}</span><br><span class="fw-normal text-muted" data-sort="text" data-sort-field="value2">{% translate "Give back until" %}</span></th>
                                 <th></th>
                             </tr>
@@ -110,7 +109,6 @@
                                     <td class="text-end" data-value="{{ row.share.credited|unlocalize }}">{{ row.share.credited|intcomma }}</td>
                                     <td class="text-end" data-value="{{ row.pending|unlocalize }}">{{ row.pending|intcomma }}</td>
                                     <td class="text-end" data-value="{{ row.left|unlocalize }}">{{ row.left|intcomma }}</td>
-                                    <td class="text-end text-nowrap" data-value="{{ row.left_total|unlocalize }}">{{ row.left_total|isk }}{% include 'evebuilders/copy_button.html' with text=row.left_total|plain_isk %}</td>
                                     <td class="text-nowrap" data-value="{{ row.order.due_date|date:'Y-m-d' }}" data-value2="{{ row.discard_deadline|date:'Y-m-d' }}">
                                         <div>{{ row.order.due_date|date:"Y-m-d" }}</div>
                                         <div class="text-muted small">{{ row.discard_deadline|date:"Y-m-d" }}</div>

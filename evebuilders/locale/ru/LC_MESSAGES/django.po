@@ -1189,8 +1189,8 @@ msgstr "В игре откройте «Контракты» и создайте 
 msgid "Put the items you built into the contract. You can deliver in parts."
 msgstr "Положите в контракт предметы, которые вы сделали. Можно сдавать частями."
 
-msgid "Set the price to the price per unit multiplied by the quantity in the contract. The price for everything you still have to deliver is in the column \"Total left\"."
-msgstr "Поставьте цену, равную цене за единицу, умноженной на количество в контракте. Цена за всё, что осталось сдать, указана в колонке «Сумма несданного»."
+msgid "Set the price to the price per unit multiplied by the quantity in the contract."
+msgstr "Поставьте цену, равную цене за единицу, умноженной на количество в контракте."
 
 msgid "Write the order number into the contract title, for example N20261109-1."
 msgstr "Впишите номер заказа в название контракта, например N20261109-1."
