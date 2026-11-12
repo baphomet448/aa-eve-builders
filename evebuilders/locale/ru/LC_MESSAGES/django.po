@@ -1228,7 +1228,7 @@ msgstr "Цена должна быть целым числом ISK."
 
 
 msgid "Available"
-msgstr "Доступно"
+msgstr "Заказано"
 
 msgid "Receiver"
 msgstr "Приемщик"

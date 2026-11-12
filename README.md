@@ -66,6 +66,8 @@ ______________________________________________________________________
 - **English and Russian** interface.
 - **Convenience**: search and filters above the order list, item icons, buttons that copy
   an order number or a price, and dates in the time zone of your browser.
+- **Management**: three tabs (contracts, statistics with the cost to buy out the active
+  orders, and the history with a filter and pages).
 
 ## How it works
 
@@ -95,7 +97,7 @@ There is no PyPI release: install the wheel from the release page. Activate the 
 environment of your Auth first.
 
 ```shell
-pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.3/aa_eve_builders-0.2.3-py3-none-any.whl
+pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.3.0/aa_eve_builders-0.3.0-py3-none-any.whl
 ```
 
 Add the apps to `INSTALLED_APPS` in your `local.py` (`eveuniverse` only if it is not
@@ -124,7 +126,7 @@ The image of Auth has no `git`, so use the wheel too. Add this line to
 `conf/requirements.txt`:
 
 ```text
-aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.2.3/aa_eve_builders-0.2.3-py3-none-any.whl
+aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.3.0/aa_eve_builders-0.3.0-py3-none-any.whl
 ```
 
 Add the `INSTALLED_APPS` lines and the scheduled tasks to `conf/local.py`. Then rebuild
@@ -223,24 +225,42 @@ Subsystem, Structure, Structure Module and Fighter.
 
 ## Discord notifications
 
-Create a webhook in each Discord channel (channel settings, Integrations). Then give the
-two addresses to the plugin in the Django admin: **EVE BUILDERS, Discord settings**. A
-change applies at once, no restart is needed. The address of a webhook is a secret
-(whoever has it can write to the channel), so it is edited in the admin and not on the
-pages of the plugin.
+Messages go to three channels, each with its own webhook: **New orders**, **On review**
+and **Everything else**. Set the webhooks in the plugin: **Settings, Discord** (managers
+only). The address of a webhook is a secret (whoever has it can write to the channel), so
+it is never shown again: the page shows only the end of it, an empty field keeps the saved
+address, and only addresses of Discord are accepted. A change applies at once, no restart
+is needed. The button "Send a test message" posts to a channel without the mention of
+everyone.
 
-An empty channel in the admin falls back to the setting of `local.py`
-(`EVEBUILDERS_DISCORD_*`, see Configuration), so an older setup keeps working. In Docker,
-what you put into `.env` reaches the worker only after the containers are recreated.
+The same page has a table of the 11 kinds of messages. For each kind choose the channel,
+or "Off", and say whether the message mentions @everyone. A message that goes to a channel
+without a webhook is not sent (the page warns about it).
+
+Until the table is saved, the messages go where they went in the earlier versions, so an
+update changes nothing by itself:
+
+| Kind of message                                            | Channel (by default) |
+| ---------------------------------------------------------- | -------------------- |
+| New order, order changed, order deleted                    | New orders           |
+| A builder took a part, gave it back, a manager released it | Everything else      |
+| A contract waits for acceptance, was accepted and credited | Everything else      |
+| Credited by hand, a contract cannot be counted             | Everything else      |
+| The ESI token stopped working                              | Everything else      |
+
+An empty webhook of "New orders" or "Everything else" falls back to the setting of
+`local.py` (`EVEBUILDERS_DISCORD_NEW_ORDER_*` and `EVEBUILDERS_DISCORD_COMPLETE_*`, see
+Configuration). The third channel has no setting in `local.py`. The webhooks can also be
+set in the Django admin (EVE BUILDERS, Discord settings).
 
 The thread ID is optional. It is needed only when the webhook has to post into a thread
 (a forum channel needs it). Switch on the developer mode in Discord, then copy the ID of
 the thread. Create the webhook in the parent channel of the thread.
 
 Messages are sent in the background with several retries when Discord is busy. They are
-written in **Russian**, and each starts with an emoji that tells the kind of event.
-Check the channels with the command below. It posts a test message that mentions
-@everyone:
+written in **Russian**, and each starts with an emoji that tells the kind of event. The
+command below posts a test message to the channels that have a webhook (it mentions
+@everyone):
 
 ```shell
 python manage.py evebuilders_test_notification

@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [In Development] - Unreleased
 
+## [0.3.0] - 2026-11-12
+
+### Added
+
+- Management has three tabs: Contracts, Statistics and History.
+- Statistics: the number of orders, the ships built (frigates, destroyers, cruisers,
+  battlecruisers, battleships, capital ships, other), the number of active orders and the
+  cost to buy them out. The cost goes down as items are delivered.
+- History: the events of all orders with a filter (kind of event, text, dates), a sorting
+  by a column and pages.
+- Settings, tab Discord: the webhooks of three channels ("New orders", "On review",
+  "Everything else") and a button that sends a test message without the mention of
+  everyone. The address of a webhook is never shown again and only Discord addresses are
+  taken.
+- A table of the 11 kinds of Discord messages: for each one the channel (or "Off") and
+  whether it mentions everyone.
+- A new card of the order: striped lines in an agreed order, the price with "ISK" next to
+  the copy button, and the quantity line by line.
+
+### Changed
+
+- Without settings the messages go where they went before (new, changed and deleted
+  orders to "New orders", everything else to the channel that was called "Reports" and is
+  now "Everything else"), so the update changes nothing until the table is saved.
+- "My orders": the column "Total left" is removed and the font of the tables is a little
+  bigger.
+- In Russian the column "Available" is called "Заказано" (the whole quantity of the order;
+  "Свободно" is what can still be taken).
+
+### Migrations
+
+- 0009: the third Discord channel and the routes of the messages. Run `migrate` after the
+  update.
+
 ## [0.2.3] - 2026-11-10
 
 ### Changed
