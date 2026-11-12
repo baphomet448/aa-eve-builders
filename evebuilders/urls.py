@@ -44,5 +44,7 @@ urlpatterns = [
     ),
     path("settings/esi/connect/", views.connect_esi, name="connect_esi"),
     path("settings/sync-catalog/", views.start_sync, name="sync_catalog"),
+    path("settings/discord/", views.discord_settings, name="discord_settings"),
+    path("settings/discord/test/", views.discord_test, name="discord_test"),
     path("items/search/", views.item_search, name="item_search"),
 ]

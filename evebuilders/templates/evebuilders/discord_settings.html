@@ -1,0 +1,154 @@
+{% extends 'evebuilders/base.html' %}
+
+{% load i18n %}
+
+{% block details %}
+    {% include 'evebuilders/settings_tabs.html' with active='discord' %}
+
+    {% if unreachable %}
+        <div class="alert alert-warning">
+            {% translate "These messages are not sent: their channel has no webhook." %}
+            <ul class="mb-0">
+                {% for text in unreachable %}
+                    <li>{{ text }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'evebuilders:discord_settings' %}">
+        {% csrf_token %}
+
+        <div class="card card-primary mb-3">
+            <div class="card-header">
+                <div class="card-title">{% translate "Channels" %}</div>
+            </div>
+            <div class="card-body">
+                <p>
+                    {% blocktranslate trimmed %}
+                        A webhook is the address that lets the plugin write into a Discord channel
+                        (make one in the settings of the channel, Integrations). Whoever knows it can
+                        write into the channel, so the address is never shown here: paste a new one
+                        to change it. An empty field keeps the saved address.
+                    {% endblocktranslate %}
+                </p>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                {% endif %}
+
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>{% translate "Channel" %}</th>
+                                <th>{% translate "Webhook" %}</th>
+                                <th>{% translate "New address" %}</th>
+                                <th>{% translate "Thread ID" %}</th>
+                                <th>{% translate "Remove the webhook" %}</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in form.channel_rows %}
+                                <tr>
+                                    <td class="fw-bold text-nowrap">{{ row.name }}</td>
+                                    <td class="text-nowrap">
+                                        {% if row.status.source == 'plugin' %}
+                                            <span class="badge bg-success">{% translate "Set" %}</span> {{ row.status.tail }}
+                                        {% elif row.status.source == 'local' %}
+                                            <span class="badge bg-info">{% translate "From local.py" %}</span> {{ row.status.tail }}
+                                        {% else %}
+                                            <span class="badge bg-secondary">{% translate "Not set" %}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="min-width: 22rem;">
+                                        {{ row.url }}
+                                        {% if row.url.errors %}<div class="text-danger small">{{ row.url.errors|join:" " }}</div>{% endif %}
+                                    </td>
+                                    <td>
+                                        {{ row.thread }}
+                                        {% if row.thread.errors %}<div class="text-danger small">{{ row.thread.errors|join:" " }}</div>{% endif %}
+                                    </td>
+                                    <td class="text-center">{{ row.clear }}</td>
+                                    <td class="text-nowrap">
+                                        <button type="submit" form="evb-test-{{ row.channel }}" class="btn btn-sm btn-outline-primary">
+                                            {% translate "Send a test message" %}
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-muted small mb-0">
+                    {% translate "The thread ID is needed only if the webhook posts into a thread. The test message uses the saved settings: save your changes first." %}
+                </p>
+            </div>
+        </div>
+
+        <div class="card card-primary mb-3">
+            <div class="card-header">
+                <div class="card-title">{% translate "Where each message goes" %}</div>
+            </div>
+            <div class="card-body">
+                <p>
+                    {% blocktranslate trimmed %}
+                        Choose the channel of every kind of message, or switch it off, and say
+                        whether it mentions everyone. A message that goes to a channel without a
+                        webhook is not sent.
+                    {% endblocktranslate %}
+                </p>
+                <p>
+                    {% blocktranslate trimmed %}
+                        The scheme: only new orders go to "New orders", only the contracts that
+                        wait for acceptance go to "On review", everything else goes to
+                        "Everything else". Only the messages that need somebody at once (a new
+                        order, a contract on review, a contract that cannot be counted, the ESI
+                        token) mention everyone.
+                    {% endblocktranslate %}
+                </p>
+
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>{% translate "Message" %}</th>
+                                <th>{% translate "Channel" %}</th>
+                                <th class="text-center">{% translate "Mention everyone" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in form.kind_rows %}
+                                <tr>
+                                    <td class="text-nowrap">{{ row.emoji }} {{ row.label }}</td>
+                                    <td style="width: 14rem;">{{ row.route }}</td>
+                                    <td class="text-center">{{ row.everyone }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <button type="submit" class="btn btn-primary">{% translate "Save" %}</button>
+                {% translate "Set the routes of the scheme (new orders / on review / everything else)?" as scheme_text %}
+                <button type="submit" name="action" value="apply_scheme" class="btn btn-outline-primary"
+                        onclick="return confirm('{{ scheme_text|escapejs }}');">
+                    {% translate "Apply the scheme" %}
+                </button>
+                {% translate "Send every kind of message where it went by default?" as confirm_text %}
+                <button type="submit" name="action" value="reset_routes" class="btn btn-outline-secondary"
+                        onclick="return confirm('{{ confirm_text|escapejs }}');">
+                    {% translate "Reset to defaults" %}
+                </button>
+            </div>
+        </div>
+    </form>
+
+    {% for row in form.channel_rows %}
+        <form id="evb-test-{{ row.channel }}" method="post" action="{% url 'evebuilders:discord_test' %}">
+            {% csrf_token %}
+            <input type="hidden" name="channel" value="{{ row.channel }}">
+        </form>
+    {% endfor %}
+{% endblock %}

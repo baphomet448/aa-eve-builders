@@ -1292,3 +1292,144 @@ msgstr "Стоимость выкупа активных заказов"
 
 msgid "Price per unit times what is not delivered yet, for all active orders. The sum goes down as items are delivered."
 msgstr "Цена за единицу, умноженная на то, что ещё не сдано, по всем активным заказам. Сумма уменьшается по мере сдачи."
+
+msgid "New orders"
+msgstr "Новые заказы"
+
+msgid "Everything else"
+msgstr "Всё остальное"
+
+msgid "Off"
+msgstr "Выключено"
+
+msgid "New order"
+msgstr "Новый заказ"
+
+msgid "Order changed"
+msgstr "Заказ изменён"
+
+msgid "Order deleted"
+msgstr "Заказ удалён"
+
+msgid "A builder took a part"
+msgstr "Строитель взял часть"
+
+msgid "A builder gave a part back"
+msgstr "Строитель вернул часть"
+
+msgid "A manager released a part"
+msgstr "Менеджер освободил часть"
+
+msgid "A contract waits for acceptance"
+msgstr "Контракт ждёт принятия"
+
+msgid "A contract was accepted and credited"
+msgstr "Контракт принят и зачтён"
+
+msgid "Credited by hand"
+msgstr "Зачтено вручную"
+
+msgid "A contract cannot be counted"
+msgstr "Контракт нельзя засчитать"
+
+msgid "The ESI token stopped working"
+msgstr "ESI-токен перестал работать"
+
+msgid "Channels"
+msgstr "Каналы"
+
+msgid "Channel"
+msgstr "Канал"
+
+msgid "Webhook"
+msgstr "Вебхук"
+
+msgid "New address"
+msgstr "Новый адрес"
+
+msgid "Thread ID"
+msgstr "ID ветки"
+
+msgid "Remove the webhook"
+msgstr "Удалить вебхук"
+
+msgid "Send a test message"
+msgstr "Отправить тест"
+
+msgid "Set"
+msgstr "Задан"
+
+msgid "From local.py"
+msgstr "Из local.py"
+
+msgid "Not set"
+msgstr "Не задан"
+
+msgid "Where each message goes"
+msgstr "Куда идёт каждое сообщение"
+
+msgid "Message"
+msgstr "Сообщение"
+
+msgid "Mention everyone"
+msgstr "Упоминать @everyone"
+
+msgid "Apply the scheme"
+msgstr "Применить схему"
+
+msgid "Reset to defaults"
+msgstr "Сбросить на значения по умолчанию"
+
+msgid "Set the routes of the scheme (new orders / on review / everything else)?"
+msgstr "Установить маршруты по схеме (новые заказы / на проверке / всё остальное)?"
+
+msgid "Send every kind of message where it went by default?"
+msgstr "Отправлять все сообщения туда, куда они шли по умолчанию?"
+
+msgid "These messages are not sent: their channel has no webhook."
+msgstr "Эти сообщения не отправляются: у их канала нет вебхука."
+
+msgid "The thread ID is needed only if the webhook posts into a thread. The test message uses the saved settings: save your changes first."
+msgstr "ID ветки нужен, только если вебхук пишет в ветку. Тестовое сообщение использует сохранённые настройки: сначала сохраните изменения."
+
+msgid "A webhook is the address that lets the plugin write into a Discord channel (make one in the settings of the channel, Integrations). Whoever knows it can write into the channel, so the address is never shown here: paste a new one to change it. An empty field keeps the saved address."
+msgstr "Вебхук — это адрес, по которому плагин пишет в канал Discord (создаётся в настройках канала, «Интеграции»). Кто знает адрес, может писать в канал, поэтому он здесь никогда не показывается: чтобы изменить его, вставьте новый. Пустое поле оставляет сохранённый адрес."
+
+msgid "Choose the channel of every kind of message, or switch it off, and say whether it mentions everyone. A message that goes to a channel without a webhook is not sent."
+msgstr "Выберите канал для каждого вида сообщений или выключите его и укажите, упоминать ли @everyone. Сообщение, которое идёт в канал без вебхука, не отправляется."
+
+msgid "The scheme: only new orders go to \"New orders\", only the contracts that wait for acceptance go to \"On review\", everything else goes to \"Everything else\". Only the messages that need somebody at once (a new order, a contract on review, a contract that cannot be counted, the ESI token) mention everyone."
+msgstr "Схема: в «Новые заказы» идут только новые заказы, в «На проверке» только контракты, которые ждут принятия, всё остальное идёт во «Всё остальное». @everyone упоминают только сообщения, на которые надо реагировать сразу (новый заказ, контракт на проверке, контракт, который нельзя засчитать, ESI-токен)."
+
+msgid "The address must be a Discord webhook (https://discord.com/api/webhooks/...)."
+msgstr "Адрес должен быть вебхуком Discord (https://discord.com/api/webhooks/...)."
+
+msgid "The thread ID is a number."
+msgstr "ID ветки — это число."
+
+msgid "The Discord settings were saved."
+msgstr "Настройки Discord сохранены."
+
+msgid "Every kind of message goes where it went by default."
+msgstr "Все сообщения снова идут туда, куда шли по умолчанию."
+
+msgid "The scheme was applied: new orders, orders on review, everything else."
+msgstr "Схема применена: новые заказы, заказы на проверке, всё остальное."
+
+msgid "First set the webhook of the channel \"%(channel)s\": otherwise its messages would be lost."
+msgstr "Сначала задайте вебхук канала «%(channel)s»: иначе его сообщения потеряются."
+
+msgid "Unknown channel."
+msgstr "Неизвестный канал."
+
+msgid "A test message was sent to the channel \"%(channel)s\"."
+msgstr "Тестовое сообщение отправлено в канал «%(channel)s»."
+
+msgid "The channel \"%(channel)s\" has no webhook."
+msgstr "У канала «%(channel)s» не задан вебхук."
+
+msgid "Discord refused the message. Check the webhook address and the thread ID."
+msgstr "Discord отклонил сообщение. Проверьте адрес вебхука и ID ветки."
+
+msgid "Discord does not answer now. Try again later."
+msgstr "Discord сейчас не отвечает. Попробуйте позже."

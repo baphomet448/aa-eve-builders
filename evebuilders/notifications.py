@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # The two channels (webhooks), named after the channels of the live system
 CHANNEL_NEW_ORDER = "new_order"  # industry-new-order-ping
 CHANNEL_COMPLETE = "complete"  # industry-complete-ping
-CHANNEL_PROBLEMS = "problems"
+CHANNEL_REVIEW = "review"
 
 EMBED_TITLE = "PROB Builders Notification"
 EMBED_COLOR = 0x2B6CB0
@@ -188,9 +188,9 @@ def _webhook(channel: str) -> tuple[str, str]:
             app_settings.EVEBUILDERS_DISCORD_COMPLETE_THREAD_ID,
         )
 
-    if channel == CHANNEL_PROBLEMS:
+    if channel == CHANNEL_REVIEW:
         if config is not None:
-            return config.problems_webhook_url, config.problems_thread_id
+            return config.review_webhook_url, config.review_thread_id
 
         return "", ""
 
@@ -412,7 +412,7 @@ DEFAULT_CHANNELS = {
     KIND_CONTRACT_INVALID: CHANNEL_COMPLETE,
     KIND_TOKEN_FAILURE: CHANNEL_COMPLETE,
 }
-CHANNELS = (CHANNEL_NEW_ORDER, CHANNEL_COMPLETE, CHANNEL_PROBLEMS)
+CHANNELS = (CHANNEL_NEW_ORDER, CHANNEL_COMPLETE, CHANNEL_REVIEW)
 OFF = ""  # the "channel" of a kind that is switched off
 
 

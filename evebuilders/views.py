@@ -31,6 +31,14 @@ from evebuilders.catalog import (
     start_catalog_sync,
 )
 from evebuilders.contracts import CONTRACTS_SCOPE, EsiError, connect_source
+from evebuilders.discord_settings import (
+    CHANNEL_NAMES,
+    DiscordSettingsForm,
+    apply_scheme,
+    reset_routes,
+    send_test_message,
+    unreachable_kinds,
+)
 from evebuilders.forms import OrderEditForm, OrderForm
 from evebuilders.levels import builder_users, level_rows, set_builder_level
 from evebuilders.manager_actions import (
@@ -42,6 +50,7 @@ from evebuilders.manager_actions import (
 )
 from evebuilders.messages import display_name
 from evebuilders.models import CatalogSync, ContractSource, Destination, Order
+from evebuilders.notifications import CHANNEL_REVIEW, CHANNELS
 from evebuilders.order_detail import contract_rows, event_rows, share_rows
 from evebuilders.orders import (
     create_order,
@@ -823,3 +832,102 @@ def delete_station_view(request: WSGIRequest, place_id: int) -> HttpResponse:
     )
 
     return redirect("evebuilders:stations")
+
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+def discord_settings(request: WSGIRequest) -> HttpResponse:
+    """
+    The tab "Discord" of the settings: the webhooks of the channels and where each
+    kind of message goes (managers only)
+    :param request:
+    :return:
+    """
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        if action == "reset_routes":
+            reset_routes()
+            messages.success(
+                request, _("Every kind of message goes where it went by default.")
+            )
+
+            return redirect("evebuilders:discord_settings")
+
+        if action == "apply_scheme":
+            if apply_scheme():
+                messages.success(
+                    request,
+                    _(
+                        "The scheme was applied: new orders, orders on review, "
+                        "everything else."
+                    ),
+                )
+            else:
+                messages.error(
+                    request,
+                    _(
+                        'First set the webhook of the channel "%(channel)s": '
+                        "otherwise its messages would be lost."
+                    )
+                    % {"channel": CHANNEL_NAMES[CHANNEL_REVIEW]},
+                )
+
+            return redirect("evebuilders:discord_settings")
+
+        form = DiscordSettingsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, _("The Discord settings were saved."))
+
+            return redirect("evebuilders:discord_settings")
+    else:
+        form = DiscordSettingsForm()
+
+    context = {"form": form, "unreachable": unreachable_kinds()}
+
+    return render(request, "evebuilders/discord_settings.html", context)
+
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+@require_POST
+def discord_test(request: WSGIRequest) -> HttpResponse:
+    """
+    Send a test message (without the mention of everyone) to a channel
+    :param request:
+    :return:
+    """
+
+    channel = request.POST.get("channel", "")
+    if channel not in CHANNELS:
+        messages.error(request, _("Unknown channel."))
+
+        return redirect("evebuilders:discord_settings")
+
+    name = CHANNEL_NAMES[channel]
+    result = send_test_message(channel)
+    if result == "sent":
+        messages.success(
+            request,
+            _('A test message was sent to the channel "%(channel)s".')
+            % {"channel": name},
+        )
+    elif result == "skipped":
+        messages.warning(
+            request,
+            _('The channel "%(channel)s" has no webhook.') % {"channel": name},
+        )
+    elif result == "rejected":
+        messages.error(
+            request,
+            _(
+                "Discord refused the message. Check the webhook address and the "
+                "thread ID."
+            ),
+        )
+    else:
+        messages.warning(request, _("Discord does not answer now. Try again later."))
+
+    return redirect("evebuilders:discord_settings")

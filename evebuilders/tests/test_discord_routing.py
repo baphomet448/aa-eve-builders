@@ -13,7 +13,7 @@ from evebuilders.models import DiscordConfig
 from evebuilders.notifications import (
     CHANNEL_COMPLETE,
     CHANNEL_NEW_ORDER,
-    CHANNEL_PROBLEMS,
+    CHANNEL_REVIEW,
     DEFAULT_CHANNELS,
     KIND_CONTRACT_INVALID,
     KIND_KEY,
@@ -33,7 +33,7 @@ from evebuilders.tests.test_take_discard_views import ViewsTestCase
 
 NEW_ORDER_URL = "https://discord.com/api/webhooks/1/new"
 COMPLETE_URL = "https://discord.com/api/webhooks/2/complete"
-PROBLEMS_URL = "https://discord.com/api/webhooks/3/problems"
+REVIEW_URL = "https://discord.com/api/webhooks/3/problems"
 DELAY = "evebuilders.tasks.send_discord_notification.delay"
 
 
@@ -64,9 +64,9 @@ class TestSavedRoutes(TestCase):
         return DiscordConfig.objects.create(routes=routes)
 
     def test_a_saved_route_wins(self):
-        self._save(**{KIND_TAKEN: {"channel": CHANNEL_PROBLEMS, "everyone": False}})
+        self._save(**{KIND_TAKEN: {"channel": CHANNEL_REVIEW, "everyone": False}})
 
-        self.assertEqual(route_of(KIND_TAKEN), (CHANNEL_PROBLEMS, False))
+        self.assertEqual(route_of(KIND_TAKEN), (CHANNEL_REVIEW, False))
 
     def test_a_kind_can_be_switched_off(self):
         self._save(**{KIND_NEW_ORDER: {"channel": "", "everyone": True}})
@@ -79,9 +79,9 @@ class TestSavedRoutes(TestCase):
         self.assertEqual(route_of(KIND_TAKEN), (CHANNEL_COMPLETE, False))
 
     def test_the_mention_is_on_when_a_route_does_not_say(self):
-        self._save(**{KIND_TAKEN: {"channel": CHANNEL_PROBLEMS}})
+        self._save(**{KIND_TAKEN: {"channel": CHANNEL_REVIEW}})
 
-        self.assertEqual(route_of(KIND_TAKEN), (CHANNEL_PROBLEMS, True))
+        self.assertEqual(route_of(KIND_TAKEN), (CHANNEL_REVIEW, True))
 
     def test_the_older_switch_for_taken_still_works(self):
         DiscordConfig.objects.create(notify_taken=False)
@@ -92,10 +92,10 @@ class TestSavedRoutes(TestCase):
     def test_a_saved_route_wins_over_the_older_switch(self):
         DiscordConfig.objects.create(
             notify_taken=False,
-            routes={KIND_TAKEN: {"channel": CHANNEL_PROBLEMS, "everyone": True}},
+            routes={KIND_TAKEN: {"channel": CHANNEL_REVIEW, "everyone": True}},
         )
 
-        self.assertEqual(route_of(KIND_TAKEN), (CHANNEL_PROBLEMS, True))
+        self.assertEqual(route_of(KIND_TAKEN), (CHANNEL_REVIEW, True))
 
 
 class TestThirdChannel(TestCase):
@@ -103,13 +103,13 @@ class TestThirdChannel(TestCase):
 
     def test_it_comes_from_the_settings_of_the_plugin(self):
         DiscordConfig.objects.create(
-            problems_webhook_url=PROBLEMS_URL, problems_thread_id="123"
+            review_webhook_url=REVIEW_URL, review_thread_id="123"
         )
 
-        self.assertEqual(_webhook(CHANNEL_PROBLEMS), (PROBLEMS_URL, "123"))
+        self.assertEqual(_webhook(CHANNEL_REVIEW), (REVIEW_URL, "123"))
 
     def test_without_settings_it_is_empty(self):
-        self.assertEqual(_webhook(CHANNEL_PROBLEMS), ("", ""))
+        self.assertEqual(_webhook(CHANNEL_REVIEW), ("", ""))
 
 
 class TestPayload(SimpleTestCase):
@@ -154,7 +154,7 @@ class TestNotifyUsesTheRoute(TestCase):
         self.config = DiscordConfig.objects.create(
             new_order_webhook_url=NEW_ORDER_URL,
             complete_webhook_url=COMPLETE_URL,
-            problems_webhook_url=PROBLEMS_URL,
+            review_webhook_url=REVIEW_URL,
         )
 
     @staticmethod
@@ -178,13 +178,13 @@ class TestNotifyUsesTheRoute(TestCase):
         delay.assert_called_once_with(CHANNEL_COMPLETE, payload)
 
     def test_a_message_goes_to_the_channel_of_its_kind(self):
-        self.config.routes = {KIND_TAKEN: {"channel": CHANNEL_PROBLEMS}}
+        self.config.routes = {KIND_TAKEN: {"channel": CHANNEL_REVIEW}}
         self.config.save()
 
         delay = self._notify(CHANNEL_COMPLETE, self._kind_message(KIND_TAKEN))
 
         channel, sent = delay.call_args.args
-        self.assertEqual(channel, CHANNEL_PROBLEMS)
+        self.assertEqual(channel, CHANNEL_REVIEW)
         self.assertNotIn(KIND_KEY, sent)
         self.assertEqual(sent["content"], "@everyone")
 
@@ -216,8 +216,8 @@ class TestNotifyUsesTheRoute(TestCase):
         delay.assert_not_called()
 
     def test_a_channel_without_a_webhook_sends_nothing(self):
-        self.config.problems_webhook_url = ""
-        self.config.routes = {KIND_TAKEN: {"channel": CHANNEL_PROBLEMS}}
+        self.config.review_webhook_url = ""
+        self.config.routes = {KIND_TAKEN: {"channel": CHANNEL_REVIEW}}
         self.config.save()
 
         delay = self._notify(CHANNEL_COMPLETE, self._kind_message(KIND_TAKEN))
