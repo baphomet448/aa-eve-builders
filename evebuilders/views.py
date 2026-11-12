@@ -39,6 +39,7 @@ from evebuilders.discord_settings import (
     unreachable_kinds,
 )
 from evebuilders.forms import OrderEditForm, OrderForm
+from evebuilders.history import EVENT_KINDS, history_result
 from evebuilders.levels import builder_users, level_rows, set_builder_level
 from evebuilders.manager_actions import (
     cancel_order,
@@ -62,7 +63,6 @@ from evebuilders.orders import (
 )
 from evebuilders.overview import (
     problem_contract_rows,
-    recent_events,
     waiting_contract_rows,
 )
 from evebuilders.permissions import MANAGE_ACCESS, has_any_access
@@ -724,12 +724,13 @@ def management_statistics(request: WSGIRequest) -> HttpResponse:
 @permission_required(MANAGE_ACCESS)
 def management_history(request: WSGIRequest) -> HttpResponse:
     """
-    The tab "History" of the management: the latest activity (managers only)
+    The tab "History" of the management: the events of all orders with a filter, a
+    sorting and pages (managers only)
     :param request:
     :return:
     """
 
-    context = {"events": recent_events()}
+    context = {"result": history_result(request.GET), "kinds": EVENT_KINDS}
 
     return render(request, "evebuilders/management_history.html", context)
 

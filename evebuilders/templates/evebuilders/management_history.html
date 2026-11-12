@@ -12,20 +12,53 @@
             <div class="card-title">{% translate "Latest activity" %}</div>
         </div>
         <div class="card-body">
-            {% if events %}
+            <form method="get" action="{% url 'evebuilders:management_history' %}"
+                  class="row g-2 mb-3 align-items-end">
+                <div class="col-12 col-md-3">
+                    <input type="search" name="q" value="{{ result.query.text }}"
+                           class="form-control form-control-sm"
+                           placeholder="{% translate 'Order number, details or who did it' %}">
+                </div>
+                <div class="col-6 col-md-3">
+                    <select name="kind" class="form-select form-select-sm">
+                        <option value="">{% translate "All events" %}</option>
+                        {% for value, label in kinds %}
+                            <option value="{{ value }}" {% if value == result.query.kind %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small mb-0">{% translate "From (UTC)" %}</label>
+                    <input type="date" name="date_from" value="{{ result.query.date_from|date:'Y-m-d' }}"
+                           class="form-control form-control-sm">
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small mb-0">{% translate "To (UTC)" %}</label>
+                    <input type="date" name="date_to" value="{{ result.query.date_to|date:'Y-m-d' }}"
+                           class="form-control form-control-sm">
+                </div>
+                <div class="col-auto">
+                    {% if result.query.sort != 'when' %}<input type="hidden" name="sort" value="{{ result.query.sort }}">{% endif %}
+                    {% if result.query.direction != 'desc' %}<input type="hidden" name="dir" value="{{ result.query.direction }}">{% endif %}
+                    <button type="submit" class="btn btn-sm btn-primary">{% translate "Filter" %}</button>
+                    <a href="{% url 'evebuilders:management_history' %}" class="btn btn-sm btn-outline-secondary">{% translate "Reset" %}</a>
+                </div>
+            </form>
+
+            {% if result.rows %}
                 <div class="table-responsive">
                     <table class="table table-sm align-middle">
                         <thead>
                             <tr>
-                                <th>{% translate "When" %}</th>
-                                <th>{% translate "Order" %}</th>
-                                <th>{% translate "Event" %}</th>
-                                <th>{% translate "By" %}</th>
+                                <th><a href="{{ result.sort_links.when.url }}" class="text-reset text-decoration-none">{% translate "When" %}{{ result.sort_links.when.arrow }}</a></th>
+                                <th><a href="{{ result.sort_links.order.url }}" class="text-reset text-decoration-none">{% translate "Order" %}{{ result.sort_links.order.arrow }}</a></th>
+                                <th><a href="{{ result.sort_links.kind.url }}" class="text-reset text-decoration-none">{% translate "Event" %}{{ result.sort_links.kind.arrow }}</a></th>
+                                <th><a href="{{ result.sort_links.actor.url }}" class="text-reset text-decoration-none">{% translate "By" %}{{ result.sort_links.actor.arrow }}</a></th>
                                 <th>{% translate "Details" %}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for row in events %}
+                            {% for row in result.rows %}
                                 <tr>
                                     <td class="text-nowrap">{{ row.event.created_at|local_time }}</td>
                                     <td class="text-nowrap">
@@ -41,6 +74,40 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <span class="text-muted small">
+                        {% blocktranslate with total_events=result.total trimmed %}
+                            Events: {{ total_events }}
+                        {% endblocktranslate %}
+                        &middot;
+                        {% blocktranslate with number=result.page.number total=result.page.paginator.num_pages trimmed %}
+                            Page {{ number }} of {{ total }}
+                        {% endblocktranslate %}
+                    </span>
+
+                    {% if result.page.paginator.num_pages > 1 %}
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item {% if not result.previous_url %}disabled{% endif %}">
+                                <a class="page-link" href="{{ result.previous_url|default:'#' }}">{% translate "Previous page" %}</a>
+                            </li>
+                            {% for item in result.pages %}
+                                {% if item.gap %}
+                                    <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+                                {% else %}
+                                    <li class="page-item {% if item.current %}active{% endif %}">
+                                        <a class="page-link" href="{{ item.url }}">{{ item.number }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            <li class="page-item {% if not result.next_url %}disabled{% endif %}">
+                                <a class="page-link" href="{{ result.next_url|default:'#' }}">{% translate "Next page" %}</a>
+                            </li>
+                        </ul>
+                    {% endif %}
+                </div>
+            {% elif result.query.is_filtered %}
+                <p class="mb-0">{% translate "Nothing matches the filter." %}</p>
             {% else %}
                 <p class="mb-0">{% translate "Nothing has happened yet." %}</p>
             {% endif %}

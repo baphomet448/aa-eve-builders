@@ -1418,3 +1418,33 @@ msgstr "Discord отклонил сообщение. Проверьте адре
 
 msgid "Discord does not answer now. Try again later."
 msgstr "Discord сейчас не отвечает. Попробуйте позже."
+
+msgid "Order number, details or who did it"
+msgstr "Номер заказа, подробности или кто сделал"
+
+msgid "All events"
+msgstr "Все события"
+
+msgid "From (UTC)"
+msgstr "С (UTC)"
+
+msgid "To (UTC)"
+msgstr "По (UTC)"
+
+msgid "Filter"
+msgstr "Фильтр"
+
+msgid "Previous page"
+msgstr "Назад"
+
+msgid "Next page"
+msgstr "Вперёд"
+
+msgid "Events: %(total_events)s"
+msgstr "Событий: %(total_events)s"
+
+msgid "Page %(number)s of %(total)s"
+msgstr "Страница %(number)s из %(total)s"
+
+msgid "Nothing matches the filter."
+msgstr "По фильтру ничего не найдено."
