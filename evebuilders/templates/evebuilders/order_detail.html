@@ -10,6 +10,25 @@
         <a href="{% url 'evebuilders:orders' %}">&larr; {% translate "Corporate orders" %}</a>
     </p>
 
+    <style>
+        #evebuilders-order-card .evb-rows { margin: 0; }
+        #evebuilders-order-card .evb-row {
+            display: flex;
+            gap: 1rem;
+            padding: 0.45rem 1rem;
+            border-bottom: 1px solid rgba(128, 128, 128, 0.25);
+        }
+        #evebuilders-order-card .evb-row:nth-child(odd) { background: rgba(128, 128, 128, 0.08); }
+        #evebuilders-order-card .evb-row:last-child { border-bottom: 0; }
+        #evebuilders-order-card dt { flex: 0 0 11rem; font-weight: 600; margin: 0; }
+        #evebuilders-order-card dd { flex: 1 1 auto; margin: 0; }
+
+        @media (max-width: 575.98px) {
+            #evebuilders-order-card .evb-row { flex-direction: column; gap: 0.1rem; }
+            #evebuilders-order-card dt { flex-basis: auto; }
+        }
+    </style>
+
     <div id="evebuilders-order-card" class="card card-primary mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div class="card-title mb-0">{% translate "Order" %} {{ order.number }}{% include 'evebuilders/copy_button.html' with text=order.number %}</div>
@@ -19,64 +38,84 @@
                 </a>
             {% endif %}
         </div>
-        <div class="card-body">
-            <dl class="row mb-0">
-                <dt class="col-sm-3">{% translate "Status" %}</dt>
-                <dd class="col-sm-9">
-                    <span class="badge
-                        {% if order.status == 'NEW' %}bg-primary
-                        {% elif order.status == 'IN_PROGRESS' %}bg-info
-                        {% elif order.status == 'DISTRIBUTED' %}bg-warning
-                        {% elif order.status == 'COMPLETED' %}bg-success
-                        {% else %}bg-secondary{% endif %}">
-                        {{ order.get_status_display }}
-                    </span>
-                </dd>
+        <div class="card-body p-0">
+            <dl class="evb-rows">
+                <div class="evb-row">
+                    <dt>{% translate "Status" %}</dt>
+                    <dd>
+                        <span class="badge
+                            {% if order.status == 'NEW' %}bg-primary
+                            {% elif order.status == 'IN_PROGRESS' %}bg-info
+                            {% elif order.status == 'DISTRIBUTED' %}bg-warning
+                            {% elif order.status == 'COMPLETED' %}bg-success
+                            {% else %}bg-secondary{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </dd>
+                </div>
 
-                <dt class="col-sm-3">{% translate "Access level" %}</dt>
-                <dd class="col-sm-9">{% include 'evebuilders/level_badge.html' with level=order.access_level label=order.get_access_level_display %}</dd>
+                <div class="evb-row">
+                    <dt>{% translate "Access level" %}</dt>
+                    <dd>{% include 'evebuilders/level_badge.html' with level=order.access_level label=order.get_access_level_display %}</dd>
+                </div>
 
-                <dt class="col-sm-3">{% translate "Item" %}</dt>
-                <dd class="col-sm-9">{% include 'evebuilders/item_icon.html' with type_id=order.eve_type_id %}{{ order.eve_type.name }}</dd>
+                <div class="evb-row">
+                    <dt>{% translate "Item" %}</dt>
+                    <dd>{% include 'evebuilders/item_icon.html' with type_id=order.eve_type_id %}{{ order.eve_type.name }}</dd>
+                </div>
 
-                <dt class="col-sm-3">{% translate "Price per unit" %}</dt>
-                <dd class="col-sm-9">{{ order.unit_price|isk }} ISK{% include 'evebuilders/copy_button.html' with text=order.unit_price|plain_isk %}</dd>
+                <div class="evb-row">
+                    <dt>{% translate "Price per unit" %}</dt>
+                    <dd>{{ order.unit_price|isk }} ISK{% include 'evebuilders/copy_button.html' with text=order.unit_price|plain_isk %}</dd>
+                </div>
 
-                <dt class="col-sm-3">{% translate "Priority" %}</dt>
-                <dd class="col-sm-9">
-                    <span class="badge
-                        {% if order.priority == 'HIGH' %}bg-danger
-                        {% elif order.priority == 'MEDIUM' %}bg-warning
-                        {% else %}bg-secondary{% endif %}">
-                        {{ order.get_priority_display }}
-                    </span>
-                </dd>
+                <div class="evb-row">
+                    <dt>{% translate "Priority" %}</dt>
+                    <dd>
+                        <span class="badge
+                            {% if order.priority == 'HIGH' %}bg-danger
+                            {% elif order.priority == 'MEDIUM' %}bg-warning
+                            {% else %}bg-secondary{% endif %}">
+                            {{ order.get_priority_display }}
+                        </span>
+                    </dd>
+                </div>
 
-                <dt class="col-sm-3">{% translate "Due date" %}</dt>
-                <dd class="col-sm-9">{{ order.due_date|date:"Y-m-d" }}</dd>
+                <div class="evb-row">
+                    <dt>{% translate "Due date" %}</dt>
+                    <dd>{{ order.due_date|date:"Y-m-d" }}</dd>
+                </div>
 
-                <dt class="col-sm-3">{% translate "Quantity" %}</dt>
-                <dd class="col-sm-9">
-                    <ul class="list-unstyled mb-0">
-                        <li>{% translate "Available" %}: {{ order.quantity|intcomma }}</li>
-                        <li>{% translate "Taken" %}: {{ order.taken|intcomma }}</li>
-                        <li>{% translate "Ready" %}: {{ order.credited|intcomma }}</li>
-                        <li>{% translate "On review" %}: {{ order.pending|intcomma }}</li>
-                        <li>{% translate "Free" %}: {{ order.free|intcomma }}</li>
-                    </ul>
-                </dd>
+                <div class="evb-row">
+                    <dt>{% translate "Quantity" %}</dt>
+                    <dd>
+                        <ul class="list-unstyled mb-0">
+                            <li>{% translate "Available" %}: {{ order.quantity|intcomma }}</li>
+                            <li>{% translate "Taken" %}: {{ order.taken|intcomma }}</li>
+                            <li>{% translate "Ready" %}: {{ order.credited|intcomma }}</li>
+                            <li>{% translate "On review" %}: {{ order.pending|intcomma }}</li>
+                            <li>{% translate "Free" %}: {{ order.free|intcomma }}</li>
+                        </ul>
+                    </dd>
+                </div>
 
-                <dt class="col-sm-3">{% translate "Destination" %}</dt>
-                <dd class="col-sm-9">{{ order.destination|default:"-" }}</dd>
+                <div class="evb-row">
+                    <dt>{% translate "Destination" %}</dt>
+                    <dd>{{ order.destination|default:"-" }}</dd>
+                </div>
 
-                <dt class="col-sm-3">{% translate "Note" %}</dt>
-                <dd class="col-sm-9">{{ order.note|default:"-" }}</dd>
+                <div class="evb-row">
+                    <dt>{% translate "Note" %}</dt>
+                    <dd>{{ order.note|default:"-" }}</dd>
+                </div>
 
-                <dt class="col-sm-3">{% translate "Created" %}</dt>
-                <dd class="col-sm-9">
-                    {{ order.created_at|local_time }}
-                    {% if order.created_by %}({{ order.created_by }}){% endif %}
-                </dd>
+                <div class="evb-row">
+                    <dt>{% translate "Created" %}</dt>
+                    <dd>
+                        {{ order.created_at|local_time }}
+                        {% if order.created_by %}({{ order.created_by }}){% endif %}
+                    </dd>
+                </div>
             </dl>
         </div>
     </div>

@@ -60,3 +60,7 @@ class TestOrderCard(ViewsTestCase):
     def test_status_priority_and_level_are_badges(self):
         self.assertIn('<span class="badge bg-success">Base</span>', self.card)
         self.assertGreaterEqual(self.card.count('class="badge'), 3)
+
+    def test_every_line_is_a_separate_striped_row(self):
+        # Ten lines: the seven agreed ones, then the place, the note and the creation
+        self.assertEqual(self.card.count('<div class="evb-row">'), 10)
