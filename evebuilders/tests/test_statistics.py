@@ -189,3 +189,11 @@ class TestStatisticsPage(StatisticsTestCase):
 
     def test_a_builder_is_sent_away(self):
         self.assertEqual(self._page(self.builder).status_code, 302)
+
+    def test_the_current_statistics_come_before_the_general_ones(self):
+        response = self._page(self.manager)
+
+        content = response.content.decode()
+        self.assertLess(
+            content.index("Current statistics"), content.index("General statistics")
+        )
