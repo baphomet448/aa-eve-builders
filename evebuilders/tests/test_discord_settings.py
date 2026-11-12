@@ -10,7 +10,7 @@ from django.urls import reverse
 
 # AA EVE Builders
 from evebuilders import app_settings
-from evebuilders.discord_settings import SCHEME, is_discord_webhook
+from evebuilders.discord_settings import is_discord_webhook
 from evebuilders.models import DiscordConfig
 from evebuilders.notifications import (
     CHANNEL_COMPLETE,
@@ -18,12 +18,8 @@ from evebuilders.notifications import (
     CHANNEL_REVIEW,
     CHANNELS,
     DEFAULT_CHANNELS,
-    KIND_CONTRACT_INVALID,
-    KIND_CONTRACT_WAITING,
     KIND_NEW_ORDER,
-    KIND_ORDER_CHANGED,
     KIND_TAKEN,
-    KIND_TOKEN_FAILURE,
     route_of,
 )
 from evebuilders.tests.test_notifications import fake_response
@@ -57,37 +53,6 @@ class TestIsDiscordWebhook(SimpleTestCase):
         ):
             with self.subTest(url=url):
                 self.assertFalse(is_discord_webhook(url))
-
-
-class TestTheScheme(SimpleTestCase):
-    """The scheme of the managers"""
-
-    def test_new_orders_alone_the_contracts_on_review_alone_the_rest_together(self):
-        channels = {kind: route["channel"] for kind, route in SCHEME.items()}
-
-        self.assertEqual(len(SCHEME), 11)
-        self.assertEqual(channels[KIND_NEW_ORDER], CHANNEL_NEW_ORDER)
-        self.assertEqual(channels[KIND_CONTRACT_WAITING], CHANNEL_REVIEW)
-        others = [
-            channel
-            for kind, channel in channels.items()
-            if kind not in (KIND_NEW_ORDER, KIND_CONTRACT_WAITING)
-        ]
-        self.assertEqual(set(others), {CHANNEL_COMPLETE})
-        self.assertEqual(len(others), 9)
-
-    def test_only_what_needs_somebody_at_once_mentions_everyone(self):
-        mentioning = {kind for kind, route in SCHEME.items() if route["everyone"]}
-
-        self.assertEqual(
-            mentioning,
-            {
-                KIND_NEW_ORDER,
-                KIND_CONTRACT_WAITING,
-                KIND_CONTRACT_INVALID,
-                KIND_TOKEN_FAILURE,
-            },
-        )
 
 
 @override_settings(STORAGES=TEST_STORAGES)
@@ -283,40 +248,6 @@ class TestSavingTheRoutes(DiscordSettingsTestCase):
 
         self.assertContains(response, "These messages are not sent")
         self.assertContains(response, "A builder took a part")
-
-
-class TestApplyingTheScheme(DiscordSettingsTestCase):
-    """The button of the scheme of the managers"""
-
-    def test_the_scheme_sets_the_routes(self):
-        DiscordConfig.objects.create(review_webhook_url=URL)
-
-        response = self._action("apply_scheme")
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(route_of(KIND_NEW_ORDER), (CHANNEL_NEW_ORDER, True))
-        self.assertEqual(route_of(KIND_CONTRACT_WAITING), (CHANNEL_REVIEW, True))
-        self.assertEqual(route_of(KIND_ORDER_CHANGED), (CHANNEL_COMPLETE, False))
-        self.assertEqual(route_of(KIND_TAKEN), (CHANNEL_COMPLETE, False))
-        self.assertEqual(route_of(KIND_CONTRACT_INVALID), (CHANNEL_COMPLETE, True))
-        self.assertEqual(route_of(KIND_TOKEN_FAILURE), (CHANNEL_COMPLETE, True))
-        self.assertEqual(len(DiscordConfig.objects.get().routes), 11)
-        self.assertIn(
-            "The scheme was applied: new orders, orders on review, everything else.",
-            self._messages(response),
-        )
-
-    def test_it_waits_until_the_review_channel_has_a_webhook(self):
-        DiscordConfig.objects.create(complete_webhook_url=URL)
-
-        response = self._action("apply_scheme")
-
-        self.assertEqual(DiscordConfig.objects.get().routes, {})
-        self.assertIn(
-            'First set the webhook of the channel "On review": otherwise its '
-            "messages would be lost.",
-            self._messages(response),
-        )
 
 
 class TestTheTestMessage(DiscordSettingsTestCase):

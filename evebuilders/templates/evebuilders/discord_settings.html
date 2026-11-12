@@ -99,15 +99,6 @@
                         webhook is not sent.
                     {% endblocktranslate %}
                 </p>
-                <p>
-                    {% blocktranslate trimmed %}
-                        The scheme: only new orders go to "New orders", only the contracts that
-                        wait for acceptance go to "On review", everything else goes to
-                        "Everything else". Only the messages that need somebody at once (a new
-                        order, a contract on review, a contract that cannot be counted, the ESI
-                        token) mention everyone.
-                    {% endblocktranslate %}
-                </p>
 
                 <div class="table-responsive">
                     <table class="table table-sm align-middle">
@@ -131,11 +122,6 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">{% translate "Save" %}</button>
-                {% translate "Set the routes of the scheme (new orders / on review / everything else)?" as scheme_text %}
-                <button type="submit" name="action" value="apply_scheme" class="btn btn-outline-primary"
-                        onclick="return confirm('{{ scheme_text|escapejs }}');">
-                    {% translate "Apply the scheme" %}
-                </button>
                 {% translate "Send every kind of message where it went by default?" as confirm_text %}
                 <button type="submit" name="action" value="reset_routes" class="btn btn-outline-secondary"
                         onclick="return confirm('{{ confirm_text|escapejs }}');">

@@ -34,7 +34,6 @@ from evebuilders.contracts import CONTRACTS_SCOPE, EsiError, connect_source
 from evebuilders.discord_settings import (
     CHANNEL_NAMES,
     DiscordSettingsForm,
-    apply_scheme,
     reset_routes,
     send_test_message,
     unreachable_kinds,
@@ -50,7 +49,7 @@ from evebuilders.manager_actions import (
 )
 from evebuilders.messages import display_name
 from evebuilders.models import CatalogSync, ContractSource, Destination, Order
-from evebuilders.notifications import CHANNEL_REVIEW, CHANNELS
+from evebuilders.notifications import CHANNELS
 from evebuilders.order_detail import contract_rows, event_rows, share_rows
 from evebuilders.orders import (
     create_order,
@@ -852,27 +851,6 @@ def discord_settings(request: WSGIRequest) -> HttpResponse:
             messages.success(
                 request, _("Every kind of message goes where it went by default.")
             )
-
-            return redirect("evebuilders:discord_settings")
-
-        if action == "apply_scheme":
-            if apply_scheme():
-                messages.success(
-                    request,
-                    _(
-                        "The scheme was applied: new orders, orders on review, "
-                        "everything else."
-                    ),
-                )
-            else:
-                messages.error(
-                    request,
-                    _(
-                        'First set the webhook of the channel "%(channel)s": '
-                        "otherwise its messages would be lost."
-                    )
-                    % {"channel": CHANNEL_NAMES[CHANNEL_REVIEW]},
-                )
 
             return redirect("evebuilders:discord_settings")
 

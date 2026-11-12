@@ -1374,14 +1374,8 @@ msgstr "Сообщение"
 msgid "Mention everyone"
 msgstr "Упоминать @everyone"
 
-msgid "Apply the scheme"
-msgstr "Применить схему"
-
 msgid "Reset to defaults"
 msgstr "Сбросить на значения по умолчанию"
-
-msgid "Set the routes of the scheme (new orders / on review / everything else)?"
-msgstr "Установить маршруты по схеме (новые заказы / на проверке / всё остальное)?"
 
 msgid "Send every kind of message where it went by default?"
 msgstr "Отправлять все сообщения туда, куда они шли по умолчанию?"
@@ -1398,9 +1392,6 @@ msgstr "Вебхук — это адрес, по которому плагин �
 msgid "Choose the channel of every kind of message, or switch it off, and say whether it mentions everyone. A message that goes to a channel without a webhook is not sent."
 msgstr "Выберите канал для каждого вида сообщений или выключите его и укажите, упоминать ли @everyone. Сообщение, которое идёт в канал без вебхука, не отправляется."
 
-msgid "The scheme: only new orders go to \"New orders\", only the contracts that wait for acceptance go to \"On review\", everything else goes to \"Everything else\". Only the messages that need somebody at once (a new order, a contract on review, a contract that cannot be counted, the ESI token) mention everyone."
-msgstr "Схема: в «Новые заказы» идут только новые заказы, в «На проверке» только контракты, которые ждут принятия, всё остальное идёт во «Всё остальное». @everyone упоминают только сообщения, на которые надо реагировать сразу (новый заказ, контракт на проверке, контракт, который нельзя засчитать, ESI-токен)."
-
 msgid "The address must be a Discord webhook (https://discord.com/api/webhooks/...)."
 msgstr "Адрес должен быть вебхуком Discord (https://discord.com/api/webhooks/...)."
 
@@ -1412,12 +1403,6 @@ msgstr "Настройки Discord сохранены."
 
 msgid "Every kind of message goes where it went by default."
 msgstr "Все сообщения снова идут туда, куда шли по умолчанию."
-
-msgid "The scheme was applied: new orders, orders on review, everything else."
-msgstr "Схема применена: новые заказы, заказы на проверке, всё остальное."
-
-msgid "First set the webhook of the channel \"%(channel)s\": otherwise its messages would be lost."
-msgstr "Сначала задайте вебхук канала «%(channel)s»: иначе его сообщения потеряются."
 
 msgid "Unknown channel."
 msgstr "Неизвестный канал."

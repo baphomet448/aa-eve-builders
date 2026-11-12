@@ -95,27 +95,6 @@ ROUTE_CHOICES = [(channel, CHANNEL_NAMES[channel]) for channel in CHANNEL_ORDER]
     (OFF, _("Off"))
 ]
 
-# The scheme the managers asked for: new orders alone, the contracts that wait for
-# acceptance alone, everything else in one channel. Only the messages that need
-# somebody at once mention everyone.
-_MENTIONING = {
-    KIND_NEW_ORDER,
-    KIND_CONTRACT_WAITING,
-    KIND_CONTRACT_INVALID,
-    KIND_TOKEN_FAILURE,
-}
-SCHEME = {
-    kind: {
-        "channel": (
-            CHANNEL_NEW_ORDER
-            if kind == KIND_NEW_ORDER
-            else CHANNEL_REVIEW if kind == KIND_CONTRACT_WAITING else CHANNEL_COMPLETE
-        ),
-        "everyone": kind in _MENTIONING,
-    }
-    for kind in KIND_INFO
-}
-
 # Only the addresses of Discord itself are taken: a manager must not be able to make
 # the server send requests to any other address
 _DISCORD_HOSTS = ("discord.com", "discordapp.com")
@@ -177,24 +156,6 @@ def reset_routes() -> None:
     if config is not None:
         config.routes = {}
         config.save(update_fields=["routes", "updated_at"])
-
-
-def apply_scheme() -> bool:
-    """
-    Set the routes of the scheme of the managers.
-
-    :return: False when nothing was done: the channel of the orders on review has no
-        webhook yet, and its messages would be lost
-    """
-
-    if not _webhook(CHANNEL_REVIEW)[0]:
-        return False
-
-    config = DiscordConfig.objects.first() or DiscordConfig()
-    config.routes = SCHEME
-    config.save()
-
-    return True
 
 
 def send_test_message(channel: str) -> str:
