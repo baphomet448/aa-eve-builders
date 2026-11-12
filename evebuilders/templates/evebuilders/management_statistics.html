@@ -1,16 +1,83 @@
 {% extends 'evebuilders/base.html' %}
 
 {% load i18n %}
+{% load humanize %}
+{% load evebuilders_extras %}
 
 {% block details %}
     {% include 'evebuilders/management_tabs.html' with active='statistics' %}
 
+    <div class="card card-primary mb-3">
+        <div class="card-header">
+            <div class="card-title">{% translate "General statistics" %}</div>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+                <tbody>
+                    <tr>
+                        <td>{% translate "Total orders" %}</td>
+                        <td class="text-end">{{ stats.total_orders|intcomma }}</td>
+                    </tr>
+                    <tr>
+                        <td>{% translate "Ships built" %}</td>
+                        <td class="text-end">{{ stats.ships_built|intcomma }}</td>
+                    </tr>
+                    <tr>
+                        <td class="ps-4">{% translate "Frigates" %}</td>
+                        <td class="text-end">{{ stats.built_by_class.frigates|intcomma }}</td>
+                    </tr>
+                    <tr>
+                        <td class="ps-4">{% translate "Destroyers" %}</td>
+                        <td class="text-end">{{ stats.built_by_class.destroyers|intcomma }}</td>
+                    </tr>
+                    <tr>
+                        <td class="ps-4">{% translate "Cruisers" %}</td>
+                        <td class="text-end">{{ stats.built_by_class.cruisers|intcomma }}</td>
+                    </tr>
+                    <tr>
+                        <td class="ps-4">{% translate "Battlecruisers" %}</td>
+                        <td class="text-end">{{ stats.built_by_class.battlecruisers|intcomma }}</td>
+                    </tr>
+                    <tr>
+                        <td class="ps-4">{% translate "Battleships" %}</td>
+                        <td class="text-end">{{ stats.built_by_class.battleships|intcomma }}</td>
+                    </tr>
+                    <tr>
+                        <td class="ps-4">{% translate "Capital ships" %}</td>
+                        <td class="text-end">{{ stats.built_by_class.capital|intcomma }}</td>
+                    </tr>
+                    <tr>
+                        <td class="ps-4">{% translate "Other ships" %}</td>
+                        <td class="text-end">{{ stats.built_by_class.other|intcomma }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="text-muted small mb-0 p-3">
+                {% translate "Delivered ships are always counted, even if the order was cancelled later." %}
+            </p>
+        </div>
+    </div>
+
     <div class="card card-primary">
         <div class="card-header">
-            <div class="card-title">{% translate "Statistics" %}</div>
+            <div class="card-title">{% translate "Current statistics" %}</div>
         </div>
-        <div class="card-body">
-            <p class="mb-0">{% translate "The statistics will appear here soon." %}</p>
+        <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+                <tbody>
+                    <tr>
+                        <td>{% translate "Active orders" %}</td>
+                        <td class="text-end">{{ stats.active_orders|intcomma }}</td>
+                    </tr>
+                    <tr>
+                        <td>{% translate "Buyout cost of the active orders" %}</td>
+                        <td class="text-end text-nowrap">{{ stats.buyout_cost|isk }} ISK{% include 'evebuilders/copy_button.html' with text=stats.buyout_cost|plain_isk %}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="text-muted small mb-0 p-3">
+                {% translate "Price per unit times what is not delivered yet, for all active orders. The sum goes down as items are delivered." %}
+            </p>
         </div>
     </div>
 {% endblock %}

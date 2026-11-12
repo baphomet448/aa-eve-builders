@@ -65,7 +65,8 @@ class TestManagementTabs(ViewsTestCase):
         self.assertContains(response, "Latest activity")
         self.assertNotContains(response, "Contracts that need attention")
 
-    def test_the_statistics_tab_is_a_placeholder_for_now(self):
+    def test_the_statistics_tab_shows_the_statistics(self):
         response = self._get(self.manager, TABS["statistics"])
 
-        self.assertContains(response, "The statistics will appear here soon.")
+        self.assertContains(response, "General statistics")
+        self.assertContains(response, "Current statistics")

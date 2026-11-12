@@ -1247,3 +1247,48 @@ msgstr "Контракты, ожидающие принятия"
 
 msgid "The statistics will appear here soon."
 msgstr "Статистика скоро появится здесь."
+
+msgid "General statistics"
+msgstr "Общая статистика"
+
+msgid "Current statistics"
+msgstr "Текущая статистика"
+
+msgid "Total orders"
+msgstr "Всего заказов"
+
+msgid "Ships built"
+msgstr "Построено кораблей"
+
+msgid "Frigates"
+msgstr "Фрегаты"
+
+msgid "Destroyers"
+msgstr "Эсминцы"
+
+msgid "Cruisers"
+msgstr "Крейсеры"
+
+msgid "Battlecruisers"
+msgstr "Линейные крейсеры"
+
+msgid "Battleships"
+msgstr "Линкоры"
+
+msgid "Capital ships"
+msgstr "Капитальные корабли"
+
+msgid "Other ships"
+msgstr "Другие корабли"
+
+msgid "Delivered ships are always counted, even if the order was cancelled later."
+msgstr "Сданные корабли учитываются всегда, даже если заказ потом отменили."
+
+msgid "Active orders"
+msgstr "Текущее количество заказов"
+
+msgid "Buyout cost of the active orders"
+msgstr "Стоимость выкупа активных заказов"
+
+msgid "Price per unit times what is not delivered yet, for all active orders. The sum goes down as items are delivered."
+msgstr "Цена за единицу, умноженная на то, что ещё не сдано, по всем активным заказам. Сумма уменьшается по мере сдачи."

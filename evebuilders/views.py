@@ -64,6 +64,7 @@ from evebuilders.places import (
     search_systems,
     system_stations,
 )
+from evebuilders.statistics import collect_statistics
 from evebuilders.sync import next_sync_time, sync_now
 
 # The due date offered on a new order form
@@ -706,7 +707,9 @@ def management_statistics(request: WSGIRequest) -> HttpResponse:
     :return:
     """
 
-    return render(request, "evebuilders/management_statistics.html", {})
+    context = {"stats": collect_statistics()}
+
+    return render(request, "evebuilders/management_statistics.html", context)
 
 
 @login_required
