@@ -118,7 +118,8 @@ class TestManagementPage(ViewsTestCase):
             actor=self.manager, user=self.builder, level=Order.AccessLevel.MIDDLE
         )
 
-        response = self._page()
+        self.client.force_login(self.manager)
+        response = self.client.get(reverse("evebuilders:management_history"))
 
         self.assertContains(response, "Level of")
         self.assertContains(response, "Took 400")

@@ -1,0 +1,16 @@
+{% extends 'evebuilders/base.html' %}
+
+{% load i18n %}
+
+{% block details %}
+    {% include 'evebuilders/management_tabs.html' with active='statistics' %}
+
+    <div class="card card-primary">
+        <div class="card-header">
+            <div class="card-title">{% translate "Statistics" %}</div>
+        </div>
+        <div class="card-body">
+            <p class="mb-0">{% translate "The statistics will appear here soon." %}</p>
+        </div>
+    </div>
+{% endblock %}

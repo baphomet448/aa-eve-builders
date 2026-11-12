@@ -31,7 +31,7 @@
     {{ block.super }}
     {% if perms.evebuilders.manage_access %}
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'management' %}active{% endif %}"
+            <a class="nav-link {% if 'management' in request.resolver_match.url_name %}active{% endif %}"
                href="{% url 'evebuilders:management' %}">
                 {% translate "Management" %}
             </a>

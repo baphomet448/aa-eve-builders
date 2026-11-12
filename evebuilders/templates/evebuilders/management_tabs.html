@@ -1,0 +1,19 @@
+{% load i18n %}
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link {% if active == 'contracts' %}active{% endif %}" data-tab="contracts" href="{% url 'evebuilders:management' %}">
+            {% translate "Contracts" %}
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active == 'statistics' %}active{% endif %}" data-tab="statistics" href="{% url 'evebuilders:management_statistics' %}">
+            {% translate "Statistics" %}
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active == 'history' %}active{% endif %}" data-tab="history" href="{% url 'evebuilders:management_history' %}">
+            {% translate "History" %}
+        </a>
+    </li>
+</ul>

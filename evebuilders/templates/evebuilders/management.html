@@ -6,6 +6,8 @@
 {% load evebuilders_extras %}
 
 {% block details %}
+    {% include 'evebuilders/management_tabs.html' with active='contracts' %}
+
     <div class="card card-primary mb-3">
         <div class="card-header">
             <div class="card-title">{% translate "Contracts that need attention" %}</div>
@@ -59,9 +61,9 @@
         </div>
     </div>
 
-    <div class="card card-primary mb-3">
+    <div class="card card-primary">
         <div class="card-header">
-            <div class="card-title">{% translate "Waiting for acceptance" %}</div>
+            <div class="card-title">{% translate "Contracts waiting for acceptance" %}</div>
         </div>
         <div class="card-body">
             {% if waiting %}
@@ -88,7 +90,8 @@
                                             <a href="{% url 'evebuilders:order_detail' row.record.order.pk %}">{{ row.record.order.number }}</a>
                                         {% else %}-{% endif %}
                                     </td>
-                                    <td class="text-nowrap">{% if row.record.order %}{% include 'evebuilders/item_icon.html' with type_id=row.record.order.eve_type_id %}{{ row.record.order.eve_type.name }}{% else %}-{% endif %}</td>                                    <td>{{ row.builder|default:"-" }}</td>
+                                    <td class="text-nowrap">{% if row.record.order %}{% include 'evebuilders/item_icon.html' with type_id=row.record.order.eve_type_id %}{{ row.record.order.eve_type.name }}{% else %}-{% endif %}</td>
+                                    <td>{{ row.builder|default:"-" }}</td>
                                     <td class="text-end">{{ row.record.quantity|intcomma }}</td>
                                     <td class="text-end">{{ row.record.price|isk }}</td>
                                 </tr>
@@ -98,46 +101,6 @@
                 </div>
             {% else %}
                 <p class="mb-0">{% translate "No contracts are waiting for acceptance." %}</p>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="card card-primary">
-        <div class="card-header">
-            <div class="card-title">{% translate "Latest activity" %}</div>
-        </div>
-        <div class="card-body">
-            {% if events %}
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle">
-                        <thead>
-                            <tr>
-                                <th>{% translate "When" %}</th>
-                                <th>{% translate "Order" %}</th>
-                                <th>{% translate "Event" %}</th>
-                                <th>{% translate "By" %}</th>
-                                <th>{% translate "Details" %}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for row in events %}
-                                <tr>
-                                    <td class="text-nowrap">{{ row.event.created_at|local_time }}</td>
-                                    <td class="text-nowrap">
-                                        {% if row.event.order %}
-                                            <a href="{% url 'evebuilders:order_detail' row.event.order.pk %}">{{ row.event.order.number }}</a>
-                                        {% else %}-{% endif %}
-                                    </td>
-                                    <td>{{ row.event.get_kind_display }}</td>
-                                    <td>{{ row.actor|default:"-" }}</td>
-                                    <td>{{ row.event.description }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <p class="mb-0">{% translate "Nothing has happened yet." %}</p>
             {% endif %}
         </div>
     </div>

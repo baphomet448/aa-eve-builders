@@ -683,8 +683,8 @@ def delete_order(request: WSGIRequest, order_id: int) -> HttpResponse:
 @permission_required(MANAGE_ACCESS)
 def management(request: WSGIRequest) -> HttpResponse:
     """
-    What needs a manager's attention: contracts that cannot be counted,
-    contracts that wait for acceptance, and the latest activity (managers only)
+    The tab "Contracts" of the management: contracts that cannot be counted and
+    contracts that wait for acceptance (managers only)
     :param request:
     :return:
     """
@@ -692,10 +692,35 @@ def management(request: WSGIRequest) -> HttpResponse:
     context = {
         "problems": problem_contract_rows(),
         "waiting": waiting_contract_rows(),
-        "events": recent_events(),
     }
 
     return render(request, "evebuilders/management.html", context)
+
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+def management_statistics(request: WSGIRequest) -> HttpResponse:
+    """
+    The tab "Statistics" of the management (managers only)
+    :param request:
+    :return:
+    """
+
+    return render(request, "evebuilders/management_statistics.html", {})
+
+
+@login_required
+@permission_required(MANAGE_ACCESS)
+def management_history(request: WSGIRequest) -> HttpResponse:
+    """
+    The tab "History" of the management: the latest activity (managers only)
+    :param request:
+    :return:
+    """
+
+    context = {"events": recent_events()}
+
+    return render(request, "evebuilders/management_history.html", context)
 
 
 @login_required

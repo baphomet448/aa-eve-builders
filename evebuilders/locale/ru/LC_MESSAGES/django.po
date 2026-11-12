@@ -1238,3 +1238,12 @@ msgstr "Назначьте его приемщику из колонки «Пр�
 
 msgid "Watch the status: look at this page from time to time. If a contract cannot be counted, it appears in the list below with the reason."
 msgstr "Следите за статусом: время от времени заглядывайте на эту страницу. Если контракт не удаётся засчитать, он появится в списке ниже с причиной."
+
+msgid "Statistics"
+msgstr "Статистика"
+
+msgid "Contracts waiting for acceptance"
+msgstr "Контракты, ожидающие принятия"
+
+msgid "The statistics will appear here soon."
+msgstr "Статистика скоро появится здесь."
