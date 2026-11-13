@@ -203,6 +203,7 @@ class OrderEvent(models.Model):
         CREDITED = "CREDITED", _("Credited")
         MANUAL_CREDIT = "MANUAL_CREDIT", _("Credited manually")
         LEVEL_CHANGED = "LEVEL_CHANGED", _("Builder level changed")
+        ROLE_CHANGED = "ROLE_CHANGED", _("Builder role changed")
         TOKEN_ERROR = "TOKEN_ERROR", _("ESI token problem")
 
     order = models.ForeignKey(

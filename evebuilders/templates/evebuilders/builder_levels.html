@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load l10n %}
+{% load evebuilders_extras %}
 
 {% block details %}
     {% include 'evebuilders/settings_tabs.html' with active='builders' %}
@@ -15,19 +16,28 @@
             <p>
                 {% blocktranslate trimmed %}
                     People are listed here when their groups, their state or their own
-                    permissions give them the Builder or Manager access (give the permission in
-                    the Auth group settings). A builder sees and takes the orders up to his
-                    level; without a setting the level is Base.
+                    permissions give them a role of the plugin. A builder sees and takes the
+                    orders up to his level; without a setting the level is Base. Only an admin
+                    can make a manager here; the role of an admin is given in the admin site of
+                    Auth.
                 {% endblocktranslate %}
             </p>
 
             {% if rows %}
-                                <div class="row g-2 mb-2 align-items-center" data-filter-for="evebuilders-builders">
+                <div class="row g-2 mb-2 align-items-center" data-filter-for="evebuilders-builders">
                     <div class="col-12 col-md-4">
                         <input type="search" class="form-control form-control-sm" data-filter-text
                                placeholder="{% translate 'Name or corporation' %}">
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-2">
+                        <select class="form-select form-select-sm" data-filter-eq="role">
+                            <option value="">{% translate "All roles" %}</option>
+                            <option value="admin">{% translate "Admin" %}</option>
+                            <option value="manager">{% translate "Manager" %}</option>
+                            <option value="builder">{% translate "Builder" %}</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-2">
                         <select class="form-select form-select-sm" data-filter-eq="level">
                             <option value="">{% translate "All levels" %}</option>
                             <option value="1">Base</option>
@@ -42,32 +52,59 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table id="evebuilders-builders" class="table table-sm align-middle">                        <thead>
+                    <table id="evebuilders-builders" class="table table-sm align-middle">
+                        <thead>
                             <tr>
                                 <th data-sort="text">{% translate "Name" %}</th>
                                 <th data-sort="text">{% translate "Corporation" %}</th>
-                                <th data-sort="text">{% translate "Access" %}</th>
+                                <th data-sort="number">{% translate "Role" %}</th>
                                 <th data-sort="number">{% translate "Level" %}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for row in rows %}
                                 <tr data-search="{{ row.name }} {{ row.corporation }}"
+                                    data-role="{{ row.role }}"
                                     data-level="{{ row.level|unlocalize }}">
                                     <td>{{ row.name }}</td>
                                     <td>{{ row.corporation|default:"-" }}</td>
-                                    <td>
-                                        {% if row.is_manager %}
+                                    <td class="text-nowrap" data-value="{{ row.role_rank|unlocalize }}">
+                                        {% if row.role == 'admin' %}
+                                            <span class="badge bg-info">{% translate "Admin" %}</span>
+                                        {% elif row.role == 'manager' %}
                                             <span class="badge bg-primary">{% translate "Manager" %}</span>
+                                            {% if row.manager_via %}
+                                                <small class="text-muted">({{ row.manager_via }})</small>
+                                            {% endif %}
                                         {% else %}
                                             <span class="badge bg-secondary">{% translate "Builder" %}</span>
                                         {% endif %}
+
+                                        {% if request.user|can_administer %}
+                                            {% if row.role == 'builder' %}
+                                                <form method="post" action="{% url 'evebuilders:set_manager' row.user.pk %}" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="manager" value="1">
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary py-0">
+                                                        {% translate "Make manager" %}
+                                                    </button>
+                                                </form>
+                                            {% elif row.role == 'manager' and row.manager_direct and not row.manager_via %}
+                                                <form method="post" action="{% url 'evebuilders:set_manager' row.user.pk %}" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="manager" value="0">
+                                                    <button type="submit" class="btn btn-sm btn-outline-secondary py-0">
+                                                        {% translate "Remove manager" %}
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        {% endif %}
                                     </td>
-                                    <td>
-                                        <div class="mb-1">{% include 'evebuilders/level_badge.html' with level=row.level label=row.level_label %}</div>
+                                    <td data-value="{{ row.level|unlocalize }}">
                                         <form method="post" action="{% url 'evebuilders:set_level' row.user.pk %}"
-                                              class="d-flex gap-2">
+                                              class="d-flex align-items-center gap-2">
                                             {% csrf_token %}
+                                            {% include 'evebuilders/level_badge.html' with level=row.level label=row.level_label %}
                                             <select name="level" class="form-select form-select-sm" style="width: auto;">
                                                 {% for value, label in levels %}
                                                     <option value="{{ value }}" {% if value == row.level %}selected{% endif %}>

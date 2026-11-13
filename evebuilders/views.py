@@ -39,7 +39,12 @@ from evebuilders.discord_settings import (
 )
 from evebuilders.forms import OrderEditForm, OrderForm
 from evebuilders.history import EVENT_KINDS, history_result
-from evebuilders.levels import builder_users, level_rows, set_builder_level
+from evebuilders.levels import (
+    builder_users,
+    level_rows,
+    set_builder_level,
+    set_manager_role,
+)
 from evebuilders.manager_actions import (
     can_delete_order,
     cancel_order,
@@ -479,6 +484,39 @@ def set_level_view(request: WSGIRequest, user_id: int) -> HttpResponse:
             )
         else:
             messages.info(request, _("The level of %(name)s did not change.") % text)
+
+    return redirect("evebuilders:builder_levels")
+
+
+@login_required
+@admin_required
+@require_POST
+def set_manager_view(request: WSGIRequest, user_id: int) -> HttpResponse:
+    """
+    Make a builder a manager, or take the role away (admins only)
+    :param request: POST parameter ``manager``: 1 to make a manager, 0 to take away
+    :param user_id: The builder
+    :return:
+    """
+
+    user = get_object_or_404(builder_users(), pk=user_id)
+    make = request.POST.get("manager") == "1"
+    text = {"name": display_name(user)}
+
+    try:
+        changed = set_manager_role(actor=request.user, user=user, manager=make)
+    except ValidationError as ex:
+        for message in ex.messages:
+            messages.error(request, message)
+    else:
+        if make and changed:
+            messages.success(request, _("%(name)s is now a manager.") % text)
+        elif make:
+            messages.info(request, _("%(name)s is a manager already.") % text)
+        elif changed:
+            messages.success(request, _("%(name)s is no longer a manager.") % text)
+        else:
+            messages.info(request, _("%(name)s was not a manager.") % text)
 
     return redirect("evebuilders:builder_levels")
 

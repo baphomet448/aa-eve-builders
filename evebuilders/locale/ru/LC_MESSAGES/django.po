@@ -425,18 +425,6 @@ msgid "Builder levels"
 msgstr "Уровни строителей"
 
 #: templates/evebuilders/builder_levels.html
-msgid ""
-"People are listed here when their groups, their state or their own "
-"permissions give them the Builder or Manager access (give the permission in "
-"the Auth group settings). A builder sees and takes the orders up to his "
-"level; without a setting the level is Base."
-msgstr ""
-"Здесь перечислены люди, которым группы, статус (state) или собственные права "
-"дают доступ строителя или менеджера (право выдаётся в настройках групп "
-"Auth). Строитель видит и берёт заказы до своего уровня; без настройки "
-"уровень — Base."
-
-#: templates/evebuilders/builder_levels.html
 #: templates/evebuilders/settings.html
 msgid "Name"
 msgstr "Имя"
@@ -1451,3 +1439,42 @@ msgstr "По фильтру ничего не найдено."
 
 msgid "Only an admin can delete an order that a builder has taken."
 msgstr "Заказ, который строитель уже взял, может удалить только админ."
+
+msgid "People are listed here when their groups, their state or their own permissions give them a role of the plugin. A builder sees and takes the orders up to his level; without a setting the level is Base. Only an admin can make a manager here; the role of an admin is given in the admin site of Auth."
+msgstr "Здесь перечислены люди, у которых через группы, состояние или собственные права есть роль плагина. Строитель видит и берёт заказы до своего уровня; без настройки уровень Base. Менеджера здесь может назначить только админ; роль админа выдаётся в админке Auth."
+
+msgid "Admin"
+msgstr "Админ"
+
+msgid "All roles"
+msgstr "Все роли"
+
+msgid "Role"
+msgstr "Роль"
+
+msgid "Make manager"
+msgstr "Назначить менеджером"
+
+msgid "Remove manager"
+msgstr "Снять менеджера"
+
+msgid "Builder role changed"
+msgstr "Роль строителя изменена"
+
+msgid "%(name)s is now a manager."
+msgstr "%(name)s теперь менеджер."
+
+msgid "%(name)s is no longer a manager."
+msgstr "%(name)s больше не менеджер."
+
+msgid "%(name)s is a manager already."
+msgstr "%(name)s уже менеджер."
+
+msgid "%(name)s was not a manager."
+msgstr "%(name)s не был менеджером."
+
+msgid "The role of an admin is set in the admin site of Auth."
+msgstr "Роль админа выдаётся только в админке Auth."
+
+msgid "The manager role of %(name)s comes from %(source)s: take it away there."
+msgstr "Роль менеджера у %(name)s идёт через «%(source)s»: снимите её там."

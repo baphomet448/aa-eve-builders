@@ -35,6 +35,11 @@ urlpatterns = [
         views.set_level_view,
         name="set_level",
     ),
+    path(
+        "settings/builders/<int:user_id>/manager/",
+        views.set_manager_view,
+        name="set_manager",
+    ),
     path("settings/stations/", views.stations_view, name="stations"),
     path("settings/stations/add/", views.add_station_view, name="add_station"),
     path(
