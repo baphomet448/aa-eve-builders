@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [In Development] - Unreleased
 
+## [0.4.0] - 2026-11-13
+
+### Changed
+
+- **Three roles** instead of two: admin, manager and builder. Each one is a permission of
+  Auth that is given to a user, a group or a state.
+  - `builder_access` (builder): as before.
+  - `manager_access` (manager, new): the orders, the builders, the management and the
+    stations. No settings of ESI and Discord, and an order can be deleted only while nobody
+    has taken a part of it.
+  - `admin_access` (admin): everything. It is the old `manage_access`, renamed by a
+    migration: whoever had `manage_access` is an admin now.
+- A superuser of Django has no role of the plugin by being a superuser: the permission has to
+  be given like to anybody else.
+- Only an admin sees the tabs "ESI and catalog" and "Discord" of the settings and can use
+  their buttons.
+- The page of the builder levels: the level, its badge and the button are in one row, the
+  column "Access" is called "Role", there is a filter by role, and an admin can make a
+  builder a manager there (and take the role away). The change goes to the history.
+
+### Added
+
+- The event "Builder role changed" in the history.
+
+### Migrations
+
+- 0010 to 0012: the new permission, the renaming of `manage_access` to `admin_access` and
+  the new kind of event. **Before the update give `manage_access` to the group of your
+  leadership**, see the notes of the release.
+
 ## [0.3.0] - 2026-11-12
 
 ### Added

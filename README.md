@@ -97,7 +97,7 @@ There is no PyPI release: install the wheel from the release page. Activate the 
 environment of your Auth first.
 
 ```shell
-pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.3.0/aa_eve_builders-0.3.0-py3-none-any.whl
+pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.4.0/aa_eve_builders-0.4.0-py3-none-any.whl
 ```
 
 Add the apps to `INSTALLED_APPS` in your `local.py` (`eveuniverse` only if it is not
@@ -126,7 +126,7 @@ The image of Auth has no `git`, so use the wheel too. Add this line to
 `conf/requirements.txt`:
 
 ```text
-aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.3.0/aa_eve_builders-0.3.0-py3-none-any.whl
+aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.4.0/aa_eve_builders-0.4.0-py3-none-any.whl
 ```
 
 Add the `INSTALLED_APPS` lines and the scheduled tasks to `conf/local.py`. Then rebuild
@@ -177,27 +177,34 @@ Add it to the application if it is not there yet.
 
 ### Permissions
 
-Give these permissions in the Auth admin to groups or states. They appear as
-"EVE Builders ... | general | ...":
+Give these permissions in the Auth admin to groups or states (or to a user). They appear as
+"EVE Builders ... | general | ...". A higher role has the lower ones.
 
-| Permission                   | Who      | What it allows                        |
-| ---------------------------- | -------- | ------------------------------------- |
-| `evebuilders.builder_access` | builders | View and take corporate build orders  |
-| `evebuilders.manage_access`  | managers | Manage orders and the plugin settings |
+| Permission                   | Role    | What it allows                                                                                           |
+| ---------------------------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| `evebuilders.builder_access` | builder | View and take corporate build orders                                                                     |
+| `evebuilders.manager_access` | manager | Orders, builders, the management, the stations; delete an order only while nobody has taken a part of it |
+| `evebuilders.admin_access`   | admin   | Everything: also the settings of ESI and Discord, and deleting any order                                 |
 
-Menu entries ("Corporate orders" and "My orders") are shown only to people with one of
-them. If you group the menu in folders (Auth admin, Menu), put them in a folder of
-your choice.
+Being a **superuser of Django gives no role** by itself: the permission has to be given
+like to anybody else. A manager can also be made on the page **Settings, Builder levels**
+by an admin. The role of an admin is given only here, in the Auth admin.
+
+Menu entries ("Corporate orders" and "My orders") are shown only to people with a role. If
+you group the menu in folders (Auth admin, Menu), put them in a folder of your choice.
 
 ### First setup in the web interface
 
-A manager does this once (the **Settings** button of the plugin):
+An admin does this once (the **Settings** button of the plugin):
 
 1. **ESI and catalog, ESI connection**: press **Connect** with a character that is in the
    corporation. The corporation contracts are read with this token.
 1. **ESI and catalog, Item catalog**: press **Update catalog** and wait a few minutes for
    the items to load (it also refreshes by itself every day).
-1. **Builder levels**: set the levels of the builders (Base by default).
+1. **Discord** (optional): give the webhooks of the channels and say where each kind of
+   message goes.
+1. **Builder levels**: set the levels of the builders (Base by default) and make the
+   managers.
 1. **Stations**: add the places orders are delivered to (search a system by a part of
    its name, pick a station, or add a system with the name of a structure). While the
    list is empty, the destination of an order is free text.
