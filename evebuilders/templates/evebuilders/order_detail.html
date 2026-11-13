@@ -296,7 +296,7 @@
         </div>
     </div>
 
-    {% if order.status != 'CANCELLED' %}
+    {% if can_delete %}
         <div class="card border-danger mt-3">
             <div class="card-header">
                 <div class="card-title">{% translate "Delete order" %}</div>
@@ -323,5 +323,9 @@
                 </form>
             </div>
         </div>
+    {% elif order.status != 'CANCELLED' %}
+        <p class="text-muted small mt-3">
+            {% translate "Only an admin can delete an order that a builder has taken." %}
+        </p>
     {% endif %}
 {% endblock %}

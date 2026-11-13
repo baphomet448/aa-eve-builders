@@ -25,7 +25,7 @@ from evebuilders.messages import (
 from evebuilders.models import ContractRecord, Order, OrderAssignment, OrderEvent
 from evebuilders.notifications import CHANNEL_COMPLETE, CHANNEL_NEW_ORDER, notify
 from evebuilders.orders import OPEN_STATUSES, recalculate_status, releasable_quantity
-from evebuilders.permissions import is_manager
+from evebuilders.permissions import is_admin, is_manager
 
 
 def _lock_share(actor, order_id: int, assignment_id: int):
@@ -358,20 +358,30 @@ def update_order(*, actor, order_id: int, values: dict) -> list[Change]:
 DELETE_WINDOW = timedelta(hours=1)
 
 
+def order_is_taken(order: Order) -> bool:
+    """Whether a builder has taken a part of the order and not given it back"""
+
+    return order.assignments.filter(taken__gt=0).exists()
+
+
 def can_delete_order(user, order: Order) -> bool:
     """
     Whether the user may delete (cancel) the order.
 
-    A manager may delete any order at any time, whatever its status. Someone
-    who is not a manager may delete an order he created himself, but only
-    within an hour and only while nobody has taken it.
+    An admin may delete any order at any time. A manager may delete any order, but
+    only while nobody has taken a part of it. Someone who is not a manager may
+    delete an order he created himself, but only within an hour and only while
+    nobody has taken it.
     """
 
     if order.status == Order.Status.CANCELLED:
         return False
 
-    if is_manager(user):
+    if is_admin(user):
         return True
+
+    if is_manager(user):
+        return not order_is_taken(order)
 
     return (
         order.created_by_id == user.pk
@@ -405,6 +415,10 @@ def cancel_order(*, actor, order_id: int, reason: str = "") -> Order:
         if order.status == Order.Status.CANCELLED:
             raise ValidationError(_("This order is already cancelled."))
         if not can_delete_order(actor, order):
+            if is_manager(actor) and order_is_taken(order):
+                raise ValidationError(
+                    _("Only an admin can delete an order that a builder has taken.")
+                )
             raise ValidationError(_("You cannot delete this order."))
 
         order.status = Order.Status.CANCELLED

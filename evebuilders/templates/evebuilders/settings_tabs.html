@@ -1,12 +1,15 @@
 {% load i18n %}
+{% load evebuilders_extras %}
 
 <ul class="nav nav-tabs mb-3">
-    <li class="nav-item">
-        <a class="nav-link {% if active == 'general' %}active{% endif %}"
-           href="{% url 'evebuilders:settings' %}">
-            {% translate "ESI and catalog" %}
-        </a>
-    </li>
+    {% if request.user|can_administer %}
+        <li class="nav-item">
+            <a class="nav-link {% if active == 'general' %}active{% endif %}"
+               href="{% url 'evebuilders:settings' %}">
+                {% translate "ESI and catalog" %}
+            </a>
+        </li>
+    {% endif %}
     <li class="nav-item">
         <a class="nav-link {% if active == 'builders' %}active{% endif %}"
            href="{% url 'evebuilders:builder_levels' %}">
@@ -19,10 +22,12 @@
             {% translate "Stations" %}
         </a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link {% if active == 'discord' %}active{% endif %}"
-           href="{% url 'evebuilders:discord_settings' %}">
-            Discord
-        </a>
-    </li>
+    {% if request.user|can_administer %}
+        <li class="nav-item">
+            <a class="nav-link {% if active == 'discord' %}active{% endif %}"
+               href="{% url 'evebuilders:discord_settings' %}">
+                Discord
+            </a>
+        </li>
+    {% endif %}
 </ul>

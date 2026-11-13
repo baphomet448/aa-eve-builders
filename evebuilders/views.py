@@ -41,6 +41,7 @@ from evebuilders.forms import OrderEditForm, OrderForm
 from evebuilders.history import EVENT_KINDS, history_result
 from evebuilders.levels import builder_users, level_rows, set_builder_level
 from evebuilders.manager_actions import (
+    can_delete_order,
     cancel_order,
     credit_manually,
     item_is_locked,
@@ -64,7 +65,7 @@ from evebuilders.overview import (
     problem_contract_rows,
     waiting_contract_rows,
 )
-from evebuilders.permissions import has_any_access, manager_required
+from evebuilders.permissions import admin_required, has_any_access, manager_required
 from evebuilders.places import (
     SEARCH_MIN_LENGTH,
     add_destination,
@@ -153,7 +154,7 @@ def new_order(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@manager_required
+@admin_required
 def settings_view(request: WSGIRequest) -> HttpResponse:
     """
     Plugin settings (managers only): item catalog state and the update button
@@ -172,7 +173,7 @@ def settings_view(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@manager_required
+@admin_required
 @require_POST
 def start_sync(request: WSGIRequest) -> HttpResponse:
     """
@@ -323,7 +324,7 @@ def my_orders(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@manager_required
+@admin_required
 @token_required(scopes=CONTRACTS_SCOPE, new=True)
 def connect_esi(request: WSGIRequest, token) -> HttpResponse:
     """
@@ -499,6 +500,7 @@ def order_detail(request: WSGIRequest, order_id: int) -> HttpResponse:
         "shares": share_rows(order),
         "contracts": contract_rows(order),
         "events": event_rows(order),
+        "can_delete": can_delete_order(request.user, order),
     }
 
     return render(request, "evebuilders/order_detail.html", context)
@@ -834,7 +836,7 @@ def delete_station_view(request: WSGIRequest, place_id: int) -> HttpResponse:
 
 
 @login_required
-@manager_required
+@admin_required
 def discord_settings(request: WSGIRequest) -> HttpResponse:
     """
     The tab "Discord" of the settings: the webhooks of the channels and where each
@@ -869,7 +871,7 @@ def discord_settings(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@manager_required
+@admin_required
 @require_POST
 def discord_test(request: WSGIRequest) -> HttpResponse:
     """

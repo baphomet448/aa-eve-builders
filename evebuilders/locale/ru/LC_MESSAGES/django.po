@@ -1448,3 +1448,6 @@ msgstr "Страница %(number)s из %(total)s"
 
 msgid "Nothing matches the filter."
 msgstr "По фильтру ничего не найдено."
+
+msgid "Only an admin can delete an order that a builder has taken."
+msgstr "Заказ, который строитель уже взял, может удалить только админ."
