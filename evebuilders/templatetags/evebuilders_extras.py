@@ -9,6 +9,9 @@ from django import template
 from django.contrib.humanize.templatetags.humanize import intcomma
 from django.utils.html import format_html
 
+# AA EVE Builders
+from evebuilders.permissions import has_any_access, is_admin, is_manager
+
 register = template.Library()
 
 
@@ -65,3 +68,24 @@ def local_time(value, kind: str = "datetime") -> str:
         utc.isoformat(),
         utc.strftime(pattern),
     )
+
+
+@register.filter
+def can_access(user) -> bool:
+    """Whether the user has any role of the plugin"""
+
+    return has_any_access(user)
+
+
+@register.filter
+def can_manage(user) -> bool:
+    """Whether the user is a manager or an admin"""
+
+    return is_manager(user)
+
+
+@register.filter
+def can_administer(user) -> bool:
+    """Whether the user is an admin"""
+
+    return is_admin(user)

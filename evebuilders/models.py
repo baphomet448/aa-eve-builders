@@ -25,7 +25,8 @@ class General(models.Model):
         default_permissions = ()
         permissions = (
             ("builder_access", "Can view and take corporate build orders"),
-            ("manage_access", "Can manage build orders and plugin settings"),
+            ("manager_access", "Can manage the orders and the builders (manager)"),
+            ("admin_access", "Can manage everything in the plugin (admin)"),
         )
 
 

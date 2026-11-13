@@ -268,7 +268,7 @@ class TestAddDestination(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.manager = make_user("manager", "manage_access")
+        cls.manager = make_user("manager", "admin_access")
         cls.builder = make_user("builder", "builder_access")
 
     def _add(self, actor=None, **kwargs):

@@ -46,7 +46,7 @@ class SyncTestCase(TestCase):
         cls.eve_type = EveType.objects.create(
             id=597, name="Punisher", eve_group=group, published=True
         )
-        cls.manager = make_user("manager", "manage_access")
+        cls.manager = make_user("manager", "admin_access")
         cls.builder = make_user("builder", "builder_access")
         cls.acceptor = make_user("acceptor", "builder_access")
         cls.corporation_id = 98000001

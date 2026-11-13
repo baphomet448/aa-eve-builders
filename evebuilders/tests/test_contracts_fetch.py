@@ -54,7 +54,7 @@ class FetchTestCase(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        manager = make_user("manager", "manage_access")
+        manager = make_user("manager", "admin_access")
         token = make_token(manager, manager.profile.main_character.character_id)
         cls.source = connect_source(user=manager, token=token)
 

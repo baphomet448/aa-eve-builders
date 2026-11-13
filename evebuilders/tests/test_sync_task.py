@@ -59,7 +59,7 @@ class TestSettingsStatus(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.manager = make_user("manager", "manage_access")
+        cls.manager = make_user("manager", "admin_access")
 
     def test_shows_when_contracts_were_checked(self):
         ContractSource.objects.create(

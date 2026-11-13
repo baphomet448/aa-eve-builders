@@ -34,7 +34,7 @@ class TestConnectSource(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.manager = make_user("manager", "manage_access")
+        cls.manager = make_user("manager", "admin_access")
         cls.character_id = cls.manager.profile.main_character.character_id
 
     def test_connects_a_character_of_the_user(self):
@@ -51,7 +51,7 @@ class TestConnectSource(TestCase):
         self.assertEqual(ContractSource.objects.count(), 1)
 
     def test_a_token_of_somebody_elses_character_is_refused(self):
-        other = make_user("other", "manage_access")
+        other = make_user("other", "admin_access")
         token = make_token(other, other.profile.main_character.character_id)
 
         with self.assertRaises(ValidationError):
@@ -79,7 +79,7 @@ class TestEsiConnectionBlock(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.manager = make_user("manager", "manage_access")
+        cls.manager = make_user("manager", "admin_access")
         cls.builder = make_user("builder", "builder_access")
 
     def test_connect_view_is_for_managers_only(self):

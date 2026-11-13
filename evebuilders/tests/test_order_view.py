@@ -29,7 +29,7 @@ class TestNewOrderView(TestCase):
             id=25, name="Frigate", eve_category=category, published=True
         )
         EveType.objects.create(id=597, name="Punisher", eve_group=group, published=True)
-        cls.manager = make_user("manager", "manage_access")
+        cls.manager = make_user("manager", "admin_access")
         cls.builder = make_user("builder", "builder_access")
 
     def _post_data(self, **overrides):

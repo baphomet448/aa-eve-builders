@@ -9,7 +9,7 @@
     <div class="card card-primary">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div class="card-title mb-0">{% translate "Corporate orders" %}</div>
-            {% if perms.evebuilders.manage_access %}
+            {% if request.user|can_manage %}
                 <a href="{% url 'evebuilders:new_order' %}" class="btn btn-primary btn-sm">
                     {% translate "Create order" %}
                 </a>
@@ -41,7 +41,7 @@
                             <option value="LOW">Low</option>
                         </select>
                     </div>
-                    {% if perms.evebuilders.manage_access %}
+                    {% if request.user|can_manage %}
                         <div class="col-6 col-md-2">
                             <select class="form-select form-select-sm" data-filter-eq="level">
                                 <option value="">{% translate "All levels" %}</option>
@@ -78,7 +78,7 @@
                                 <th class="text-end" data-sort="number">{% translate "Price per unit" %}</th>
                                 <th class="text-center" data-sort="number">{% translate "Priority" %}</th>
                                 <th data-sort="text">{% translate "Due date" %}</th>
-                                {% if perms.evebuilders.manage_access %}
+                                {% if request.user|can_manage %}
                                     <th class="text-center" data-sort="number">{% translate "Access" %}</th>
                                 {% endif %}
                                 <th data-sort="text">{% translate "Destination" %}</th>
@@ -93,7 +93,7 @@
                                     data-level="{{ order.access_level|unlocalize }}"
                                     data-free="{{ order.free|unlocalize }}">
                                     <td class="text-nowrap" data-value="{{ order.pk|unlocalize }}">
-                                        {% if perms.evebuilders.manage_access %}
+                                        {% if request.user|can_manage %}
                                             <a href="{% url 'evebuilders:order_detail' order.pk %}">{{ order.number }}</a>
                                         {% else %}
                                             {{ order.number }}
@@ -124,7 +124,7 @@
                                         </span>
                                     </td>
                                     <td class="text-nowrap">{{ order.due_date|date:"Y-m-d" }}</td>
-                                    {% if perms.evebuilders.manage_access %}
+                                    {% if request.user|can_manage %}
                                         <td class="text-center" data-value="{{ order.access_level|unlocalize }}">{% include 'evebuilders/level_badge.html' with level=order.access_level label=order.get_access_level_display %}</td>                                    {% endif %}
                                     <td>{{ order.destination }}</td>
                                     <td class="text-nowrap">

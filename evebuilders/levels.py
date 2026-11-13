@@ -11,18 +11,18 @@ from django.utils.translation import gettext as _
 from evebuilders.messages import display_name
 from evebuilders.models import BuilderProfile, Order, OrderEvent
 from evebuilders.orders import builder_level
-from evebuilders.permissions import MANAGE_ACCESS
+from evebuilders.permissions import CODENAMES, is_manager
 
 User = get_user_model()
 
-ACCESS_CODENAMES = ("builder_access", "manage_access")
+ACCESS_CODENAMES = CODENAMES
 
 
 def builder_users():
     """
-    The active users who may work with orders: they have the builder or manager
-    access permission themselves, through a group or through their state, or
-    they are superusers.
+    The active users who may work with orders: they have a permission of the
+    plugin themselves, through a group or through their state. Being a
+    superuser is not enough.
     """
 
     permissions = Permission.objects.filter(
@@ -31,8 +31,7 @@ def builder_users():
 
     return (
         User.objects.filter(
-            Q(is_superuser=True)
-            | Q(user_permissions__in=permissions)
+            Q(user_permissions__in=permissions)
             | Q(groups__permissions__in=permissions)
             | Q(profile__state__permissions__in=permissions),
             is_active=True,
@@ -61,7 +60,7 @@ def level_rows() -> list[dict]:
                 "level_label": Order.AccessLevel(
                     levels.get(user.pk, Order.AccessLevel.BASE)
                 ).label,
-                "is_manager": user.has_perm(MANAGE_ACCESS),
+                "is_manager": is_manager(user),
             }
         )
 

@@ -174,8 +174,8 @@ class TestPermissions(TestCase):
     def test_builder_access(self):
         self.assertTrue(has_any_access(self._user_with("builder_access")))
 
-    def test_manage_access(self):
-        self.assertTrue(has_any_access(self._user_with("manage_access")))
+    def test_admin_access(self):
+        self.assertTrue(has_any_access(self._user_with("admin_access")))
 
 
 class TestCatalogSync(TestCase):

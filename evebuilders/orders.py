@@ -50,7 +50,7 @@ from evebuilders.notifications import (
     notify,
     notify_taken_enabled,
 )
-from evebuilders.permissions import MANAGE_ACCESS, has_any_access
+from evebuilders.permissions import has_any_access, is_manager
 
 # Orders a builder can still see: not finished and not cancelled
 OPEN_STATUSES = (
@@ -188,7 +188,7 @@ def visible_orders(user):
 
     orders = Order.objects.filter(kind=Order.Kind.CORPORATE)
 
-    if not user.has_perm(MANAGE_ACCESS):
+    if not is_manager(user):
         orders = orders.filter(
             status__in=OPEN_STATUSES, access_level__lte=builder_level(user)
         )

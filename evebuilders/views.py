@@ -7,7 +7,6 @@ from datetime import timedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import (
     login_required,
-    permission_required,
     user_passes_test,
 )
 from django.core.exceptions import ValidationError
@@ -65,7 +64,7 @@ from evebuilders.overview import (
     problem_contract_rows,
     waiting_contract_rows,
 )
-from evebuilders.permissions import MANAGE_ACCESS, has_any_access
+from evebuilders.permissions import has_any_access, manager_required
 from evebuilders.places import (
     SEARCH_MIN_LENGTH,
     add_destination,
@@ -108,7 +107,7 @@ def order_list(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 def new_order(request: WSGIRequest) -> HttpResponse:
     """
     Create a corporate order (managers only)
@@ -154,7 +153,7 @@ def new_order(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 def settings_view(request: WSGIRequest) -> HttpResponse:
     """
     Plugin settings (managers only): item catalog state and the update button
@@ -173,7 +172,7 @@ def settings_view(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 @require_POST
 def start_sync(request: WSGIRequest) -> HttpResponse:
     """
@@ -215,7 +214,7 @@ def start_sync(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 @require_GET
 def item_search(request: WSGIRequest) -> JsonResponse:
     """
@@ -324,7 +323,7 @@ def my_orders(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 @token_required(scopes=CONTRACTS_SCOPE, new=True)
 def connect_esi(request: WSGIRequest, token) -> HttpResponse:
     """
@@ -437,7 +436,7 @@ def sync_contracts_view(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 def builder_levels_view(request: WSGIRequest) -> HttpResponse:
     """
     The builders and their access levels (managers only)
@@ -451,7 +450,7 @@ def builder_levels_view(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 @require_POST
 def set_level_view(request: WSGIRequest, user_id: int) -> HttpResponse:
     """
@@ -484,7 +483,7 @@ def set_level_view(request: WSGIRequest, user_id: int) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 def order_detail(request: WSGIRequest, order_id: int) -> HttpResponse:
     """
     Everything about one order: its builders, contracts and history (managers only)
@@ -506,7 +505,7 @@ def order_detail(request: WSGIRequest, order_id: int) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 @require_POST
 def release_view(request: WSGIRequest, order_id: int) -> HttpResponse:
     """
@@ -544,7 +543,7 @@ def release_view(request: WSGIRequest, order_id: int) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 @require_POST
 def credit_view(request: WSGIRequest, order_id: int) -> HttpResponse:
     """
@@ -586,7 +585,7 @@ def credit_view(request: WSGIRequest, order_id: int) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 def edit_order(request: WSGIRequest, order_id: int) -> HttpResponse:
     """
     Change an order (managers only)
@@ -657,7 +656,7 @@ def edit_order(request: WSGIRequest, order_id: int) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 @require_POST
 def delete_order(request: WSGIRequest, order_id: int) -> HttpResponse:
     """
@@ -689,7 +688,7 @@ def delete_order(request: WSGIRequest, order_id: int) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 def management(request: WSGIRequest) -> HttpResponse:
     """
     The tab "Contracts" of the management: contracts that cannot be counted and
@@ -707,7 +706,7 @@ def management(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 def management_statistics(request: WSGIRequest) -> HttpResponse:
     """
     The tab "Statistics" of the management (managers only)
@@ -721,7 +720,7 @@ def management_statistics(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 def management_history(request: WSGIRequest) -> HttpResponse:
     """
     The tab "History" of the management: the events of all orders with a filter, a
@@ -736,7 +735,7 @@ def management_history(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 def stations_view(request: WSGIRequest) -> HttpResponse:
     """
     The places orders can be delivered to, and a search to add more (managers only)
@@ -777,7 +776,7 @@ def stations_view(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 @require_POST
 def add_station_view(request: WSGIRequest) -> HttpResponse:
     """
@@ -811,7 +810,7 @@ def add_station_view(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 @require_POST
 def delete_station_view(request: WSGIRequest, place_id: int) -> HttpResponse:
     """
@@ -835,7 +834,7 @@ def delete_station_view(request: WSGIRequest, place_id: int) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 def discord_settings(request: WSGIRequest) -> HttpResponse:
     """
     The tab "Discord" of the settings: the webhooks of the channels and where each
@@ -870,7 +869,7 @@ def discord_settings(request: WSGIRequest) -> HttpResponse:
 
 
 @login_required
-@permission_required(MANAGE_ACCESS)
+@manager_required
 @require_POST
 def discord_test(request: WSGIRequest) -> HttpResponse:
     """

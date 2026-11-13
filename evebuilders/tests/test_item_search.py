@@ -104,7 +104,7 @@ class TestItemSearchView(SearchTestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         super().setUpTestData()
-        cls.manager = make_user("manager", "manage_access")
+        cls.manager = make_user("manager", "admin_access")
         cls.builder = make_user("builder", "builder_access")
         make_type(597, "Punisher", cls.frigate_group)
 

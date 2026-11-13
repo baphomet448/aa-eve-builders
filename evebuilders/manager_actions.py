@@ -25,7 +25,7 @@ from evebuilders.messages import (
 from evebuilders.models import ContractRecord, Order, OrderAssignment, OrderEvent
 from evebuilders.notifications import CHANNEL_COMPLETE, CHANNEL_NEW_ORDER, notify
 from evebuilders.orders import OPEN_STATUSES, recalculate_status, releasable_quantity
-from evebuilders.permissions import MANAGE_ACCESS
+from evebuilders.permissions import is_manager
 
 
 def _lock_share(actor, order_id: int, assignment_id: int):
@@ -38,7 +38,7 @@ def _lock_share(actor, order_id: int, assignment_id: int):
     :raises Order.DoesNotExist: When there is no such corporate order
     """
 
-    if not actor.has_perm(MANAGE_ACCESS):
+    if not is_manager(actor):
         raise ValidationError(_("Only managers can do this."))
 
     order = Order.objects.select_for_update().get(
@@ -271,7 +271,7 @@ def update_order(*, actor, order_id: int, values: dict) -> list[Change]:
     :return: The changes that were made, empty if there were none
     """
 
-    if not actor.has_perm(MANAGE_ACCESS):
+    if not is_manager(actor):
         raise ValidationError(_("Only managers can do this."))
 
     with transaction.atomic():
@@ -370,7 +370,7 @@ def can_delete_order(user, order: Order) -> bool:
     if order.status == Order.Status.CANCELLED:
         return False
 
-    if user.has_perm(MANAGE_ACCESS):
+    if is_manager(user):
         return True
 
     return (

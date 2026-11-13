@@ -31,7 +31,7 @@ class TestBuilderUsers(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.manager = make_user("manager", "manage_access")
+        cls.manager = make_user("manager", "admin_access")
         cls.builder = make_user("builder", "builder_access")
         cls.nobody = make_user("nobody")
         cls.permission = Permission.objects.get(codename="builder_access")
@@ -61,10 +61,31 @@ class TestBuilderUsers(TestCase):
         self.assertEqual(user.profile.state, state)  # the state must have stuck
         self.assertTrue(listed(user))
 
-    def test_superusers_are_listed(self):
-        root = User.objects.create_superuser("root", "root@example.com", "password")
+    def test_a_superuser_is_not_listed_by_being_one(self):
+        # Django
+        from django.contrib.auth import get_user_model
 
-        self.assertTrue(listed(root))
+        root = get_user_model().objects.create_superuser(
+            "root", "root@example.com", "password"
+        )
+
+        self.assertNotIn(root, list(builder_users()))
+
+    def test_a_superuser_with_a_permission_of_the_plugin_is_listed(self):
+        # Django
+        from django.contrib.auth import get_user_model
+        from django.contrib.auth.models import Permission
+
+        root = get_user_model().objects.create_superuser(
+            "root", "root@example.com", "password"
+        )
+        root.user_permissions.add(
+            Permission.objects.get(
+                content_type__app_label="evebuilders", codename="builder_access"
+            )
+        )
+
+        self.assertIn(root, list(builder_users()))
 
     def test_inactive_users_are_not_listed(self):
         User.objects.filter(pk=self.builder.pk).update(is_active=False)

@@ -31,7 +31,7 @@ class OrderListTestCase(TestCase):
         cls.eve_type = EveType.objects.create(
             id=597, name="Punisher", eve_group=group, published=True
         )
-        cls.manager = make_user("manager", "manage_access")
+        cls.manager = make_user("manager", "admin_access")
         cls.builder = make_user("builder", "builder_access")
         cls.base = cls._order(Order.AccessLevel.BASE)
         cls.middle = cls._order(Order.AccessLevel.MIDDLE)

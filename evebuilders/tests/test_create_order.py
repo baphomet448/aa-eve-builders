@@ -34,7 +34,7 @@ class TestCreateOrder(TestCase):
         cls.eve_type = EveType.objects.create(
             id=597, name="Punisher", eve_group=group, published=True
         )
-        cls.manager = make_user("manager", "manage_access")
+        cls.manager = make_user("manager", "admin_access")
 
     def _data(self, **overrides):
         data = {

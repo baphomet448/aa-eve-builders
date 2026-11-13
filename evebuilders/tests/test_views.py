@@ -67,7 +67,7 @@ class TestSettingsPage(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.manager = make_user("manager", "manage_access")
+        cls.manager = make_user("manager", "admin_access")
         cls.builder = make_user("builder", "builder_access")
 
     def test_anonymous_is_sent_to_login(self):
@@ -76,7 +76,7 @@ class TestSettingsPage(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn("login", response["Location"])
 
-    def test_builder_without_manage_access_is_refused(self):
+    def test_builder_without_admin_access_is_refused(self):
         self.client.force_login(self.builder)
 
         response = self.client.get(reverse("evebuilders:settings"))
@@ -109,7 +109,7 @@ class TestStartSync(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.manager = make_user("manager", "manage_access")
+        cls.manager = make_user("manager", "admin_access")
         cls.builder = make_user("builder", "builder_access")
 
     def test_get_is_not_allowed(self):

@@ -12,7 +12,7 @@ from django.utils.translation import gettext as _
 from evebuilders import __version__
 from evebuilders.contracts import ESI_BASE_URL, EsiError, EsiUnavailable
 from evebuilders.models import Destination, SolarSystem
-from evebuilders.permissions import MANAGE_ACCESS
+from evebuilders.permissions import is_manager
 
 PLACES_TIMEOUT = 15  # seconds
 SEARCH_MIN_LENGTH = 3
@@ -169,7 +169,7 @@ def add_destination(
     :return: The new place
     """
 
-    if not actor.has_perm(MANAGE_ACCESS):
+    if not is_manager(actor):
         raise ValidationError(_("Only managers can do this."))
 
     system = fetch_system(system_id)
