@@ -101,15 +101,16 @@
 
                 <div class="evb-row">
                     <dt>{% translate "Destination" %}</dt>
-                    <dd>{{ order.destination|default:"-" }}
-                        {% order_recipient order as recipient %}
-                        {% if recipient %}
-                            <div class="text-muted small">
-                                {% translate "Deliver to" %}: <strong>{{ recipient }}</strong>{% include 'evebuilders/copy_button.html' with text=recipient %}
-                            </div>
-                        {% endif %}
-                    </dd>
+                    <dd>{{ order.destination|default:"-" }}</dd>
                 </div>
+
+                {% order_recipient order as recipient %}
+                {% if recipient %}
+                    <div class="evb-row">
+                        <dt>{% translate "Deliver to" %}</dt>
+                        <dd>{{ recipient }}{% include 'evebuilders/copy_button.html' with text=recipient %}</dd>
+                    </div>
+                {% endif %}
 
                 <div class="evb-row">
                     <dt>{% translate "Note" %}</dt>

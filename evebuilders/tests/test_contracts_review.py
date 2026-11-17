@@ -134,6 +134,20 @@ class TestTheReviewPage(ReviewTestCase):
         self.assertContains(response, "No contracts are waiting for acceptance.")
         self.assertContains(response, "0 ISK")
 
+    def test_the_total_stands_in_the_row_of_the_filter(self):
+        html = self.cr_get(self.manager).content.decode()
+        form = html[html.index('<form method="get"') :]
+        form = form[: form.index("</form>")]
+
+        self.assertIn("Total cost of the contracts to buy out", form)
+        self.assertIn("ms-auto", form)
+
+    def test_the_plate_of_the_total_has_the_bigger_text(self):
+        response = self.cr_get(self.manager)
+
+        self.assertContains(response, 'class="evb-total border rounded')
+        self.assertContains(response, ".evb-total {")
+
 
 class TestTheTotal(ReviewTestCase):
     """The cost of the contracts to buy out"""
@@ -286,6 +300,12 @@ class TestBuyoutOnTheOrderList(ReviewTestCase):
         response = self.cr_orders(self.cr_plain)
 
         self.assertNotContains(response, "Buyout cost of the active orders")
+
+    def test_the_plate_has_the_bigger_text(self):
+        response = self.cr_orders(self.cr_officer)
+
+        self.assertContains(response, 'class="evb-total border rounded')
+        self.assertNotContains(response, 'class="text-muted small">Buyout cost')
 
 
 class TestTheMenu(ReviewTestCase):

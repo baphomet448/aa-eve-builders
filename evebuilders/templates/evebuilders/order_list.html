@@ -64,9 +64,9 @@
                     {% if request.user|can_manage %}
                         {% active_buyout_cost as buyout %}
                         <div class="col-auto ms-auto">
-                            <span class="border rounded px-2 py-1 text-nowrap"
+                            <span class="evb-total border rounded px-2 py-1 text-nowrap"
                                   title="{% translate 'Price per unit times what is not delivered yet, for all active orders. The sum goes down as items are delivered.' %}">
-                                <span class="text-muted small">{% translate "Buyout cost of the active orders" %}:</span>
+                                <span class="text-muted">{% translate "Buyout cost of the active orders" %}:</span>
                                 <strong>{{ buyout|isk }} ISK</strong>
                             </span>
                         </div>

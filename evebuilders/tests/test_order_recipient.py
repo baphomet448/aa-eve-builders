@@ -101,13 +101,13 @@ class TestRecipientOnTheList(RecipientTestCase):
 class TestRecipientOnTheCard(RecipientTestCase):
     """The field Destination of the order card"""
 
-    def test_the_card_says_to_whom_to_deliver(self):
+    def test_the_card_says_to_whom_to_deliver_in_a_field_of_its_own(self):
         self.rc_connect()
 
         response = self.rc_card(self.manager)
 
-        self.assertContains(response, "Deliver to")
-        self.assertContains(response, "<strong>Test Corp</strong>")
+        self.assertContains(response, "<dt>Deliver to</dt>")
+        self.assertContains(response, "<dd>Test Corp")
 
     def test_the_name_can_be_copied(self):
         self.rc_connect()
@@ -116,15 +116,24 @@ class TestRecipientOnTheCard(RecipientTestCase):
 
         self.assertContains(response, 'data-copy="Test Corp"')
 
-    def test_it_stands_under_the_station(self):
+    def test_the_field_follows_the_destination(self):
         self.rc_connect()
         Order.objects.filter(pk=self.order.pk).update(destination="Jita 4-4")
 
         content = self.rc_card(self.manager).content.decode()
 
         self.assertLess(
-            content.index("<dd>Jita 4-4"), content.index("<strong>Test Corp</strong>")
+            content.index("<dd>Jita 4-4"), content.index("<dt>Deliver to</dt>")
         )
+
+    def test_the_name_has_the_size_of_the_other_fields(self):
+        self.rc_connect()
+
+        content = self.rc_card(self.manager).content.decode()
+        row = content[content.index("<dt>Deliver to</dt>") :][:300]
+
+        self.assertNotIn("small", row)
+        self.assertNotIn("<strong>", row)
 
     def test_without_a_connection_nothing_is_shown(self):
         response = self.rc_card(self.manager)

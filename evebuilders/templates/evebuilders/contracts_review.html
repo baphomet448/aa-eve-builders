@@ -11,7 +11,7 @@
         </div>
         <div class="card-body">
             <form method="get" action="{% url 'evebuilders:contracts_review' %}"
-                  class="row g-2 mb-2 align-items-center">
+                  class="row g-2 mb-3 align-items-center">
                 <div class="col-12 col-md-4">
                     <input type="search" name="q" value="{{ result.query.text }}"
                            class="form-control form-control-sm"
@@ -23,14 +23,13 @@
                     <button type="submit" class="btn btn-sm btn-primary">{% translate "Filter" %}</button>
                     <a href="{% url 'evebuilders:contracts_review' %}" class="btn btn-sm btn-outline-secondary">{% translate "Reset" %}</a>
                 </div>
+                <div class="col-auto ms-auto">
+                    <span class="evb-total border rounded px-2 py-1 text-nowrap">
+                        <span class="text-muted">{% translate "Total cost of the contracts to buy out" %}:</span>
+                        <strong>{{ result.total|isk }} ISK</strong>
+                    </span>
+                </div>
             </form>
-
-            <div class="d-flex justify-content-end mb-2">
-                <span class="border rounded px-2 py-1 text-nowrap">
-                    <span class="text-muted small">{% translate "Total cost of the contracts to buy out" %}:</span>
-                    <strong>{{ result.total|isk }} ISK</strong>
-                </span>
-            </div>
 
             {% if result.rows %}
                 <div class="table-responsive">
