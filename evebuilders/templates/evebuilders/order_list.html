@@ -91,7 +91,7 @@
                                 {% if request.user|can_manage %}
                                     <th class="text-center" data-sort="number">{% translate "Access" %}</th>
                                 {% endif %}
-                                <th data-sort="text">{% translate "Destination" %}</th>
+                                <th class="text-end" data-sort="text">{% translate "Destination" %}</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -136,7 +136,7 @@
                                     <td class="text-nowrap">{{ order.due_date|date:"Y-m-d" }}</td>
                                     {% if request.user|can_manage %}
                                         <td class="text-center" data-value="{{ order.access_level|unlocalize }}">{% include 'evebuilders/level_badge.html' with level=order.access_level label=order.get_access_level_display %}</td>                                    {% endif %}
-                                    <td>{{ order.destination }}{% order_recipient order as recipient %}{% if recipient %}<div class="text-muted small">{% translate "Deliver to" %}: {{ recipient }}</div>{% endif %}</td>
+                                    <td class="text-end">{{ order.destination }}{% order_recipient order as recipient %}{% if recipient %}<div class="text-muted small">{% translate "Deliver to" %}: {{ recipient }}</div>{% endif %}</td>
                                     <td class="text-nowrap">
                                         {% if order.free > 0 and order.status != 'CANCELLED' %}
                                             <form method="post" action="{% url 'evebuilders:take_order' order.pk %}" class="d-flex gap-1">

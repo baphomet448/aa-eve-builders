@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [In Development] - Unreleased
 
+## [0.5.1] - 2026-11-17
+
+### Added
+
+- The command `evebuilders_reset_orders` clears the orders with their shares, contracts and
+  history and keeps the settings, the numbering of the orders and the levels. Without
+  `--yes` it only says what it would delete; `--keep NUMBER ...` keeps chosen orders.
+
 ## [0.5.0] - 2026-11-17
 
 ### Added

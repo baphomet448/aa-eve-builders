@@ -41,8 +41,8 @@
                                 <th><a href="{{ result.sort_links.item.url }}" class="text-reset text-decoration-none">{% translate "Item" %}{{ result.sort_links.item.arrow }}</a></th>
                                 <th class="text-end"><a href="{{ result.sort_links.price.url }}" class="text-reset text-decoration-none">{% translate "Price per unit" %}{{ result.sort_links.price.arrow }}</a></th>
                                 <th class="text-end"><a href="{{ result.sort_links.quantity.url }}" class="text-reset text-decoration-none">{% translate "Quantity" %}{{ result.sort_links.quantity.arrow }}</a></th>
-                                <th><a href="{{ result.sort_links.place.url }}" class="text-reset text-decoration-none">{% translate "Destination" %}{{ result.sort_links.place.arrow }}</a></th>
-                                <th><a href="{{ result.sort_links.builder.url }}" class="text-reset text-decoration-none">{% translate "Builder" %}{{ result.sort_links.builder.arrow }}</a></th>
+                                <th class="text-end"><a href="{{ result.sort_links.place.url }}" class="text-reset text-decoration-none">{% translate "Destination" %}{{ result.sort_links.place.arrow }}</a></th>
+                                <th class="text-end"><a href="{{ result.sort_links.builder.url }}" class="text-reset text-decoration-none">{% translate "Builder" %}{{ result.sort_links.builder.arrow }}</a></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -54,8 +54,8 @@
                                     <td class="text-nowrap">{% include 'evebuilders/item_icon.html' with type_id=row.record.order.eve_type_id %}{{ row.record.order.eve_type.name }}</td>
                                     <td class="text-end text-nowrap">{{ row.record.order.unit_price|isk }}</td>
                                     <td class="text-end">{{ row.record.quantity|intcomma }}</td>
-                                    <td>{{ row.record.order.destination|default:"-" }}</td>
-                                    <td>{{ row.builder|default:"-" }}</td>
+                                    <td class="text-end">{{ row.record.order.destination|default:"-" }}</td>
+                                    <td class="text-end">{{ row.builder|default:"-" }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

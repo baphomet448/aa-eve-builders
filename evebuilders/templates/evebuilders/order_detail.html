@@ -137,7 +137,7 @@
                     <table class="table table-sm align-middle">
                         <thead>
                             <tr>
-                                <th>{% translate "Builder" %}</th>
+                                <th class="text-end">{% translate "Builder" %}</th>
                                 <th class="text-end">{% translate "Taken" %}</th>
                                 <th class="text-end">{% translate "Ready" %}</th>
                                 <th class="text-end">{% translate "In contracts" %}</th>
@@ -149,7 +149,7 @@
                         <tbody>
                             {% for row in shares %}
                                 <tr>
-                                    <td>{{ row.name }}</td>
+                                    <td class="text-end">{{ row.name }}</td>
                                     <td class="text-end">{{ row.share.taken|intcomma }}</td>
                                     <td class="text-end">{{ row.share.credited|intcomma }}</td>
                                     <td class="text-end">{{ row.pending|intcomma }}</td>
@@ -230,7 +230,7 @@
                                 <th>{% translate "Contract" %}</th>
                                 <th>{% translate "State" %}</th>
                                 <th>{% translate "Title" %}</th>
-                                <th>{% translate "Builder" %}</th>
+                                <th class="text-end">{% translate "Builder" %}</th>
                                 <th class="text-end">{% translate "Quantity" %}</th>
                                 <th class="text-end">{% translate "Price" %}</th>
                                 <th>{% translate "Accepted by" %}</th>
@@ -252,7 +252,7 @@
                                         </span>
                                     </td>
                                     <td>{{ row.record.title|default:"-" }}</td>
-                                    <td>{{ row.builder }}</td>
+                                    <td class="text-end">{{ row.builder }}</td>
                                     <td class="text-end">{{ row.record.quantity|intcomma }}</td>
                                     <td class="text-end">{{ row.record.price|isk }}</td>
                                     <td>{{ row.acceptor|default:"-" }}</td>

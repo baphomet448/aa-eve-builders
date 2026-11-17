@@ -87,7 +87,7 @@ class TestRecipientOnTheList(RecipientTestCase):
 
         content = self.rc_list(self.manager).content.decode()
 
-        station = content.index("<td>Jita 4-4")
+        station = content.index('<td class="text-end">Jita 4-4')
         recipient = content.index("Deliver to: Test Corp", station)
         self.assertLess(station, recipient)
         self.assertLess(recipient - station, 200)
