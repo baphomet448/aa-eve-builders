@@ -318,6 +318,7 @@ python manage.py evebuilders_sync_contracts      # read and apply the contracts 
 python manage.py evebuilders_show_contracts      # show the corporation contracts as ESI gives them
 python manage.py evebuilders_load_systems        # (re)load the names of the solar systems
 python manage.py evebuilders_test_notification   # send a test message to Discord
+python manage.py evebuilders_reset_orders        # delete the orders and what belongs to them, the settings stay (dry run unless --yes; --keep NUMBER ...)
 ```
 
 Every command has `--help`. The names of the solar systems (used to search a system by

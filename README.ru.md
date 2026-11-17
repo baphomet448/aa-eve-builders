@@ -285,6 +285,7 @@ python manage.py evebuilders_sync_contracts      # прочитать и при�
 python manage.py evebuilders_show_contracts      # показать контракты корпорации так, как их отдаёт ESI
 python manage.py evebuilders_load_systems        # (пере)загрузить названия солнечных систем
 python manage.py evebuilders_test_notification   # отправить тестовое сообщение в Discord
+python manage.py evebuilders_reset_orders        # удалить заказы и всё, что к ним относится, настройки остаются (без --yes только показывает; --keep НОМЕР ...)
 ```
 
 У каждой команды есть `--help`. Названия систем (для поиска системы по части названия)
