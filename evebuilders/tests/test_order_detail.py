@@ -119,6 +119,14 @@ class TestOrderDetailPage(DetailTestCase):
         self.assertContains(response, "Wrong contract title")
         self.assertContains(response, "The price must be 100.00 ISK for 3 items.")
 
+    def test_the_table_of_the_builders_says_left_to_deliver(self):
+        self.client.force_login(self.manager)
+
+        response = self.client.get(self._url("order_detail"))
+
+        self.assertContains(response, "Left to deliver")
+        self.assertNotContains(response, "Not in a contract yet")
+
     def test_the_credit_form_offers_the_builders_problem_contracts_only(self):
         self._record(ContractRecord.State.INVALID, contract_id=555)
         self._record(ContractRecord.State.INVALID, contract_id=556, issuer=self.other)
