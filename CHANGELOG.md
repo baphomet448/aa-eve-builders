@@ -15,6 +15,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   history and keeps the settings, the numbering of the orders and the levels. Without
   `--yes` it only says what it would delete; `--keep NUMBER ...` keeps chosen orders.
 
+### Changed
+
+- Tables: the lines between the columns are continuous again (the short dashes of 0.5.0
+  are gone), a row no longer changes its colour under the mouse, and the columns
+  "Destination" and "Builder" are aligned to the right.
+- The card of the order: "Deliver to" is a field of its own, with the size of the other
+  fields (it was a small line under the station). In the table of the builders the column
+  "Not in a contract yet" is called "Left to deliver".
+- The plates with the total cost (the list of orders and the page of the contracts on
+  review) have a bigger text, and on the page of the contracts the total stands in the row
+  of the filter.
+
 ## [0.5.0] - 2026-11-17
 
 ### Added

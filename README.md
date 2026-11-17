@@ -101,7 +101,7 @@ There is no PyPI release: install the wheel from the release page. Activate the 
 environment of your Auth first.
 
 ```shell
-pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.5.0/aa_eve_builders-0.5.0-py3-none-any.whl
+pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.5.1/aa_eve_builders-0.5.1-py3-none-any.whl
 ```
 
 Add the apps to `INSTALLED_APPS` in your `local.py` (`eveuniverse` only if it is not
@@ -130,7 +130,7 @@ The image of Auth has no `git`, so use the wheel too. Add this line to
 `conf/requirements.txt`:
 
 ```text
-aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.5.0/aa_eve_builders-0.5.0-py3-none-any.whl
+aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.5.1/aa_eve_builders-0.5.1-py3-none-any.whl
 ```
 
 Add the `INSTALLED_APPS` lines and the scheduled tasks to `conf/local.py`. Then rebuild
