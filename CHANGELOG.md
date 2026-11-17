@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [In Development] - Unreleased
 
+## [0.5.0] - 2026-11-17
+
+### Added
+
+- The page **Contracts on review** for managers and admins, between "Corporate orders" and
+  "My orders": the contracts that wait for acceptance, with the order, the item, the price
+  per unit, the quantity in the contract, the place of delivery and the builder. It has a
+  filter, sorting and pages, and shows the total cost of the contracts to buy out (all
+  pages, with the filter applied). It can be used from a phone, without logging in to the
+  game.
+- The name of the person who accepted a contract is written to the history, in the column
+  "By" and in the text of the event. When Auth does not know the character, the name is
+  asked from ESI. The command `evebuilders_backfill_acceptors` puts the names into the
+  events that were written with a number: run it once after the update.
+- "Deliver to": the name the contract has to be made to is shown under the station, in the
+  column "Destination" of the list of orders and in the card of the order.
+- Stripes of lighter and darker rows in all the tables, and short dashes between the
+  columns.
+
+### Changed
+
+- The cost to buy out the active orders moved from the Statistics to the list of corporate
+  orders (managers see it next to the filters).
+- The history (Management, History, and the history of an order) is translated: the texts of
+  the events and the numbers are shown in the language of the reader. The event "Credited"
+  is called "Delivered".
+- The table of "My orders" no longer lets the columns run over each other in a narrow
+  window: it scrolls sideways.
+
+### Migrations
+
+- 0013: the field "who did it" of a history event (for people who are not users of Auth) and
+  the new name of the event "Delivered". **After the update run
+  `auth evebuilders_backfill_acceptors` once** (inside the container with Docker).
+
 ## [0.4.0] - 2026-11-13
 
 ### Changed

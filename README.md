@@ -66,8 +66,12 @@ ______________________________________________________________________
 - **English and Russian** interface.
 - **Convenience**: search and filters above the order list, item icons, buttons that copy
   an order number or a price, and dates in the time zone of your browser.
-- **Management**: three tabs (contracts, statistics with the cost to buy out the active
-  orders, and the history with a filter and pages).
+- **Management**: three tabs (contracts, statistics, and the history with a filter and
+  pages, translated, with the name of who accepted a contract).
+- **Contracts on review**: a page for managers (it works from a phone) with the contracts
+  that wait for acceptance and their total cost, so nobody has to log in to the game to
+  see what was delivered. The cost to buy out the active orders stands next to the
+  filters of the list of orders.
 
 ## How it works
 
@@ -97,7 +101,7 @@ There is no PyPI release: install the wheel from the release page. Activate the 
 environment of your Auth first.
 
 ```shell
-pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.4.0/aa_eve_builders-0.4.0-py3-none-any.whl
+pip install https://github.com/baphomet448/aa-eve-builders/releases/download/v0.5.0/aa_eve_builders-0.5.0-py3-none-any.whl
 ```
 
 Add the apps to `INSTALLED_APPS` in your `local.py` (`eveuniverse` only if it is not
@@ -126,7 +130,7 @@ The image of Auth has no `git`, so use the wheel too. Add this line to
 `conf/requirements.txt`:
 
 ```text
-aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.4.0/aa_eve_builders-0.4.0-py3-none-any.whl
+aa-eve-builders @ https://github.com/baphomet448/aa-eve-builders/releases/download/v0.5.0/aa_eve_builders-0.5.0-py3-none-any.whl
 ```
 
 Add the `INSTALLED_APPS` lines and the scheduled tasks to `conf/local.py`. Then rebuild
@@ -233,7 +237,7 @@ Subsystem, Structure, Structure Module and Fighter.
 ## Discord notifications
 
 Messages go to three channels, each with its own webhook: **New orders**, **On review**
-and **Everything else**. Set the webhooks in the plugin: **Settings, Discord** (managers
+and **Everything else**. Set the webhooks in the plugin: **Settings, Discord** (admins
 only). The address of a webhook is a secret (whoever has it can write to the channel), so
 it is never shown again: the page shows only the end of it, an empty field keeps the saved
 address, and only addresses of Discord are accepted. A change applies at once, no restart
@@ -271,6 +275,7 @@ command below posts a test message to the channels that have a webhook (it menti
 
 ```shell
 python manage.py evebuilders_test_notification
+python manage.py evebuilders_backfill_acceptors  # names of who accepted contracts into the history (once, after 0.5.0)
 ```
 
 | Channel   | What is sent                                                                                                                                                                                  |
@@ -333,6 +338,12 @@ With Docker change the version in the line of `conf/requirements.txt` (the tag a
 name of the file), then run `docker compose build`,
 `docker compose --env-file=.env up -d --force-recreate`, and `auth migrate` and
 `auth collectstatic --noinput` in the container.
+
+**Updating to 0.5.0 from an earlier version:** after the migration run
+`python manage.py evebuilders_backfill_acceptors` once (with Docker:
+`auth evebuilders_backfill_acceptors` in the container). It looks up the names of the
+characters that accepted contracts and are written in the history as a number. It needs
+the internet and is safe to run again.
 
 ## Known limitations
 
