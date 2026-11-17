@@ -5,24 +5,15 @@ from django.db.models import Q
 
 # Alliance Auth
 from allianceauth.authentication.models import CharacterOwnership
-from allianceauth.eveonline.models import EveCharacter
 
 # AA EVE Builders
+from evebuilders.event_text import event_texts
 from evebuilders.messages import display_name
 from evebuilders.models import ContractRecord
+from evebuilders.names import character_names
 from evebuilders.orders import pending_quantity, releasable_quantity, share_status
 
 EVENT_LIMIT = 100
-
-
-def _character_names(character_ids) -> dict:
-    """Names of the characters Auth knows, by character ID"""
-
-    return dict(
-        EveCharacter.objects.filter(character_id__in=set(character_ids)).values_list(
-            "character_id", "character_name"
-        )
-    )
 
 
 def contract_choices(share) -> list:
@@ -87,7 +78,7 @@ def contract_rows(order) -> list[dict]:
         .select_related("assignment__builder__profile__main_character")
         .order_by("-issued_at", "-created_at")
     )
-    names = _character_names(
+    names = character_names(
         [r.issuer_character_id for r in records]
         + [r.acceptor_character_id for r in records if r.acceptor_character_id]
     )
@@ -109,13 +100,20 @@ def contract_rows(order) -> list[dict]:
 
 
 def event_rows(order, limit: int = EVENT_LIMIT) -> list[dict]:
-    """The newest events of an order with the names of the people"""
+    """The newest events of an order with the names of the people and the texts"""
 
-    events = order.events.select_related("actor__profile__main_character").order_by(
-        "-created_at", "-pk"
-    )[:limit]
+    events = list(
+        order.events.select_related("actor__profile__main_character").order_by(
+            "-created_at", "-pk"
+        )[:limit]
+    )
+    texts = event_texts(events)
 
     return [
-        {"event": event, "actor": display_name(event.actor) if event.actor else ""}
+        {
+            "event": event,
+            "actor": display_name(event.actor) if event.actor else event.actor_label,
+            "text": texts[event.pk],
+        }
         for event in events
     ]

@@ -15,9 +15,6 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.translation import gettext as _
 
-# Alliance Auth
-from allianceauth.eveonline.models import EveCharacter
-
 # AA EVE Builders
 from evebuilders import app_settings
 from evebuilders.contracts import (
@@ -46,6 +43,7 @@ from evebuilders.models import (
     OrderAssignment,
     OrderEvent,
 )
+from evebuilders.names import character_name
 from evebuilders.notifications import CHANNEL_COMPLETE, notify
 from evebuilders.orders import recalculate_status
 from evebuilders.reasons import NOT_AVAILABLE, reason_fields
@@ -86,15 +84,12 @@ def _money(value: Decimal) -> Decimal:
 
 
 def _character_label(character_id: int) -> str:
-    """The name of a character if Auth knows it, otherwise its ID"""
+    """
+    The name of a character: Auth knows it, or ESI tells it (the sync may wait for
+    ESI), otherwise its ID
+    """
 
-    name = (
-        EveCharacter.objects.filter(character_id=character_id)
-        .values_list("character_name", flat=True)
-        .first()
-    )
-
-    return name or str(character_id)
+    return character_name(character_id)
 
 
 def _values(contract: dict, verdict: Verdict) -> dict:
@@ -112,7 +107,14 @@ def _values(contract: dict, verdict: Verdict) -> dict:
     }
 
 
-def _add_event(record: ContractRecord, kind: str, description: str) -> None:
+def _add_event(
+    record: ContractRecord,
+    kind: str,
+    description: str,
+    *,
+    actor=None,
+    actor_label: str = "",
+) -> None:
     """Write a history entry. Contracts without a known order have no history."""
 
     if record.order is None:
@@ -122,6 +124,8 @@ def _add_event(record: ContractRecord, kind: str, description: str) -> None:
         order=record.order,
         assignment=record.assignment,
         kind=kind,
+        actor=actor,
+        actor_label=actor_label,
         description=description,
     )
 
@@ -312,6 +316,8 @@ def _apply_credit(contract: dict, verdict: Verdict, now) -> int:
             OrderEvent.Kind.CREDITED,
             f"Credited {verdict.quantity} x {order.eve_type.name} "
             f"(contract {record.contract_id}), accepted by {accepted_by}",
+            actor=record.acceptor_user,
+            actor_label=accepted_by if acceptor_id else "",
         )
         recalculate_status(order)
 

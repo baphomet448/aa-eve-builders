@@ -12,6 +12,7 @@ from django.db.models.functions import Coalesce
 from django.utils.dateparse import parse_date
 
 # AA EVE Builders
+from evebuilders.event_text import event_texts
 from evebuilders.messages import display_name
 from evebuilders.models import OrderEvent
 
@@ -32,7 +33,9 @@ SORT_FIELDS = {
 
 # The name of the person who did it: the main character, or the login
 ACTOR_NAME = Coalesce(
-    "actor__profile__main_character__character_name", "actor__username"
+    "actor__profile__main_character__character_name",
+    "actor__username",
+    "actor_label",
 )
 
 
@@ -194,9 +197,15 @@ def history_result(params) -> HistoryResult:
     paginator = Paginator(_filtered(query), PAGE_SIZE)
     page = paginator.get_page(query.page)
 
+    events = list(page)
+    texts = event_texts(events)
     rows = [
-        {"event": event, "actor": display_name(event.actor) if event.actor else ""}
-        for event in page
+        {
+            "event": event,
+            "actor": display_name(event.actor) if event.actor else event.actor_label,
+            "text": texts[event.pk],
+        }
+        for event in events
     ]
 
     pages = []

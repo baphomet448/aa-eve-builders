@@ -200,7 +200,7 @@ class OrderEvent(models.Model):
         CONTRACT_FOUND = "CONTRACT_FOUND", _("Contract found")
         CONTRACT_INVALID = "CONTRACT_INVALID", _("Contract invalid")
         CONTRACT_CLOSED = "CONTRACT_CLOSED", _("Contract closed")
-        CREDITED = "CREDITED", _("Credited")
+        CREDITED = "CREDITED", _("Delivered")
         MANUAL_CREDIT = "MANUAL_CREDIT", _("Credited manually")
         LEVEL_CHANGED = "LEVEL_CHANGED", _("Builder level changed")
         ROLE_CHANGED = "ROLE_CHANGED", _("Builder role changed")
@@ -228,6 +228,7 @@ class OrderEvent(models.Model):
         blank=True,
         related_name="+",
     )
+    actor_label = models.CharField(max_length=100, blank=True, default="")
     description = models.TextField(blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
 

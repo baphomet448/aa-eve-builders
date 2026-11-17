@@ -1493,3 +1493,72 @@ msgstr "Номер заказа, предмет, место или строит�
 
 msgid "Contracts: %(total_contracts)s"
 msgstr "Контрактов: %(total_contracts)s"
+
+msgid "Delivered"
+msgstr "Доставлено"
+
+msgid "%(quantity)s × %(item)s, %(price)s ISK each"
+msgstr "%(quantity)s × %(item)s, по %(price)s ISK"
+
+msgid "Took %(quantity)s (now %(total)s in total)"
+msgstr "Взял %(quantity)s (всего у него %(total)s)"
+
+msgid "Gave back %(quantity)s (now %(total)s in total)"
+msgstr "Вернул %(quantity)s (всего у него %(total)s)"
+
+msgid "Released %(quantity)s from %(builder)s (now %(total)s in total)"
+msgstr "Освобождено %(quantity)s у %(builder)s (всего у него %(total)s)"
+
+msgid "Contract %(contract)s with %(quantity)s items waits for acceptance"
+msgstr "Контракт %(contract)s на %(quantity)s шт. ждёт принятия"
+
+msgid "Contract %(contract)s cannot be counted: %(reason)s"
+msgstr "Контракт %(contract)s нельзя засчитать: %(reason)s"
+
+msgid "Contract %(contract)s ended without being accepted (%(status)s)"
+msgstr "Контракт %(contract)s завершился без принятия (%(status)s)"
+
+msgid "Delivered %(quantity)s × %(item)s (contract %(contract)s), accepted by %(who)s"
+msgstr "Доставлено %(quantity)s × %(item)s (контракт %(contract)s), принял: %(who)s"
+
+msgid "unknown"
+msgstr "неизвестно"
+
+msgid "Credited manually %(quantity)s × %(item)s"
+msgstr "Зачтено вручную %(quantity)s × %(item)s"
+
+msgid "contract %(contract)s"
+msgstr "контракт %(contract)s"
+
+msgid "Order changed: %(changes)s"
+msgstr "Заказ изменён: %(changes)s"
+
+msgid "item"
+msgstr "предмет"
+
+msgid "price per unit"
+msgstr "цена за единицу"
+
+msgid "priority"
+msgstr "приоритет"
+
+msgid "due date"
+msgstr "срок сдачи"
+
+msgid "access level"
+msgstr "уровень доступа"
+
+msgid "destination"
+msgstr "доставка"
+
+msgid "note"
+msgstr "примечание"
+
+msgid "(empty)"
+msgstr "(пусто)"
+
+msgid "Level of %(name)s: %(old)s → %(new)s"
+msgstr "Уровень %(name)s: %(old)s → %(new)s"
+
+msgid "Role of %(name)s: %(old)s → %(new)s"
+msgstr "Роль %(name)s: %(old)s → %(new)s"

@@ -2,11 +2,11 @@
 
 # Alliance Auth
 from allianceauth.authentication.models import CharacterOwnership
-from allianceauth.eveonline.models import EveCharacter
 
 # AA EVE Builders
 from evebuilders.messages import display_name
 from evebuilders.models import ContractRecord, OrderAssignment, OrderEvent
+from evebuilders.names import character_names
 from evebuilders.orders import OPEN_STATUSES
 
 LIST_LIMIT = 100
@@ -14,13 +14,9 @@ EVENT_LIMIT = 50
 
 
 def _names(character_ids) -> dict:
-    """Names of the characters Auth knows, by character ID"""
+    """Names of the characters that are known, by character ID"""
 
-    return dict(
-        EveCharacter.objects.filter(character_id__in=set(character_ids)).values_list(
-            "character_id", "character_name"
-        )
-    )
+    return character_names(character_ids)
 
 
 def problem_contract_rows(limit: int = LIST_LIMIT) -> list[dict]:
