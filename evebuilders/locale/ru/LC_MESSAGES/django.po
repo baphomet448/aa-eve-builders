@@ -1478,3 +1478,6 @@ msgstr "Роль админа выдаётся только в админке Au
 
 msgid "The manager role of %(name)s comes from %(source)s: take it away there."
 msgstr "Роль менеджера у %(name)s идёт через «%(source)s»: снимите её там."
+
+msgid "Deliver to"
+msgstr "Кому сдавать"

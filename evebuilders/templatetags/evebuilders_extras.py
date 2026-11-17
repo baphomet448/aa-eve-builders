@@ -10,6 +10,8 @@ from django.contrib.humanize.templatetags.humanize import intcomma
 from django.utils.html import format_html
 
 # AA EVE Builders
+from evebuilders.models import ContractSource
+from evebuilders.orders import recipient_name
 from evebuilders.permissions import has_any_access, is_admin, is_manager
 
 register = template.Library()
@@ -89,3 +91,17 @@ def can_administer(user) -> bool:
     """Whether the user is an admin"""
 
     return is_admin(user)
+
+
+@register.simple_tag(takes_context=True)
+def order_recipient(context, order) -> str:
+    """
+    Who the items of an order are delivered to: the same name that the page My orders
+    shows. The connection is read once for a whole page.
+    """
+
+    render_context = context.render_context
+    if "evebuilders_source" not in render_context:
+        render_context["evebuilders_source"] = ContractSource.get_solo()
+
+    return recipient_name(order, render_context["evebuilders_source"])
