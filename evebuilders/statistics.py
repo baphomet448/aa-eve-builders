@@ -82,7 +82,6 @@ class Statistics:
     ships_built: int
     built_by_class: dict[str, int]
     active_orders: int
-    buyout_cost: Decimal
 
 
 def ship_class(group_name: str) -> str:
@@ -142,5 +141,4 @@ def collect_statistics() -> Statistics:
         ships_built=sum(built.values()),
         built_by_class=built,
         active_orders=Order.objects.filter(status__in=OPEN_STATUSES).count(),
-        buyout_cost=buyout_cost(),
     )

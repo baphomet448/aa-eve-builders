@@ -1,0 +1,103 @@
+{% extends 'evebuilders/base.html' %}
+
+{% load i18n %}
+{% load humanize %}
+{% load evebuilders_extras %}
+
+{% block details %}
+    <div class="card card-primary">
+        <div class="card-header">
+            <div class="card-title mb-0">{% translate "Contracts on review" %}</div>
+        </div>
+        <div class="card-body">
+            <form method="get" action="{% url 'evebuilders:contracts_review' %}"
+                  class="row g-2 mb-2 align-items-center">
+                <div class="col-12 col-md-4">
+                    <input type="search" name="q" value="{{ result.query.text }}"
+                           class="form-control form-control-sm"
+                           placeholder="{% translate 'Order number, item, destination or builder' %}">
+                </div>
+                <div class="col-auto">
+                    {% if result.query.sort != 'issued' %}<input type="hidden" name="sort" value="{{ result.query.sort }}">{% endif %}
+                    {% if result.query.direction != 'asc' %}<input type="hidden" name="dir" value="{{ result.query.direction }}">{% endif %}
+                    <button type="submit" class="btn btn-sm btn-primary">{% translate "Filter" %}</button>
+                    <a href="{% url 'evebuilders:contracts_review' %}" class="btn btn-sm btn-outline-secondary">{% translate "Reset" %}</a>
+                </div>
+            </form>
+
+            <div class="d-flex justify-content-end mb-2">
+                <span class="border rounded px-2 py-1 text-nowrap">
+                    <span class="text-muted small">{% translate "Total cost of the contracts to buy out" %}:</span>
+                    <strong>{{ result.total|isk }} ISK</strong>
+                </span>
+            </div>
+
+            {% if result.rows %}
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th><a href="{{ result.sort_links.order.url }}" class="text-reset text-decoration-none">{% translate "Order" %}{{ result.sort_links.order.arrow }}</a></th>
+                                <th><a href="{{ result.sort_links.item.url }}" class="text-reset text-decoration-none">{% translate "Item" %}{{ result.sort_links.item.arrow }}</a></th>
+                                <th class="text-end"><a href="{{ result.sort_links.price.url }}" class="text-reset text-decoration-none">{% translate "Price per unit" %}{{ result.sort_links.price.arrow }}</a></th>
+                                <th class="text-end"><a href="{{ result.sort_links.quantity.url }}" class="text-reset text-decoration-none">{% translate "Quantity" %}{{ result.sort_links.quantity.arrow }}</a></th>
+                                <th><a href="{{ result.sort_links.place.url }}" class="text-reset text-decoration-none">{% translate "Destination" %}{{ result.sort_links.place.arrow }}</a></th>
+                                <th><a href="{{ result.sort_links.builder.url }}" class="text-reset text-decoration-none">{% translate "Builder" %}{{ result.sort_links.builder.arrow }}</a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in result.rows %}
+                                <tr>
+                                    <td class="text-nowrap">
+                                        <a href="{% url 'evebuilders:order_detail' row.record.order.pk %}">{{ row.record.order.number }}</a>
+                                    </td>
+                                    <td class="text-nowrap">{% include 'evebuilders/item_icon.html' with type_id=row.record.order.eve_type_id %}{{ row.record.order.eve_type.name }}</td>
+                                    <td class="text-end text-nowrap">{{ row.record.order.unit_price|isk }}</td>
+                                    <td class="text-end">{{ row.record.quantity|intcomma }}</td>
+                                    <td>{{ row.record.order.destination|default:"-" }}</td>
+                                    <td>{{ row.builder|default:"-" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <span class="text-muted small">
+                        {% blocktranslate with total_contracts=result.count trimmed %}
+                            Contracts: {{ total_contracts }}
+                        {% endblocktranslate %}
+                        &middot;
+                        {% blocktranslate with number=result.page.number total=result.page.paginator.num_pages trimmed %}
+                            Page {{ number }} of {{ total }}
+                        {% endblocktranslate %}
+                    </span>
+
+                    {% if result.page.paginator.num_pages > 1 %}
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item {% if not result.previous_url %}disabled{% endif %}">
+                                <a class="page-link" href="{{ result.previous_url|default:'#' }}">{% translate "Previous page" %}</a>
+                            </li>
+                            {% for item in result.pages %}
+                                {% if item.gap %}
+                                    <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+                                {% else %}
+                                    <li class="page-item {% if item.current %}active{% endif %}">
+                                        <a class="page-link" href="{{ item.url }}">{{ item.number }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            <li class="page-item {% if not result.next_url %}disabled{% endif %}">
+                                <a class="page-link" href="{{ result.next_url|default:'#' }}">{% translate "Next page" %}</a>
+                            </li>
+                        </ul>
+                    {% endif %}
+                </div>
+            {% elif result.query.is_filtered %}
+                <p class="mb-0">{% translate "Nothing matches the filter." %}</p>
+            {% else %}
+                <p class="mb-0">{% translate "No contracts are waiting for acceptance." %}</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

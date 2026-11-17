@@ -28,6 +28,7 @@ urlpatterns = [
         name="management_statistics",
     ),
     path("management/history/", views.management_history, name="management_history"),
+    path("contracts/review/", views.contracts_review, name="contracts_review"),
     path("settings/", views.settings_view, name="settings"),
     path("settings/builders/", views.builder_levels_view, name="builder_levels"),
     path(

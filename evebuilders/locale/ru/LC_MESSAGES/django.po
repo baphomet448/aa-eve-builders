@@ -1481,3 +1481,15 @@ msgstr "Роль менеджера у %(name)s идёт через «%(source)s
 
 msgid "Deliver to"
 msgstr "Кому сдавать"
+
+msgid "Contracts on review"
+msgstr "Контракты на проверке"
+
+msgid "Total cost of the contracts to buy out"
+msgstr "Общая стоимость контрактов к выкупу"
+
+msgid "Order number, item, destination or builder"
+msgstr "Номер заказа, предмет, место или строитель"
+
+msgid "Contracts: %(total_contracts)s"
+msgstr "Контрактов: %(total_contracts)s"

@@ -13,6 +13,7 @@ from django.utils.html import format_html
 from evebuilders.models import ContractSource
 from evebuilders.orders import recipient_name
 from evebuilders.permissions import has_any_access, is_admin, is_manager
+from evebuilders.statistics import buyout_cost
 
 register = template.Library()
 
@@ -105,3 +106,10 @@ def order_recipient(context, order) -> str:
         render_context["evebuilders_source"] = ContractSource.get_solo()
 
     return recipient_name(order, render_context["evebuilders_source"])
+
+
+@register.simple_tag
+def active_buyout_cost():
+    """What it costs to buy out the active orders (the same sum the statistics had)"""
+
+    return buyout_cost()

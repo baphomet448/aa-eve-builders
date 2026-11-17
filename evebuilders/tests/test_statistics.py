@@ -17,7 +17,7 @@ from django.utils import timezone
 # AA EVE Builders
 from evebuilders.models import Order, OrderAssignment
 from evebuilders.orders import create_order, take_order
-from evebuilders.statistics import collect_statistics, ship_class
+from evebuilders.statistics import buyout_cost, collect_statistics, ship_class
 from evebuilders.tests.test_take_discard_views import ViewsTestCase
 from evebuilders.tests.test_views import TEST_STORAGES
 
@@ -96,7 +96,7 @@ class TestStatistics(StatisticsTestCase):
         self.assertEqual(stats.total_orders, 0)
         self.assertEqual(stats.ships_built, 0)
         self.assertEqual(stats.active_orders, 0)
-        self.assertEqual(stats.buyout_cost, Decimal("0"))
+        self.assertEqual(buyout_cost(), Decimal("0"))
         self.assertEqual(sum(stats.built_by_class.values()), 0)
 
     def test_the_total_does_not_count_cancelled_orders(self):
@@ -144,15 +144,15 @@ class TestStatistics(StatisticsTestCase):
         stats = collect_statistics()
 
         self.assertEqual(stats.active_orders, 1)
-        self.assertEqual(stats.buyout_cost, Decimal("100000"))
+        self.assertEqual(buyout_cost(), Decimal("100000"))
         self.assertEqual(active.quantity, 100)
 
     def test_the_buyout_cost_goes_down_as_items_are_delivered(self):
         order = self._ship_order("Battleship", quantity=100, price="1000")
 
-        before = collect_statistics().buyout_cost
+        before = buyout_cost()
         self._deliver(order, 50)
-        after = collect_statistics().buyout_cost
+        after = buyout_cost()
 
         self.assertEqual(before, Decimal("100000"))
         self.assertEqual(after, Decimal("50000"))
@@ -180,12 +180,9 @@ class TestStatisticsPage(StatisticsTestCase):
             "Frigates",
             "Capital ships",
             "Other ships",
-            "Buyout cost of the active orders",
-            "50,000 ISK",
         ):
             with self.subTest(text=text):
                 self.assertContains(response, text)
-        self.assertContains(response, 'data-copy="50000"')
 
     def test_a_builder_is_sent_away(self):
         self.assertEqual(self._page(self.builder).status_code, 302)
@@ -197,3 +194,8 @@ class TestStatisticsPage(StatisticsTestCase):
         self.assertLess(
             content.index("Current statistics"), content.index("General statistics")
         )
+
+    def test_the_buyout_cost_is_no_longer_on_the_statistics(self):
+        response = self._page(self.manager)
+
+        self.assertNotContains(response, "Buyout cost of the active orders")

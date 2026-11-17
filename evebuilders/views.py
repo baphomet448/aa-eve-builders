@@ -77,6 +77,7 @@ from evebuilders.places import (
     search_systems,
     system_stations,
 )
+from evebuilders.review import review_result
 from evebuilders.statistics import collect_statistics
 from evebuilders.sync import next_sync_time, sync_now
 
@@ -949,3 +950,19 @@ def discord_test(request: WSGIRequest) -> HttpResponse:
         messages.warning(request, _("Discord does not answer now. Try again later."))
 
     return redirect("evebuilders:discord_settings")
+
+
+@login_required
+@manager_required
+def contracts_review(request: WSGIRequest) -> HttpResponse:
+    """
+    The contracts that wait for acceptance, to look at from a phone (managers only)
+    :param request:
+    :return:
+    """
+
+    return render(
+        request,
+        "evebuilders/contracts_review.html",
+        {"result": review_result(request.GET)},
+    )

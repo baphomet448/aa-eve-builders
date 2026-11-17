@@ -61,6 +61,16 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary" data-filter-reset>{% translate "Reset" %}</button>
                         <span class="text-muted small ms-2">{% translate "Shown" %}: <span data-filter-count></span></span>
                     </div>
+                    {% if request.user|can_manage %}
+                        {% active_buyout_cost as buyout %}
+                        <div class="col-auto ms-auto">
+                            <span class="border rounded px-2 py-1 text-nowrap"
+                                  title="{% translate 'Price per unit times what is not delivered yet, for all active orders. The sum goes down as items are delivered.' %}">
+                                <span class="text-muted small">{% translate "Buyout cost of the active orders" %}:</span>
+                                <strong>{{ buyout|isk }} ISK</strong>
+                            </span>
+                        </div>
+                    {% endif %}
                 </div>
 
                 <div class="table-responsive">
