@@ -10,9 +10,25 @@
 {% block extra_css %}
     {{ block.super }}
     <style>
-        /* Vertical separators between the columns of every table of the plugin */
-        .table > :not(caption) > * > * + * {
-            border-left: 1px solid var(--bs-table-border-color, var(--bs-border-color, rgba(128, 128, 128, 0.35)));
+        /* The rows of every table of the plugin: lighter and darker in turns, like
+           the lines of the order card. The hover of Bootstrap still shows on top. */
+        .table > tbody > tr:nth-of-type(odd) > * {
+            background-color: rgba(128, 128, 128, 0.08);
+        }
+
+        /* Vertical separators between the columns: a short dash in every row that
+           does not reach the edges of the row. The horizontal lines stay as they are. */
+        .table > :not(caption) > * > * {
+            position: relative;
+        }
+        .table > :not(caption) > * > * + *::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0.35rem;
+            bottom: 0.35rem;
+            border-left: 1px solid rgba(128, 128, 128, 0.5);
+            pointer-events: none;
         }
     </style>
 {% endblock extra_css %}
