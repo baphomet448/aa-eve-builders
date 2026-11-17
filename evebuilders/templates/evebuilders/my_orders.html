@@ -185,4 +185,9 @@
 
 {% block extra_javascript %}
     {% include 'evebuilders/sortable_table.html' with table_id='evebuilders-my-orders' %}
+    <style>
+        /* The table never gets narrower than its content: when the window is narrow it
+           scrolls sideways instead of letting the columns run over each other */
+        #evebuilders-my-orders { width: max-content; min-width: 100%; }
+    </style>
 {% endblock %}

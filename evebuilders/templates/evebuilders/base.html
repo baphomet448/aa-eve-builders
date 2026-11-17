@@ -7,6 +7,16 @@
     PROB Builders
 {% endblock %}
 
+{% block extra_css %}
+    {{ block.super }}
+    <style>
+        /* Vertical separators between the columns of every table of the plugin */
+        .table > :not(caption) > * > * + * {
+            border-left: 1px solid var(--bs-table-border-color, var(--bs-border-color, rgba(128, 128, 128, 0.35)));
+        }
+    </style>
+{% endblock extra_css %}
+
 {% block header_nav_brand %}
     PROB Builders
 {% endblock header_nav_brand %}
